@@ -27,6 +27,7 @@ import { DatepickerComponent,
     MessageStickerComponent,
     MessageBoxComponent,
     GroupPickerComponent } from './components'
+    EllipsisComponent } from './components'
 import { AnchorDirective, 
     DynamicTemplateDirective,
     DynamicComponentDirective } from './directives'
@@ -66,6 +67,7 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
         MessageStickerComponent,
         MessageBoxComponent,
         GroupPickerComponent,
+        EllipsisComponent,
         // directives
         AnchorDirective,
         DynamicTemplateDirective,
@@ -103,6 +105,8 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
         MessageStickerComponent,
         MessageBoxComponent,
         GroupPickerComponent,
+        SimpleSelectComponent,
+        EllipsisComponent,
         // directives
         AnchorDirective,
         DynamicTemplateDirective,
