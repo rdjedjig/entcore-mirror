@@ -72,6 +72,8 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
         EllipsisComponent,
         PagerComponent,
         LengthPipe,
+        MessageStickerComponent, 
+        MessageBoxComponent,
         // directives
         AnchorDirective,
         DynamicTemplateDirective,
@@ -113,6 +115,8 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
         EllipsisComponent,
         PagerComponent,
         LengthPipe,
+        MessageStickerComponent, 
+        MessageBoxComponent,
         // directives
         AnchorDirective,
         DynamicTemplateDirective,
