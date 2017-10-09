@@ -2252,26 +2252,22 @@ i.fa {
 }
 
 .message {
-  border: 2px solid black;
-  font-weight: bold;
-  box-shadow: 2px 2px 5px $shadow-light;
-
-  &.is-success { border-color:  green; color: green;}
-  &.is-info { border-color:  blue; color: blue;}
-  &.is-danger { border-color: red; color: red;}
-  &.is-warning { border-color: orange; color: orange;}
-
-  p { margin : 0px ;}
-  .message-header {
-    padding: .25em;
-    background: black;
-    color:white;
-    font-size: 1.1em;
+    border: 2px solid black;
     font-weight: bold;
-  }
+    box-shadow: 2px 2px 5px $shadow-light;
+
+    p { margin : 0px ;}
+    .message-header {
+        padding: .25em;
+        background: black;
+        color:white;
+        font-size: 1.1em;
+        font-weight: bold;
+    }
     .message-body {
         padding: .5em;
         font-size: 0.9em;
+        font-weight: initial;
         background: white;
     }
 
@@ -2363,8 +2359,13 @@ wizard {
             background-color: $button-bg-hover ;
         }
     }
+    label {
+        min-width: 200px;
+        display: inline-block;
+    }
+
     nav.steps-progress-menu {
-        font-size: 1.05em;
+        font-size: 1.2em;
         font-weight: bold;
         color: $main-lighter;
         li { 
