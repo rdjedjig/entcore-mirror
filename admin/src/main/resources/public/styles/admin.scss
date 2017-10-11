@@ -1056,6 +1056,7 @@ div.panel-message {
     border-bottom: 1px solid $shadow-light;
 
     i.opener{ font-size: 1.3em }
+    message-sticker i.fa.is-info { color: white; }
 }
 .panel-section-content {
     font-size: 0.9em;
@@ -2244,17 +2245,11 @@ i.fa {
     padding: .5em;
 }
 
-i.fa {
-    &.is-succcess { color: green; }
-    &.is-info { color: blue; }
-    &.is-danger { color: red; }
-    &.is-warning { color: orange; }
-}
-
 .message {
     border: 2px solid black;
     font-weight: bold;
     box-shadow: 2px 2px 5px $shadow-light;
+    margin-bottom : 10px;
 
     p { margin : 0px ;}
     .message-header {
@@ -2345,6 +2340,19 @@ table {
             border-bottom: 1px solid grey;
             text-align: left;
         }
+    }
+}
+
+/* <message-sticker> */
+
+message-sticker {
+    i.fa {
+        transition: color 0.25s;
+        &.is-succcess { color: green; }
+        &.is-info { color: blue; }
+        &.is-danger { color: red; }
+        &.is-warning { color: orange; }
+        &:hover { color: $accent;}
     }
 }
 
