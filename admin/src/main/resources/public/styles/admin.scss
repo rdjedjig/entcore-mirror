@@ -1753,3 +1753,7 @@ div.flatpickr {
         }
     }
 }
+
+/* reset */
+
+div:focus { outline: 0; }
