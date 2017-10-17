@@ -41,6 +41,7 @@
     // "matieres.multi.combo.title": "Matières (enseignants)", // FIXME when user model updated
     "functionalGroups.multi.combo.title": "Groupes d'enseignement",
     "manualGroups.multi.combo.title": "Groupes ENT",
+    "ignore.activation": "Pas de filtre sur l'activation",
     "users.activated": "Utilisateurs activés",
     "users.not.activated": "Utilisateurs non activés",
     "new.user.creation": "Créer un utilisateur",
@@ -114,8 +115,15 @@
     "manage.widgets": "Gérer les widgets",
     "manage.applications": "Gérer les applications",
     "export.accounts": "Exporter des comptes",
+    "export": "Exporter",
+    "link": "Lien",
     "import.users": "Importer des utilisateurs",
     "massmail.accounts": "Publipostage des comptes",
+    "massmail.pdf": "PDF",
+    "massmail.mail": "Courriel",
+    "massmail.users.total": "comptes au total",
+    "massmail.users.nomail": "comptes sans adresse courrielle",
+    "massmail.filename": "publipostage_pdf",
     "switch.old.admin.console": "Version classique",
     "switch.old.admin.console.tooltip": "Quitter la version ALPHA et revenir à la version classique de la console d'administration",
     "no.user.found": "Aucun utilisateur trouvé",
@@ -226,5 +234,7 @@
     "applications.groups.structure": "Groupes d'établissement",
     "applications.classes": "Classes",
     "applications.groups.functional": "Groupes d'enseignement",
-    "applications.groups.manual": "Groupes manuels"
+    "applications.groups.manual": "Groupes manuels",
+    "users.with.mail": "Utilisateur avec courriel",
+    "users.without.mail": "Utilisateur sans courriel"
 }
