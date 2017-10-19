@@ -81,14 +81,13 @@ export class UserDetailsModel extends Model<UserDetailsModel> {
         return this.http.post(`/directory/user/function/${this.id}`, {
             functionCode: "ADMIN_LOCAL",
             inherit: "s",
-            scope: [structureId]
+            scope: this.functions[0][1] == null ? [structureId] : this.functions[0][1].concat(structureId)
         }).then(() => {
-            if (this.isAdml()) {
+            if (this.functions[0][0] === 'ADMIN_LOCAL') {
                 this.functions[0][1].push(structureId)
             } else {
                 this.functions = [[ 'ADMIN_LOCAL', [ structureId ]]]
             }
-
         })
     }
 
@@ -98,10 +97,11 @@ export class UserDetailsModel extends Model<UserDetailsModel> {
         })
     }
 
-    isAdml() {
+    isAdml(structureId?: string) {
         return this.functions && this.functions.length > 0 
             && this.functions[0] && this.functions[0].length > 0 
             && this.functions[0][0] === 'ADMIN_LOCAL'
+            && this.functions[0][1].includes(structureId)
     }
 
     toJSON() {
