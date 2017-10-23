@@ -211,7 +211,7 @@ export class MassMailComponent implements OnInit, OnDestroy {
         console.log(this.data)
     }
 
-    private async processMassMail(type: String) {
+    async processMassMail(type: String) {
         let outputModels = this.listFilters.getFormattedOutputModels();
         let params: any = {
             p: outputModels['type'],
@@ -241,7 +241,7 @@ export class MassMailComponent implements OnInit, OnDestroy {
             })
     }
 
-    private deselect(filter, item) {
+    deselect(filter, item) {
         filter.outputModel.splice(filter.outputModel.indexOf(item), 1)
         filter.observable.next()
     }
