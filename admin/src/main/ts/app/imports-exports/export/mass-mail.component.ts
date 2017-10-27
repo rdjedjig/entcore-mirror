@@ -128,7 +128,7 @@ export class MassMailComponent implements OnInit, OnDestroy {
         private ns: NotifyService,
         private spinner: SpinnerService,
     ) { }
-    sortObject = {lastName: String, firstName: String, classesStr: String};
+    sortObject = {lastName: '', firstName: '', classesStr: ''};
     dataSubscriber: Subscription
     routerSubscriber: Subscription
     countUsers = 0;
@@ -218,27 +218,25 @@ export class MassMailComponent implements OnInit, OnDestroy {
             c: outputModels['classes'].map(c => c.id),
             a: 'all'
         }
+        let blob;
         if (outputModels['email'].length == 1) {
             params.mail = outputModels['email'][0].indexOf('users.with.mail') >= 0;
         }
-        console.log(params)
         if (outputModels['code'].length == 1) {
-            
             params.a = outputModels['code'][0].indexOf('users.activated') >= 0;
-            
         }
-        console.log(params) 
-       this.spinner.perform('portal-content', MassMailService.massMailProcess(this.structureId, type, params))
-            .then(blob => {
-                if (type.indexOf("pdf") > -1) {
-                    this.ajaxDownload(blob, this.translate("massmail.filename") + ".pdf");
-                    this.ns.success("massmail.pdf.done");
-                } else {
-                    this.ns.success("massmail.mail.done");
-                }
-            }).catch(err => {
-                this.ns.error("massmail.error", "error", err);
-            })
+       try {
+           blob = await this.spinner.perform('portal-content', MassMailService.massMailProcess(this.structureId, type, params));
+       } catch (error) {
+           this.ns.error("massmail.error", "error", error);
+           return
+       }
+       if (type.indexOf("pdf") > -1) {
+          this.ajaxDownload(blob, this.translate("massmail.filename") + ".pdf");
+          this.ns.success("massmail.pdf.done");
+       } else {
+          this.ns.success("massmail.mail.done");
+       }
     }
 
     deselect(filter, item) {
