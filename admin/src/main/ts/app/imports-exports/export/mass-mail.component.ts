@@ -14,8 +14,11 @@ import { BundlesService } from 'sijil'
     selector: 'mass-mail',
     template: `
             <side-layout [showCompanion]="true">
-            <div side-card>
-            <div class="padded">
+            <div side-card class="filters padded">
+            <a><s5l>filters</s5l> : </a><i class="fa fa-filter" (click)="show = !show" 
+            [tooltip]="'filters' | translate"></i>
+            <div [hidden]="!show" >
+            <i class="fa fa-close close" (click)="show=false"></i>
             <div *ngFor="let filter of listFilters.filters">
                 <div *ngIf="filter.comboModel.length > 0">
                     <multi-combo
@@ -40,23 +43,22 @@ import { BundlesService } from 'sijil'
                     </div>
                 </div>
             </div>
-
             </div>
             </div>
-            <div side-companion class="padded">
-                <a>Lancer le publipostage : </a>
+            <div side-card class="padded">
+                <div style="text-align: center">
+                    <div >{{countUsers}} <s5l>massmail.users.total</s5l></div>
+                    <div >{{countUsersWithoutMail}} <s5l>massmail.users.nomail</s5l></div>
+                </div>
+                    <a><s5l>process.massmail</s5l> : </a>
                 <button class="cell" (click)="processMassMail('pdf')">
                     <s5l>massmail.pdf</s5l>
                 </button>
                 <button class="cell" (click)="processMassMail('mail')">
                     <s5l>massmail.mail</s5l>
                 </button>
-                <div style="text-align: center">
-                    <div >{{countUsers}} <s5l>massmail.users.total</s5l></div>
-                    <div >{{countUsersWithoutMail}} <s5l>massmail.users.nomail</s5l></div>
-                </div>
             </div>
-            <div side-companion>
+            <div side-card>
             
             <hr>
             
@@ -66,9 +68,9 @@ import { BundlesService } from 'sijil'
                     <tr>
                         <th (click)="setUserOrder('lastName')"><s5l>lastName</s5l></th>
                         <th (click)="setUserOrder('firstName')"><s5l>firstName</s5l></th>
-                        <th (click)="setUserOrder('profile')"><s5l>profile</s5l></th>
+                        <th (click)="setUserOrder('type')"><s5l>profile</s5l></th>
                         <th (click)="setUserOrder('login')"><s5l>login</s5l></th>
-                        <th (click)="setUserOrder('activationCode')"><s5l>activation.code</s5l></th>
+                        <th (click)="setUserOrder('code')"><s5l>activation.code</s5l></th>
                         <th (click)="setUserOrder('email')"><s5l>email</s5l></th>
                         <th (click)="setUserOrder('classesStr')"><s5l>create.user.classe</s5l></th>
                         <th><s5l>link</s5l></th>
@@ -140,6 +142,7 @@ export class MassMailComponent implements OnInit, OnDestroy {
     addFilter = false;
     downloadAnchor = null;
     downloadObjectUrl = null;
+    show: boolean = false;
 
     translate = (...args) => { return (<any>this.bundles.translate)(...args) }
 
