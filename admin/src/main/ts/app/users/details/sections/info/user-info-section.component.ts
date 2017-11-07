@@ -190,11 +190,6 @@ export class UserInfoSection extends AbstractSection implements OnInit {
     }
 
     getStructures(fn) {
-        let list = fn.includes(this.structure.id) ? this.getStructure(this.structure.id).name : this.getStructure(fn[0]).name;
-        if (fn.length > 1) {
-            fn.splice(fn.indexOf(this.structure.id), 1);
-            list = list + ', ' + fn.map(id => this.getStructure(id).name).join(', ');
-        }
-        return list;
+        return fn.map((id: string) => this.getStructure(id).name).join(', ');
     }
 }
