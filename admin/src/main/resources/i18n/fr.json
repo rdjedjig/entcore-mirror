@@ -123,7 +123,7 @@
     "massmail.accounts": "Publipostage des comptes",
     "massmail.pdf": "PDF",
     "massmail.mail": "Courriel",
-    "massmail.users.total": "comptes au total",
+    "massmail.users.total": "comptes sélectionnés au total",
     "massmail.users.nomail": "comptes sans adresse courrielle",
     "massmail.filename": "publipostage_pdf",
     "massmail.filters" : "Filtrer la liste à publiposter ",

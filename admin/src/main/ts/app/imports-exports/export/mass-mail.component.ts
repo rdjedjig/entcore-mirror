@@ -8,6 +8,7 @@ import { SpinnerService } from '../../core/services/spinner.service'
 import { StructureModel, UserModel } from '../../core/store'
 import { MassMailService } from './mass-mail.service'
 import { BundlesService } from 'sijil'
+import { FilterPipe } from 'infra-components'
 
 
 @Component({
@@ -26,7 +27,6 @@ import { BundlesService } from 'sijil'
                         [title]="filter.label | translate"
                         [display]="filter.display || translate"
                         [orderBy]="filter.order || orderer"
-                        [filter]="resetCount()"
                     ></multi-combo>
                     <div class="multi-combo-companion">
                         <div *ngFor="let item of filter.outputModel"
@@ -37,7 +37,7 @@ import { BundlesService } from 'sijil'
                             <span *ngIf="!filter.display">
                                 {{ item | translate }}
                             </span>
-                            <i class="fa fa-trash" (click)="check()"></i>
+                            <i class="fa fa-trash"></i>
                         </div>
                     </div>
                 </div>
@@ -91,8 +91,7 @@ import { BundlesService } from 'sijil'
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let user of (data | filter: filters | filter: sortObject) | orderBy: userOrder; ">
-                        {{count(user)}}
+                    <tr *ngFor="let user of (getData() | filter: sortObject) | orderBy: userOrder ">
                         <td> 
                         <i class="fa fa-lock"  *ngIf="user?.code && user?.code?.length > 0"
                         [tooltip]="'user.icons.tooltip.inactive' | translate"></i> {{user.lastName}}</td>
@@ -111,7 +110,7 @@ import { BundlesService } from 'sijil'
                         </td>
                 
                 </tbody>
-</table>
+            </table>
             </div>
         </side-layout>`,
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -250,16 +249,18 @@ export class MassMailComponent implements OnInit, OnDestroy {
         this.userOrder = this.userOrder === order ? '-' + order : order;
     }
 
-    resetCount() {
+    getData(){
+        let users = FilterPipe.prototype.transform(this.data, this.filters) || []
         this.countUsers = 0;
         this.countUsersWithoutMail = 0;
-    }
+        users.forEach( user => {
+            this.countUsers++;
+            if (!user.email)
+                this.countUsersWithoutMail++;
+        })
+        return users;
 
-    count(user) {
-        this.countUsers++;
-        if (!user.email)
-            this.countUsersWithoutMail++;
-    }
+    }   
 }
 
 export class MailFilter extends UserFilter<string> {
