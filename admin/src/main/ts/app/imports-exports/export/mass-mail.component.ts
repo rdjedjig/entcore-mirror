@@ -15,8 +15,7 @@ import { BundlesService } from 'sijil'
     template: `
             <side-layout [showCompanion]="true">
             <div side-card class="filters padded">
-            <a><s5l>filters</s5l> : </a><i class="fa fa-filter" (click)="show = !show" 
-            [tooltip]="'filters' | translate"></i>
+            <i class="fa fa-filter"><a (click)="show = !show"><s5l>massmail.filters</s5l></a></i>
             <div [hidden]="!show" >
             <i class="fa fa-close close" (click)="show=false"></i>
             <div *ngFor="let filter of listFilters.filters">
@@ -66,20 +65,20 @@ import { BundlesService } from 'sijil'
             <table>
                 <thead>
                     <tr>
-                        <th (click)="setUserOrder('lastName')"><s5l>lastName</s5l></th>
-                        <th (click)="setUserOrder('firstName')"><s5l>firstName</s5l></th>
-                        <th (click)="setUserOrder('type')"><s5l>profile</s5l></th>
-                        <th (click)="setUserOrder('login')"><s5l>login</s5l></th>
-                        <th (click)="setUserOrder('code')"><s5l>activation.code</s5l></th>
-                        <th (click)="setUserOrder('email')"><s5l>email</s5l></th>
-                        <th (click)="setUserOrder('classesStr')"><s5l>create.user.classe</s5l></th>
+                        <th (click)="setUserOrder('lastName')"><i class="fa fa-sort"></i><s5l>lastName</s5l></th>
+                        <th (click)="setUserOrder('firstName')"><i class="fa fa-sort"></i><s5l>firstName</s5l></th>
+                        <th (click)="setUserOrder('type')"><i class="fa fa-sort"></i><s5l>profile</s5l></th>
+                        <th (click)="setUserOrder('login')"><i class="fa fa-sort"></i><s5l>login</s5l></th>
+                        <th (click)="setUserOrder('code')"><i class="fa fa-sort"></i><s5l>activation.code</s5l></th>
+                        <th (click)="setUserOrder('email')"><i class="fa fa-sort"></i><s5l>email</s5l></th>
+                        <th (click)="setUserOrder('classesStr')"><i class="fa fa-sort"></i><s5l>create.user.classe</s5l></th>
                         <th><s5l>link</s5l></th>
                     </tr>
                     <tr>    
                         <th>
-                            <input class="twelve" type="text" [(ngModel)]="sortObject.lastName" placeholder="search"/></th>
+                            <input class="twelve" type="text" [(ngModel)]="sortObject.lastName" [attr.placeholder]="'search' | translate"/></th>
                         <th>
-                            <input type="text" [(ngModel)]="sortObject.firstName" placeholder="search"/>
+                            <input type="text" [(ngModel)]="sortObject.firstName" [attr.placeholder]="'search' | translate"/>
                         </th>
                         <th>
                         </th>
@@ -87,7 +86,7 @@ import { BundlesService } from 'sijil'
                         <th></th>
                         <th></th>
                         <th>
-                            <input type="text" [(ngModel)]="sortObject.classesStr" placeholder="search"/>
+                            <input type="text" [(ngModel)]="sortObject.classesStr" [attr.placeholder]="'search' | translate"/>
                         </th>
                     </tr>
                 </thead>
@@ -231,14 +230,14 @@ export class MassMailComponent implements OnInit, OnDestroy {
        try {
            blob = await this.spinner.perform('portal-content', MassMailService.massMailProcess(this.structureId, type, params));
        } catch (error) {
-           this.ns.error("massmail.error", "error", error);
+           this.ns.error(this.translate("massmail.error"), "error", error);
            return
        }
        if (type.indexOf("pdf") > -1) {
           this.ajaxDownload(blob, this.translate("massmail.filename") + ".pdf");
-          this.ns.success("massmail.pdf.done");
+          this.ns.success(this.translate("massmail.pdf.done"));
        } else {
-          this.ns.success("massmail.mail.done");
+          this.ns.success(this.translate("massmail.mail.done"));
        }
     }
 

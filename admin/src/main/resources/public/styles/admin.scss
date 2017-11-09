@@ -1528,6 +1528,9 @@ mass-mail{
         padding: 5px;
         border-bottom:1px solid grey;
     }
+    th{
+        text-align: left;
+    }
     tr {
         &:hover {
             cursor: pointer;
