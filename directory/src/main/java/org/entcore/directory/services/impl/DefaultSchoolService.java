@@ -364,7 +364,7 @@ public class DefaultSchoolService implements SchoolService {
 			UserInfos.Function f = userInfos.getFunctions().get(ADMIN_LOCAL);
 			List<String> scope = f.getScope();
 			if (scope != null && !scope.isEmpty()) {
-				condition += "AND s.id IN {scope} ";
+				condition += "WHERE s.id IN {scope} ";
 				params.putArray("scope", new JsonArray(scope.toArray()));
 			}
 		}
