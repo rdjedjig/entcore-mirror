@@ -46,7 +46,6 @@ export class ImportsExportsRoot implements OnInit, OnDestroy {
         // Watch selected structure
         this.structureSubscriber = routing.observe(this.route, "data").subscribe((data: Data) => {
             if(data['structure']) {
-                console.log('structure ' + data['structure'].UAI); 
                 this.cdRef.markForCheck()
             }
         })
