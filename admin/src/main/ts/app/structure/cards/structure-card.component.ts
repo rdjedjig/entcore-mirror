@@ -10,7 +10,7 @@ import { Component, ChangeDetectionStrategy } from '@angular/core'
             </span>
         </div>
         <div class="card-body">
-            <button disabled title="En construction">
+            <button routerLink="services/connectors">
                 <i class="fa fa-plug"></i>
                 <s5l>manage.connectors</s5l>
             </button>
