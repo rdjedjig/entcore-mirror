@@ -34,7 +34,7 @@ import { Subscription } from 'rxjs/Subscription'
                 <i class="fa fa-exchange"
                     *ngIf="currentStructure"
                     [tooltip]="'imports.exports' | translate"
-                    [routerLink]="'/admin/' + currentStructure?.id + '/imports-exports/import-csv'"
+                    [routerLink]="'/admin/' + currentStructure?.id + '/imports-exports/export'"
                     [class.active]="router.isActive('/admin/' + currentStructure?.id + '/imports-exports', false)"></i>
                 <i class="fa fa-th"
                     *ngIf="currentStructure"
