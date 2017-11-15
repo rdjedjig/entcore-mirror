@@ -7,7 +7,7 @@ import { StructureModel } from '../../core/store'
 @Component({
     selector: 'export',
     template: `
-        <div class="container">
+        <div class="container has-shadow">
             <h2><s5l>export.configuration</s5l></h2>
 
             <form class="has-vertical-padding">
