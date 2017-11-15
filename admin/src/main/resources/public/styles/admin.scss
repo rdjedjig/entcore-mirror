@@ -279,8 +279,16 @@ ul {
     padding: 10px 0px;
 }
 
+.is-pulled-left {
+    float: left;
+}
+
 .is-pulled-right {
     float: right;
+}
+
+.is-clearfix {
+    clear: both;
 }
 
 /* UX */
@@ -1634,10 +1642,15 @@ app-details {
 }
 
 mass-mail{
+    button:hover {
+        i.filters-toggle {
+            color: white;
+        }
+    }
+
     .filters-toggle {
-        cursor: pointer;
+        color: $accent;
         font-size: 1.5em;
-        padding-left: 0px;
     }
 
     .filtersOn {
