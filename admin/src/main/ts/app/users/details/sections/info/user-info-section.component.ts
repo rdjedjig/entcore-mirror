@@ -40,13 +40,15 @@ import { SpinnerService, NotifyService, PlateformeInfoService } from '../../../.
                 <i class="fa fa-cog"></i>
             </button>
             <div *ngFor="let function of details.functions">
-                {{ function[0] | translate }}
-                <span *ngIf="function[1] && function[1].length > 0 && getStructure(function[1][0])">
-                    ({{ getStructures(function[1]) }})
-                </span>
-                <span *ngIf="function[1] && function[1].length > 0 && !getStructure(function[1][0])">
-                    ({{ 'member.of.n.structures' | translate:{ count: function[1].length } }})
-                </span>
+                <div class="adml-listing">
+                    {{ function[0] | translate }}
+                    <span *ngIf="function[1] && function[1].length > 0 && getStructure(function[1][0])">
+                        ({{ getStructures(function[1]) }})
+                    </span>
+                    <span *ngIf="function[1] && function[1].length > 0 && !getStructure(function[1][0])">
+                        ({{ 'member.of.n.structures' | translate:{ count: function[1].length } }})
+                    </span>
+                </div>
                 <button *ngIf="details.isAdml(this.structure.id)" 
                     (click)="removeAdml()">
                     <s5l>adml.remove</s5l>
@@ -117,7 +119,8 @@ export class UserInfoSection extends AbstractSection implements OnInit {
                 this.ns.success({
                         key: 'notify.user.add.adml.content',
                         parameters: {user: this.user.firstName + ' ' + this.user.lastName}
-                    }, 'notify.user.add.adml.title')
+                    }, 'notify.user.add.adml.title');
+                this.cdRef.markForCheck();
             }).catch(err => {
                 this.ns.error({
                         key: 'notify.user.add.adml.error.content',

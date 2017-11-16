@@ -83,12 +83,10 @@ export class UserDetailsModel extends Model<UserDetailsModel> {
             functionCode: "ADMIN_LOCAL",
             inherit: "s",
             scope: this.functions[0][1] == null ? [structureId] : this.functions[0][1].concat(structureId)
-        }).then(() => {
-            if (this.functions[0][0] === 'ADMIN_LOCAL') {
-                this.functions[0][1].push(structureId)
-            } else {
-                this.functions = [[ 'ADMIN_LOCAL', [ structureId ]]]
-            }
+        }).then(async (res) => {
+            await this.http.get(`/directory/user/${this.id}/functions`).then((res) => {
+                this.functions = res.data[0].functions;
+            })
         })
     }
 
