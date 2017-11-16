@@ -66,7 +66,7 @@ import { UsersStore } from '../users.store'
             </button>
         </div>
 
-        <div class="panel-message yellow" *ngIf="user?.disappearanceDate">
+        <div class="panel-message yellow" *ngIf="!user?.deleteDate && user?.disappearanceDate">
             <i class="fonticon waiting-predelete"></i>
             <s5l>user.predeleted.waiting</s5l>
         </div>
@@ -283,8 +283,8 @@ export class UserDetails implements OnInit, OnDestroy{
     }
 
     isRemovable() {
-        return (this.user.disappearanceDate 
-            || (this.user.source !== 'AAF' && this.user.source !== "AAF1D")
+        return ((this.user.disappearanceDate 
+            || (this.user.source !== 'AAF' && this.user.source !== "AAF1D"))
             && !this.user.deleteDate)
     }
 

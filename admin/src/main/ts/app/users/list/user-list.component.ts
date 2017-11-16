@@ -60,7 +60,7 @@ import { UserModel } from '../../core/store/models'
                     *ngIf="item?.deleteDate"
                     [tooltip]="'user.icons.tooltip.deleted' | translate"></i>
                 <i class="fonticon waiting-predelete" 
-                    *ngIf="item?.disappearanceDate"
+                    *ngIf="!item?.deleteDate && item?.disappearanceDate"
                     [tooltip]="'user.icons.tooltip.disappeared' | translate"></i>
             </span>
             <i class="profile" [ngClass]="item.type">{{item.type | translate}}</i>
