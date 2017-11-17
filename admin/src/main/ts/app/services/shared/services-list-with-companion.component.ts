@@ -75,15 +75,15 @@ export class ServicesListWithCompanionComponent implements AfterViewInit {
             collection: this.servicesStore.structure.applications.data, 
             model: this.servicesStore.application, 
             routeData: 'apps',
-            searchPlaceholder: 'search.application',
-            noResultsLabel: 'list.results.no.applications'
+            searchPlaceholder: 'services.application.search',
+            noResultsLabel: 'services.application.list.empty'
         },
         connectors : {
             collection: this.servicesStore.structure.connectors.data, 
             model:this.servicesStore.connector, 
             routeData:'connectors',
-            searchPlaceholder:'search.connector',
-            noResultsLabel:'list.results.no.connectors'
+            searchPlaceholder:'services.connector.search',
+            noResultsLabel:'services.connector.list.empty'
         }
     }
 
