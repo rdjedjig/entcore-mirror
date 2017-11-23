@@ -38,6 +38,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -261,6 +263,21 @@ public class DefaultAppRegistryService implements AppRegistryService {
 			handler.handle(new Either.Left<String, JsonObject>("invalid.arguments"));
 		}
 	}
+
+    @Override
+    public void linkGroupsToRole(List<String> groups, String roleId, Handler<Either<String, JsonObject>> handler) {
+        JsonObject params = new JsonObject();
+        params.putArray("groups", new JsonArray(groups));
+        params.putString("roleId", roleId);
+        if (groups.size() == 0 || (roleId != null && !roleId.trim().isEmpty())) {
+            String query = "MATCH (r:Role), (g:Group) " +
+                    "WHERE r.id = {roleId} and g.id IN {groups} " +
+                    "CREATE UNIQUE (g)-[:AUTHORIZED]->(r)";
+            neo.execute(query, params, Neo4jResult.validEmptyHandler(handler));
+        }  else {
+            handler.handle(new Either.Left<String, JsonObject>("invalid.arguments"));
+        }
+    }
 
 	@Override
 	public void deleteGroupLink(String groupId, String roleId, Handler<Either<String, JsonObject>> handler) {

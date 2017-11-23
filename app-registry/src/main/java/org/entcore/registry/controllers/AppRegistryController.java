@@ -36,11 +36,7 @@ import org.entcore.common.http.filter.AdminFilter;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserUtils;
 import org.entcore.common.utils.StringUtils;
-import org.entcore.registry.filters.ApplicationFilter;
-import org.entcore.registry.filters.LinkRoleGroupFilter;
-import org.entcore.registry.filters.RoleFilter;
-import org.entcore.registry.filters.RoleGroupFilter;
-import org.entcore.registry.filters.SuperAdminFilter;
+import org.entcore.registry.filters.*;
 import org.entcore.registry.services.AppRegistryService;
 import org.entcore.registry.services.impl.DefaultAppRegistryService;
 import org.vertx.java.core.Handler;
@@ -57,6 +53,7 @@ import static org.entcore.common.bus.BusResponseHandler.busResponseHandler;
 import static org.entcore.common.http.response.DefaultResponseHandler.*;
 
 import java.net.URL;
+import java.util.List;
 
 public class AppRegistryController extends BaseController {
 
@@ -215,6 +212,15 @@ public class AppRegistryController extends BaseController {
 		final String roleId = request.params().get("roleId");
 		appRegistryService.addGroupLink(groupId, roleId, defaultResponseHandler(request));
 	}
+
+    @Put("/authorize/groups/role/:roleId")
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(AdminGroupFilter.class)
+    public void linksGroupToRole(final HttpServerRequest request) {
+        final List<String> groups = request.params().getAll("groupId");
+        final String roleId = request.params().get("roleId");
+        appRegistryService.linkGroupsToRole(groups, roleId, defaultResponseHandler(request));
+    }
 
 	@Delete("/authorize/group/:groupId/role/:roleId")
 	@SecuredAction(value = "", type = ActionType.RESOURCE)

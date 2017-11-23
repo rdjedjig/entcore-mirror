@@ -28,6 +28,8 @@ import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
+import java.util.List;
+
 public interface AppRegistryService {
 
 	void listApplications(String structureId, Handler<Either<String, JsonArray>> handler);
@@ -54,6 +56,8 @@ public interface AppRegistryService {
 	void linkRolesToGroup(String groupId, JsonArray rolesIds, Handler<Either<String, JsonObject>> handler);
 
 	void addGroupLink(String groupId, String roleId, Handler<Either<String, JsonObject>> handler);
+
+    void linkGroupsToRole(List<String> groups, String roleId, Handler<Either<String, JsonObject>> handler);
 
 	void deleteGroupLink(String groupId, String roleId, Handler<Either<String, JsonObject>> handler);
 

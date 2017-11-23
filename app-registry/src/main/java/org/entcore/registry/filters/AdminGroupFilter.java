@@ -19,6 +19,7 @@
 
 package org.entcore.registry.filters;
 
+import java.util.List;
 import java.util.Map;
 
 import org.entcore.common.http.filter.ResourcesProvider;
@@ -33,7 +34,7 @@ import org.vertx.java.core.json.JsonObject;
 
 import fr.wseduc.webutils.http.Binding;
 
-public class WidgetLinkFilter implements ResourcesProvider{
+public class AdminGroupFilter implements ResourcesProvider{
 
 	private final Neo4j neo4j = Neo4j.getInstance();
 
@@ -56,19 +57,19 @@ public class WidgetLinkFilter implements ResourcesProvider{
 			return;
 		}
 
-		final String groupId = request.params().get("groupId");
-		if(groupId == null || groupId.trim().isEmpty()){
+		final List<String> groups = request.params().getAll("groupId");
+		if(groups.size() == 0){
 			handler.handle(false);
 			return;
 		}
 
 		String query =
-			"MATCH (s:Structure)<-[:BELONGS*0..1]-()<-[:DEPENDS]-(g:Group {id : {groupId}}) "+
-			"WHERE s.id IN {adminScope} " +
+			"MATCH (s:Structure)<-[:BELONGS*0..1]-()<-[:DEPENDS]-(g:Group}) "+
+			"WHERE s.id IN {adminScope} AND g.id IN {groups}" +
 			"RETURN count(g) = 1 as exists";
 		JsonObject params = new JsonObject()
-			.putString("groupId", groupId)
-			.putArray("adminScope", new JsonArray(adminLocal.getScope().toArray()));
+                .putArray("groups", new JsonArray(groups))
+                .putArray("adminScope", new JsonArray(adminLocal.getScope().toArray()));
 
 		neo4j.execute(query, params, new Handler<Message<JsonObject>>() {
 			public void handle(Message<JsonObject> event) {

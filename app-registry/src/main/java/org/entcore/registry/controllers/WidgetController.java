@@ -28,9 +28,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.entcore.common.http.filter.AdminFilter;
 import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.registry.filters.AdminGroupFilter;
 import org.entcore.registry.filters.AnyAdmin;
 import org.entcore.registry.filters.SuperAdminFilter;
-import org.entcore.registry.filters.WidgetLinkFilter;
 import org.entcore.registry.services.WidgetService;
 import org.entcore.registry.services.impl.DefaultWidgetService;
 import org.vertx.java.core.Handler;
@@ -89,7 +89,7 @@ public class WidgetController extends BaseController {
 
 	@Post("/widget/:id/link/:groupId")
 	@SecuredAction(value = "", type = ActionType.RESOURCE)
-	@ResourceFilter(WidgetLinkFilter.class)
+	@ResourceFilter(AdminGroupFilter.class)
 	public void linkWidget(final HttpServerRequest request){
 		final String widgetId = request.params().get("id");
 		final List<String> groupIds = new ArrayList<String>();
@@ -99,7 +99,7 @@ public class WidgetController extends BaseController {
 
 	@Delete("/widget/:id/link/:groupId")
 	@SecuredAction(value = "", type = ActionType.RESOURCE)
-	@ResourceFilter(WidgetLinkFilter.class)
+	@ResourceFilter(AdminGroupFilter.class)
 	public void unlinkWidget(final HttpServerRequest request){
 		final String widgetId = request.params().get("id");
 		final List<String> groupIds = new ArrayList<String>();
@@ -110,7 +110,7 @@ public class WidgetController extends BaseController {
 
 	@Put("/widget/:id/mandatory/:groupId")
 	@SecuredAction(value = "", type = ActionType.RESOURCE)
-	@ResourceFilter(WidgetLinkFilter.class)
+	@ResourceFilter(AdminGroupFilter.class)
 	public void setWidgetMandatory(final HttpServerRequest request){
 		final String widgetId = request.params().get("id");
 		final List<String> groupIds = new ArrayList<String>();
@@ -120,7 +120,7 @@ public class WidgetController extends BaseController {
 
 	@Delete("/widget/:id/mandatory/:groupId")
 	@SecuredAction(value = "", type = ActionType.RESOURCE)
-	@ResourceFilter(WidgetLinkFilter.class)
+	@ResourceFilter(AdminGroupFilter.class)
 	public void removeWidgetMandatory(final HttpServerRequest request){
 		final String widgetId = request.params().get("id");
 		final List<String> groupIds = new ArrayList<String>();
