@@ -75,10 +75,10 @@ object DirectoryAdmlScenario {
     .header("Content-Length", "0")
     .check(status.is(200)))
 
-    .exec(http("relative student")
-    .put("""/directory/user/${studentId}/related/${relativeId}""")
-    .header("Content-Length", "0")
-    .check(status.is(200)))
+    // .exec(http("relative student")
+    // .put("""/directory/user/${studentId}/related/${relativeId}""")
+    // .header("Content-Length", "0")
+    // .check(status.is(200)))
 
     .exec(http("User add function ")
     .post("""/directory/user/function/${childrenId}""")
