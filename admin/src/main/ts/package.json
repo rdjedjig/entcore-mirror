@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --deploy-url=public/dist/ --base-href=/ --proxy-config=proxy.conf.json",
+    "start": "ng serve --deploy-url=public/dist/ --base-href=/admin --proxy-config=proxy.conf.json",
     "build": "ng build --deploy-url=public/dist/ --base-href=/admin/ && ./node_modules/gulp/bin/gulp.js buildWithLocalPath",
     "build-prod": "ng build --prod --deploy-url=public/ --base-href=/admin/ && ./node_modules/gulp/bin/gulp.js buildWithDockerPath",
     "test": "ng test",
