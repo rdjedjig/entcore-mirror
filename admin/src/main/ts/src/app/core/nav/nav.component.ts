@@ -7,7 +7,8 @@ import {Config} from '../resolvers/Config';
 
 @Component({
     selector: 'ode-app-nav',
-    templateUrl: './nav.component.html'
+    templateUrl: './nav.component.html',
+    styleUrls: ['./nav.component.scss']
 })
 export class NavComponent implements OnInit, OnDestroy {
     // tslint:disable-next-line:variable-name

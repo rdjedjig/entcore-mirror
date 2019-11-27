@@ -5,7 +5,7 @@
   (onCancel)="confirmCancel = false">
   <p>{{ 'import.cancel.message' | translate }}</p>
 </ode-lightbox-confirm>
-<wizard
+<ode-wizard
   (cancel)="confirmCancel=true"
   (nextStep)="nextStep($event)"
   (previousStep)="previousStep($event)"
@@ -304,4 +304,4 @@
       </div>
     </ng-template>
   </ode-step>
-</wizard>
+</ode-wizard>

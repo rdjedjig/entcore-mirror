@@ -86,10 +86,13 @@ a:hover { color: initial; }
 
 h1 {
   margin: 0;
-  padding: 50px 20px 20px;
+  padding: 40px 0px 20px;
   color: mix($grey-light, $grey-dark, 10%);
-  font-size: 30px;
+  font-size: 24px;
   font-weight: normal;
+  i {
+    margin-right: 15px;
+  }
 }
 
 h2 {
@@ -751,7 +754,7 @@ button.card-button {
   font-size: 0.9em;
   > * {
     @extend .card;
-    margin: 20px;
+    margin: 0 20px 20px 0;
     padding: 10px 20px 0px 20px;
     box-sizing: border-box;
     flex: 0.5 0 calc(33% - 40px);
@@ -767,8 +770,8 @@ button.card-button {
   }
   .card-header {
     flex: 1 0 100%;
-    font-size: 1.5em;
-    line-height: 1.5em;
+    font-size: 1.4em;
+    line-height: 1.4em;
     i {
       margin-right: 15px;
     }
@@ -980,7 +983,7 @@ ode-side-panel {
     background-color: $grey-dark;
     overflow-y: auto !important;
   }
-  > div > item-tree > ul {
+  > div > ode-item-tree > ul {
     padding-left: 0px;
   }
 }
@@ -1077,7 +1080,7 @@ ode-spinner-cube.button-spinner {
     background-color: white;
     margin-bottom: 60px;
     .panel-header {
-      font-size: 1.6em;
+      font-size: 1.3em;
       color: mix($grey-light, $grey-dark, 10%);
       padding: 20px;
       div {
@@ -1367,7 +1370,7 @@ ode-portal {
     height: 50px;
     box-shadow: 0px 0px 20px $shadow-light;
     span {
-      font-size: 1.5em;
+      font-size: 1.6em;
     }
   }
   ode-side-panel {
@@ -1386,9 +1389,6 @@ ode-portal {
       &:-ms-input-placeholder{color:rgba(250,250,250,0.4);}
       &::-moz-placeholder {color:rgba(250,250,250,0.4);}
     }
-  }
-  div[header-left] > * {
-    margin-right: 20px;
   }
   div[header-left], div[header-right] {
     a {

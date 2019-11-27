@@ -31,7 +31,7 @@ export class StepComponent {
 }
 
 @Component({
-    selector: 'wizard',
+    selector: 'ode-wizard',
     template: `
         <div class="wizard">
             <nav class="wizard-menu">
@@ -45,7 +45,7 @@ export class StepComponent {
                 </ul>
             </nav>
             <section class="wizard-content">
-                <ng-content select="step"></ng-content>
+                <ng-content select="ode-step"></ng-content>
                 <nav class="wizard-content-nav" *ngIf="activeStep < steps.length - 1">
                     <button class="wizard-content-nav__button cancel"
                         (click)="cancel.emit()"
@@ -114,9 +114,9 @@ export class StepComponent {
     `]
 })
 export class WizardComponent implements AfterContentInit, OnDestroy {
-    @Output('cancel') cancel: EventEmitter<{}> = new EventEmitter();
-    @Output('previousStep') previousStep: EventEmitter<Number> = new EventEmitter();
-    @Output('nextStep') nextStep: EventEmitter<Number> = new EventEmitter();
+    @Output() cancel: EventEmitter<{}> = new EventEmitter();
+    @Output() previousStep: EventEmitter<number> = new EventEmitter();
+    @Output() nextStep: EventEmitter<number> = new EventEmitter();
 
     public canDoNext = true;
 
@@ -126,7 +126,7 @@ export class WizardComponent implements AfterContentInit, OnDestroy {
     doCancel() {
         this.activeStep = 0;
         this.steps.forEach((step, index) => {
-            index == 0 ? step.isActived = true : step.isActived = false;
+            index === 0 ? step.isActived = true : step.isActived = false;
         });
         this.canDoNext = true;
     }
@@ -157,7 +157,7 @@ export class WizardComponent implements AfterContentInit, OnDestroy {
     }
 
     ngAfterContentInit() {
-        if (this.steps.length == 0) {
+        if (this.steps.length === 0) {
             throw new Error('<wizard> component musts nest at least 1 <step> compoent');
         }
     }
