@@ -80,7 +80,7 @@ export class UserCreateComponent implements OnInit, OnDestroy {
                 }
                 this.usersStore.structure.users.data.push(this.newUser);
 
-                this.router.navigate(['/app', this.usersStore.structure.id, 'users', res.data.id, 'details'], {
+                this.router.navigate(['/admin', this.usersStore.structure.id, 'users', res.data.id, 'details'], {
                     relativeTo: this.route,
                     replaceUrl: false
                 });

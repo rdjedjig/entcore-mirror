@@ -55,7 +55,7 @@ export class ManagementRootComponent implements OnInit, OnDestroy {
     }
 
     isActive(path: string): boolean {
-        return this.router.isActive('/app/' + this.structure.id + '/management/' + path, false);
+        return this.router.isActive('/admin/' + this.structure.id + '/management/' + path, false);
     }
 
 }

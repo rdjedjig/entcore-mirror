@@ -174,7 +174,7 @@ export class MessageFlashListComponent implements OnInit {
     }
 
     createMessage(): void {
-        this.router.navigate(['/app', this.structure.id, 'management', 'message-flash', 'create']);
+        this.router.navigate(['/admin', this.structure.id, 'management', 'message-flash', 'create']);
     }
 
     editMessage(messageId?: string): void {
@@ -185,14 +185,14 @@ export class MessageFlashListComponent implements OnInit {
             message = this.displayedMessages.find(mess => this.checkboxes[mess.id]);
         }
         if (!!message) {
-            this.router.navigate(['/app', this.structure.id, 'management', 'message-flash', 'edit', message.id]);
+            this.router.navigate(['/admin', this.structure.id, 'management', 'message-flash', 'edit', message.id]);
         }
     }
 
     duplicateMessage(): void {
         const message: FlashMessageModel = this.displayedMessages.find(mess => this.checkboxes[mess.id]);
         if (!!message) {
-            this.router.navigate(['/app', this.structure.id, 'management', 'message-flash', 'duplicate', message.id]);
+            this.router.navigate(['/admin', this.structure.id, 'management', 'message-flash', 'duplicate', message.id]);
         }
     }
 

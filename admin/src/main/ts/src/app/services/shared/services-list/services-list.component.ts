@@ -119,7 +119,7 @@ export class ServicesListComponent implements OnInit, OnDestroy{
     }
 
     showCompanion = (): boolean => {
-        const basePath = `/app/${this.servicesStore.structure.id}/services/${this.serviceName}`;
+        const basePath = `/admin/${this.servicesStore.structure.id}/services/${this.serviceName}`;
         if (this.collectionRef[this.serviceName].model) {
             return this.router.isActive(`${basePath}\\${this.collectionRef[this.serviceName].model.id}`, true);
         } else {

@@ -82,10 +82,10 @@ buildNode () {
 buildAdminNode() {
   case `uname -s` in
     MINGW*)
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node12 sh -c "npm --no-bin-links install && npm run build-prod"
+      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node12 sh -c "npm --no-bin-links install && npm run build-docker-prod"
       ;;
     *)
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node12 sh -c "npm install && npm run build-prod"
+      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node12 sh -c "npm install && npm run build-docker-prod"
   esac
 }
 

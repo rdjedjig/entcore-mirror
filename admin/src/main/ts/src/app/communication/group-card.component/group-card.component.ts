@@ -108,7 +108,7 @@ export class GroupCardComponent {
     }
 
     public viewMembers(group: GroupModel) {
-        window.open(`/app/${getStructureIdOfGroup(group)}/groups/${this.groupTypeRouteMapping.get(group.type)}/${group.id}/details`, '_blank');
+        window.open(`/admin/${getStructureIdOfGroup(group)}/groups/${this.groupTypeRouteMapping.get(group.type)}/${group.id}/details`, '_blank');
     }
 
     getStructureNameOfGroup(group: GroupModel): string {

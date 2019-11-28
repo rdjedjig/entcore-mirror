@@ -38,10 +38,10 @@ export class ServicesComponent implements OnInit, OnDestroy {
     }
 
     public showCreateConnectorButton(): boolean {
-        if (this.router.isActive(`/app/${this.servicesStore.structure.id}/services/connectors/create`, true)) {
+        if (this.router.isActive(`/admin/${this.servicesStore.structure.id}/services/connectors/create`, true)) {
             return false;
         }
-        if (this.router.isActive(`/app/${this.servicesStore.structure.id}/services/connectors`, false)) {
+        if (this.router.isActive(`/admin/${this.servicesStore.structure.id}/services/connectors`, false)) {
             return true;
         }
         return false;

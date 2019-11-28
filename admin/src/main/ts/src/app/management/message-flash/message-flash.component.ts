@@ -19,7 +19,7 @@ export class MessageFlashComponent implements OnInit {
         routing.observe(this.route, 'data').subscribe(async (data: Data) => {
             if (data.structure) {
                 const structure = data.structure;
-                if (this.router.isActive('/app/' + structure.id + '/management/message-flash', true)) {
+                if (this.router.isActive('/admin/' + structure.id + '/management/message-flash', true)) {
                     this.router.navigate(['list'], {relativeTo: this.route});
                 }
             }

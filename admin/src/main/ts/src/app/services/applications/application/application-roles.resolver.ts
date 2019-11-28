@@ -23,7 +23,7 @@ export class ApplicationRolesResolver implements Resolve<RoleModel[] | Boolean> 
         const targetApp: ApplicationModel = structure && structure.applications.data.find(a => a.id == appId);
 
         if (!targetApp) {
-            this.router.navigate(['/app', structure._id, 'services', 'applications']);
+            this.router.navigate(['/admin', structure._id, 'services', 'applications']);
         } else {
             return this.spinner.perform('portal-content', targetApp.syncRoles(structure._id)
                 .then(() => targetApp.roles)

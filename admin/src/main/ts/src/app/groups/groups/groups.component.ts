@@ -62,7 +62,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
     }
 
     createButtonHidden() {
-        return !this.router.isActive('/app/' + this.groupsStore.structure.id + '/groups/manualGroup', false)
-            || this.router.isActive('/app/' + this.groupsStore.structure.id + '/groups/manualGroup/create', true);
+        return !this.router.isActive('/admin/' + this.groupsStore.structure.id + '/groups/manualGroup', false)
+            || this.router.isActive('/admin/' + this.groupsStore.structure.id + '/groups/manualGroup/create', true);
     }
 }

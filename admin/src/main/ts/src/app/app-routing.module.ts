@@ -10,7 +10,7 @@ import {RouterModule, Routes} from '@angular/router';
 
 const routes: Routes = [
   {
-      path: 'app',
+      path: 'admin',
       resolve: {session: SessionResolver, structures: StructuresResolver, i18n: I18nResolver, config: ConfigResolver},
       component: NavComponent,
       children: [
@@ -20,7 +20,7 @@ const routes: Routes = [
   },
   {
       path: '**',
-      redirectTo: '/app'
+      redirectTo: '/admin'
   }
 ];
 @NgModule({

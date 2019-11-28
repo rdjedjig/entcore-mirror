@@ -23,7 +23,7 @@ export class GroupDetailsResolver implements Resolve<GroupModel> {
         const targetGroup = structure && structure.groups.data.find(g => g.id === groupId);
 
         if (!targetGroup) {
-            this.router.navigate(['/app', structure._id, 'groups', groupType]);
+            this.router.navigate(['/admin', structure._id, 'groups', groupType]);
         }
         if (targetGroup.users && targetGroup.users.length < 1) {
             this.spinner.perform('groups-content', targetGroup.syncUsers()

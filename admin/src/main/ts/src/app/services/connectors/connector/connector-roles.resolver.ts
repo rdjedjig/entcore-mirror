@@ -21,7 +21,7 @@ export class ConnectorRolesResolver implements Resolve<RoleModel[]|Boolean> {
         const targetConnector = structure && structure.connectors.data.find(a => a.id === connectorId);
 
         if (!targetConnector) {
-            this.router.navigate(['/app', structure._id, 'services', 'connectors']);
+            this.router.navigate(['/admin', structure._id, 'services', 'connectors']);
         } else {
             return this.spinner.perform('portal-content', targetConnector.syncRoles(structure._id, connectorId)
                 .then(() => targetConnector.roles)

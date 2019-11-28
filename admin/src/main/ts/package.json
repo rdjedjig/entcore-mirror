@@ -3,9 +3,11 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --deploy-url=public/dist/ --base-href=/admin --proxy-config=proxy.conf.json",
-    "build": "ng build --deploy-url=public/dist/ --base-href=/admin/ && ./node_modules/gulp/bin/gulp.js buildWithLocalPath",
-    "build-prod": "ng build --prod --deploy-url=public/ --base-href=/admin/ && ./node_modules/gulp/bin/gulp.js buildWithDockerPath",
+    "start": "ng serve --proxy-config=proxy.conf.json",
+    "build": "ng build --deploy-url=admin/public/dist/ && ./node_modules/gulp/bin/gulp.js build",
+    "build-prod": "ng build --prod --deploy-url=admin/public/dist/ && ./node_modules/gulp/bin/gulp.js build",
+    "build-docker": "ng build --deploy-url=admin/public/dist/ && ./node_modules/gulp/bin/gulp.js buildWithDockerPath",
+    "build-docker-prod": "ng build --prod --deploy-url=admin/public/dist/ && ./node_modules/gulp/bin/gulp.js buildWithDockerPath",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
@@ -47,6 +49,7 @@
     "@types/jquery": "^3.3.31",
     "@types/node": "~8.9.4",
     "codelyzer": "^5.0.0",
+    "del": "^5.1.0",
     "gulp": "^4.0.2",
     "gulp-rename": "^1.4.0",
     "jasmine-core": "~3.4.0",

@@ -35,6 +35,12 @@
     "logLevel": "debug",
     "changeOrigin": true
   },
+  "/languages": {
+    "target": "http://localhost:8090",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true
+  },
   "/timeline/*": {
     "target": "http://localhost:8090",
     "secure": false,

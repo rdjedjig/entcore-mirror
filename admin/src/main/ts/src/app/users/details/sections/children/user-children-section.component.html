@@ -25,7 +25,7 @@
   <ul class="actions-list">
     <li *ngFor="let child of details?.children">
       <div *ngIf="child.id">
-        <a class="action" [routerLink]="['/app', structure.id ,'users', child.id, 'details']">
+        <a class="action" [routerLink]="['/admin', structure.id ,'users', child.id, 'details']">
           {{ child.displayName?.split(' ')[1] | uppercase }} {{ child.displayName?.split(' ')[0] }}
         </a>
         <i  class="fa fa-times action" (click)="removeChild(child)"

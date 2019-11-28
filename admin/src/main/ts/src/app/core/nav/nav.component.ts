@@ -16,8 +16,8 @@ export class NavComponent implements OnInit, OnDestroy {
     set currentStructure(struct: StructureModel) {
         this._currentStructure = struct;
 
-        const replacerRegex = /^\/{0,1}app(\/[^\/]+){0,1}/;
-        const newPath = window.location.pathname.replace(replacerRegex, `/app/${struct.id}`);
+        const replacerRegex = /^\/{0,1}admin(\/[^\/]+){0,1}/;
+        const newPath = window.location.pathname.replace(replacerRegex, `/admin/${struct.id}`);
 
         this.router.navigateByUrl(newPath);
     }

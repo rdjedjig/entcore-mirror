@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, AfterViewInit, OnDestroy} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {Subscription} from 'rxjs';
 import {ActivatedRoute, Data, NavigationEnd, Router} from '@angular/router';
@@ -28,7 +28,7 @@ import 'trumbowyg/plugins/history/trumbowyg.history.js';
     templateUrl: './message-flash-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MessageFlashFormComponent implements OnInit {
+export class MessageFlashFormComponent implements OnInit, OnDestroy, AfterViewInit {
 
     constructor(
         public route: ActivatedRoute,
@@ -74,7 +74,7 @@ export class MessageFlashFormComponent implements OnInit {
                 this.messages = data.messages;
                 this.originalMessage = this.messages.find(mess => mess.id == this.messageId);
                 if (!this.originalMessage || this.originalMessage.structureId !== this.structure.id) {
-                    this.router.navigate(['/app', this.structure.id, 'management', 'message-flash', 'list']);
+                    this.router.navigate(['/admin', this.structure.id, 'management', 'message-flash', 'list']);
                     return;
                 }
                 this.message.id = this.originalMessage.id;
@@ -123,7 +123,7 @@ export class MessageFlashFormComponent implements OnInit {
 
     ngAfterViewInit() {
         const jq = $ as any;
-        jq.trumbowyg.svgPath = '/admin/public/styles/icons.svg';
+        jq.trumbowyg.svgPath = '/admin/public/assets/icons.svg';
         const trumbowygEditor = jq('#trumbowyg-editor');
         trumbowygEditor.trumbowyg({
             lang: this.bundles.currentLanguage,
@@ -301,9 +301,9 @@ export class MessageFlashFormComponent implements OnInit {
 
     goBack(forceReload: boolean): void {
         if (forceReload) {
-            this.router.navigate(['/app', this.structure.id, 'management', 'message-flash', 'list'], { queryParams: { forceReload: 'true' } });
+            this.router.navigate(['/admin', this.structure.id, 'management', 'message-flash', 'list'], { queryParams: { forceReload: 'true' } });
         } else {
-            this.router.navigate(['/app', this.structure.id, 'management', 'message-flash', 'list']);
+            this.router.navigate(['/admin', this.structure.id, 'management', 'message-flash', 'list']);
         }
         return;
     }

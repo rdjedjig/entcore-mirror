@@ -69,7 +69,7 @@ export class GroupsTypeViewComponent implements OnInit, OnDestroy {
     }
 
     showCompanion(): boolean {
-        const groupTypeRoute = '/app/' +
+        const groupTypeRoute = '/admin/' +
             (this.groupsStore.structure ? this.groupsStore.structure.id : '') +
             '/groups/' + this.groupType;
 
@@ -82,7 +82,7 @@ export class GroupsTypeViewComponent implements OnInit, OnDestroy {
     }
 
     closePanel() {
-        this.router.navigateByUrl('/app/' + (this.groupsStore.structure ? this.groupsStore.structure.id : '') +
+        this.router.navigateByUrl('/admin/' + (this.groupsStore.structure ? this.groupsStore.structure.id : '') +
             '/groups/' + this.groupType);
     }
 
