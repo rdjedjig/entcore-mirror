@@ -1,10 +1,10 @@
+import { globalStore } from './../core/store/global.store';
+import { StructureModel } from './../core/store/models/structure.model';
+import { ProfilesService } from './../core/services/profiles.service';
+import { SpinnerService } from './../core/services/spinner.service';
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, Resolve} from '@angular/router';
 
-import { StructureModel } from '../core/store/models/structure.model';
-import { globalStore } from '../core/store/global.store';
-import { SpinnerService } from '../core/services/spinner.service';
-import { ProfilesService } from '../core/services/profiles.service';
 
 @Injectable()
 export class StructureResolver implements Resolve<StructureModel> {
@@ -25,6 +25,7 @@ export class StructureResolver implements Resolve<StructureModel> {
 }
 
 export function sync(structure: StructureModel, force?: boolean): Promise<StructureModel> {
+    console.log('STRUCTURE', structure)
     const classesPromise = structure.syncClasses(force);
     const groupsPromise = structure.syncGroups(force);
     const sourcesPromise = structure.syncSources(force);
