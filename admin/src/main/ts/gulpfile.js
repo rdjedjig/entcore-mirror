@@ -1,6 +1,6 @@
 var gulp = require('gulp')
 var rename = require('gulp-rename');
-var del = require('del');
+var clean = require('gulp-clean');
 
 function copy(srcDir, destDir) {
     console.log(`Copying ${srcDir} to ${destDir}...`);
@@ -15,17 +15,20 @@ function renameIndexFile(srcIndexFile, newIndexFileBasename, destDir) {
         .pipe(gulp.dest(destDir));
 }
 
-gulp.task('clean', () => {
-    console.log('Deleting ../resources/public/dist');
-    return del(['../resources/public/dist'], {force: true});
-});
+function clean(dir) {
+    console.log(`Deleting ${dir}`);
+    return gulp.src(dir, {read: false})
+        .pipe(clean({force: true}));
+}
 
-gulp.task('build', gulp.series('clean', () => {
+gulp.task('build', () => {
+    clean('../resources/public/dist');
     copy('./dist/**/*', '../resources/public/dist/');
     return renameIndexFile('./dist/index.html', 'admin', '../resources/view/');
-}));
+});
 
-gulp.task('buildWithDockerPath', gulp.series('clean'), () => {
+gulp.task('buildWithDockerPath', () => {
+    clean('../resources/public/dist');
     copy('/home/node/app/dist/**/*', '/home/node/base/src/main/resources/public/dist/');
     return renameIndexFile('/home/node/app/dist/index.html', 'admin', '/home/node/base/src/main/resources/view/');
 });
