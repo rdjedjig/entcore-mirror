@@ -56,6 +56,8 @@ public class DefaultSchoolService implements SchoolService {
 	private final Neo4j neo = Neo4j.getInstance();
 	private final EventBus eventBus;
 
+	static final String EXCLUDE_ADMC_QUERY_FILTER = " NOT((u)-[:HAS_FUNCTION]->(:Function {externalId:'SUPER_ADMIN'})) ";
+
 	public DefaultSchoolService(EventBus eventBus) {
 		this.eventBus = eventBus;
 	}
@@ -337,13 +339,17 @@ public class DefaultSchoolService implements SchoolService {
 	}
 
 	@Override
-	public void userList(String structureId, boolean listRemovedUsersInsteadOfNormalUsers, Handler<Either<String, JsonArray>> handler) {
+	public void userList(String structureId, boolean listRemovedUsersInsteadOfNormalUsers, boolean isAdmc, Handler<Either<String, JsonArray>> handler) {
+		String filter = "";
+		if (!isAdmc) {
+			filter = (listRemovedUsersInsteadOfNormalUsers ? "AND " : "WHERE ") + EXCLUDE_ADMC_QUERY_FILTER;
+		}
 		String userStructMatcher = listRemovedUsersInsteadOfNormalUsers == false
 			? "MATCH (u:User)-[:IN]->(pg:ProfileGroup)-[:DEPENDS]->(s:Structure {id:{structureId}}) "
 			: "MATCH (s:Structure {id:{structureId}}), " +
 				"(u:User)-[:IN]->(pg:ProfileGroup) WHERE EXISTS(u.removedFromStructures) AND s.externalId IN (coalesce(u.removedFromStructures, [])) ";
 		String query =
-			userStructMatcher +
+			userStructMatcher + filter +
 			"MATCH (pg)-[:HAS_PROFILE]->(p: Profile) " +
 			"WITH distinct u, p " +
 			"OPTIONAL MATCH (u)-[:IN]->(:ProfileGroup)-[:DEPENDS]->(class: Class) " +
@@ -387,7 +393,7 @@ public class DefaultSchoolService implements SchoolService {
 	public void blockUsers(String structureId, String profile, boolean block, boolean isAdmc, Handler<JsonObject> handler) {
 		String filter = "";
 		if (!isAdmc) {
-			filter = "AND NOT((u)-[:HAS_FUNCTION]->(:Function {externalId:'SUPER_ADMIN'})) ";
+			filter = "AND " + EXCLUDE_ADMC_QUERY_FILTER;
 		}
 		String query =
 			"MATCH (s:Structure {id:{structureId}})<-[:DEPENDS]-(g:ProfileGroup)<-[:IN]-(u:User) " +
