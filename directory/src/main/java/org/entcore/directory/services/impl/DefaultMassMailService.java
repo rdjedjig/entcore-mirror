@@ -251,6 +251,10 @@ public class DefaultMassMailService extends Renders implements MassMailService {
             condition = "WHERE NOT(u.activationCode IS NULL) ";
         }
 
+        if (!userInfos.getFunctions().containsKey(SUPER_ADMIN)) {
+            condition += "AND " + DefaultSchoolService.EXCLUDE_ADMC_QUERY_FILTER;
+        }
+
         //Profiles
         if (filterObj.containsKey("profiles") && filterObj.getJsonArray("profiles").size() > 0) {
             condition += "AND p.name IN {profilesArray} ";
