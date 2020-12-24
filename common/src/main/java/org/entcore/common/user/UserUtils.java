@@ -19,6 +19,8 @@
 
 package org.entcore.common.user;
 
+import com.fasterxml.jackson.databind.DeserializationConfig;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.wseduc.webutils.I18n;
 import fr.wseduc.webutils.http.Renders;
@@ -31,6 +33,8 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -43,7 +47,7 @@ import static fr.wseduc.webutils.Utils.getOrElse;
 import static fr.wseduc.webutils.Utils.handlerToAsyncHandler;
 
 public class UserUtils {
-
+	static Logger log = LoggerFactory.getLogger(UserUtils.class);
 	private static final String COMMUNICATION_USERS = "wse.communication.users";
 	private static final String DIRECTORY = "directory";
 	private static final String SESSION_ADDRESS = "wse.session";
@@ -454,9 +458,12 @@ public class UserUtils {
 		}
 		ObjectMapper mapper = new ObjectMapper();
 		try {
+			mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			return mapper.readValue(session.encode(), UserInfos.class);
 		} catch (IOException e) {
 			e.printStackTrace();
+			log.error("Failed to parse session: ",e);
 			return null;
 		}
 	}
