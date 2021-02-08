@@ -102,10 +102,10 @@ buildNode () {
 buildAdminNode() {
   case `uname -s` in
     MINGW*)
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node12 sh -c "npm install --no-bin-links && npm rm --no-save ngx-ode-core ngx-ode-sijil ngx-ode-ui && npm install --no-save ngx-ode-core@$next ngx-ode-sijil@$next ngx-ode-ui@$next && npm run build-docker-prod"
+      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node12 sh -c "npm install --no-bin-links && npm rm --no-save ngx-ode-core ngx-ode-sijil ngx-ode-ui && npm install --no-save ngx-ode-core@master ngx-ode-sijil@master ngx-ode-ui@master && npm run build-docker-prod"
       ;;
     *)
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node12 sh -c "npm install && npm rm --no-save ngx-ode-core ngx-ode-sijil ngx-ode-ui && npm install --no-save ngx-ode-core@$next ngx-ode-sijil@$next ngx-ode-ui@$next && npm run build-docker-prod"
+      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node12 sh -c "npm install && npm rm --no-save ngx-ode-core ngx-ode-sijil ngx-ode-ui && npm install --no-save ngx-ode-core@master ngx-ode-sijil@master ngx-ode-ui@master && npm run build-docker-prod"
   esac
 }
 
