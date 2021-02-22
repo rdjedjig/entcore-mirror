@@ -272,21 +272,25 @@ public class DirectoryController extends BaseController {
 								JsonObject j = new JsonObject()
 										.put("action", "initDefaultCommunicationRules")
 										.put("schoolIds", new fr.wseduc.webutils.collections.JsonArray().add(schoolId));
-								eb.send("wse.communication", j);
-								String classId = event.right().getValue().getString("id");
-								if (classId != null && !classId.trim().isEmpty() &&
-										request.params().contains("setDefaultRoles") &&
-										config.getBoolean("classDefaultRoles", false)) {
-									ApplicationUtils.setDefaultClassRoles(eb, classId,
-											handlerToAsyncHandler(new Handler<Message<JsonObject>>() {
-												@Override
-												public void handle(Message<JsonObject> message) {
-													renderJson(request, event.right().getValue(), 201);
-												}
-											}));
-								} else {
-									renderJson(request, event.right().getValue(), 201);
-								}
+								eb.send("wse.communication", j, handlerToAsyncHandler(new Handler<Message<JsonObject>>() {
+									@Override
+									public void handle(Message<JsonObject> message) {
+										String classId = event.right().getValue().getString("id");
+										if (classId != null && !classId.trim().isEmpty() &&
+												request.params().contains("setDefaultRoles") &&
+												config.getBoolean("classDefaultRoles", false)) {
+											ApplicationUtils.setDefaultClassRoles(eb, classId,
+													handlerToAsyncHandler(new Handler<Message<JsonObject>>() {
+														@Override
+														public void handle(Message<JsonObject> message) {
+															renderJson(request, event.right().getValue(), 201);
+														}
+													}));
+										} else {
+											renderJson(request, event.right().getValue(), 201);
+										}
+									}
+								}));
 							} else {
 								request.response().setStatusCode(404).end();
 							}
