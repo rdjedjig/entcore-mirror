@@ -129,8 +129,34 @@ testGradle () {
   ./gradlew "$GRADLE_OPTION"test
 }
 
+locally () {
+  if [ -e $PWD/../ode-ts-client ]; then
+    docker-compose run --rm \
+      -u "$USER_UID:$GROUP_GID" \
+      -v $PWD/../ode-ts-client:/home/node/ode-ts-client \
+      node sh -c "npm install --no-save /home/node/ode-ts-client"
+  fi
+  if [ -e $PWD/../ode-ngjs-front ]; then
+    docker-compose run --rm \
+      -u "$USER_UID:$GROUP_GID" \
+      -v $PWD/../ode-ngjs-front:/home/node/ode-ngjs-front \
+      node sh -c "npm install --no-save /home/node/ode-ngjs-front"
+  fi
+}
+
 watch () {
-  docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "node_modules/gulp/bin/gulp.js watch-$MODULE --springboard=/home/node/$SPRINGBOARD"
+  local bind_mounts=" -v $PWD/../$SPRINGBOARD:/home/node/springboard"
+  if [ -e $PWD/../ode-ts-client ]; then
+    bind_mounts=$bind_mounts" -v $PWD/../ode-ts-client:/home/node/ode-ts-client"
+  fi
+  if [ -e $PWD/../ode-ngjs-front ]; then
+    bind_mounts=$bind_mounts" -v $PWD/../ode-ngjs-front:/home/node/ode-ngjs-front"
+  fi
+  docker-compose run \
+    --rm \
+    -u "$USER_UID:$GROUP_GID" \
+    $bind_mounts \
+    node sh -c "node_modules/gulp/bin/gulp.js watch-$MODULE --springboard=/home/node/springboard"
 }
 
 ngWatch () {
@@ -169,6 +195,9 @@ do
       ;;
     install)
       buildNode && buildAdminNode && buildGradle
+      ;;
+    locally)
+      locally
       ;;
     watch)
       watch
