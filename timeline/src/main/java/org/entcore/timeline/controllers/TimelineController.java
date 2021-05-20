@@ -153,6 +153,13 @@ public class TimelineController extends BaseController {
 		renderView(request, new JsonObject().put("lightMode",isLightmode()).put("cache", cache));
 	}
 
+	@Get("/timeline2")
+	@SecuredAction(value = "timeline.view", type = ActionType.AUTHENTICATED)
+	public void view2(HttpServerRequest request) {
+		final boolean cache = config.getBoolean("cache", false);
+		renderView(request, new JsonObject().put("lightMode",isLightmode()).put("cache", cache));
+	}
+
 	@Get("/preferencesView")
 	@SecuredAction(value = "timeline.preferencesView", type = ActionType.AUTHENTICATED)
 	public void preferencesView(HttpServerRequest request) {
