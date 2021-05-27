@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html with-theme>
 	<head>
 		<title>{{#i18n}}timeline.title{{/i18n}}</title>
 		<meta charset="utf-8" />
@@ -12,20 +12,18 @@
 		<script type="text/javascript" src="/timeline/public/dist/timeline2/application.js"></script>
 	</head>
 	<body>
-		<span>
-			<div translate key="from"></div>
-			<div translate content="from"></div>
-			<div translate attr="funky" funky="from"></div>
-			<div translate attrs="{title:'from'}"></div>
-
-			<i18n>from</i18n>
-			<input type="text" i18n-placeholder="your.i18n.key"></input>
-			<input i18n-value="your.i18n.key"></input>
-			<input value="[['your.i18n.key'|i18n]]"></input>
-		</span>
-
 		<ode-portal title="{{#i18n}}timeline.title{{/i18n}}">
-			<div ng-include="template.containers.main"></div>
+			<span>
+				<div translate key="empty.wiki.consultation"></div>
+				<div translate content="empty.wiki.consultation"></div>
+				<div translate attr="funky" funky="empty.wiki.consultation"></div>
+				<div translate attrs="{title:'empty.wiki.consultation'}"></div>
+	
+				<i18n>empty.wiki.consultation</i18n>
+				<input type="text" i18n-placeholder="empty.wiki.consultation"></input>
+				<input i18n-value="empty.wiki.consultation"></input>
+				<input value="[['empty.wiki.consultation'|i18n]]"></input>
+			</span>
 		</ode-portal>
 <!--
 		<assistant></assistant>
