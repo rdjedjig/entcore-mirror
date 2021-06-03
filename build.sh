@@ -129,7 +129,7 @@ testGradle () {
   ./gradlew "$GRADLE_OPTION"test
 }
 
-locally () {
+localDep () {
   if [ -e $PWD/../ode-ts-client ]; then
     docker-compose run --rm \
       -u "$USER_UID:$GROUP_GID" \
@@ -196,8 +196,8 @@ do
     install)
       buildNode && buildAdminNode && buildGradle
       ;;
-    locally)
-      locally
+    localDep)
+      localDep
       ;;
     watch)
       watch
