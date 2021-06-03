@@ -7,23 +7,105 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.9/angular.min.js" integrity="sha512-CjpXuCK2f47gfxIjQvOwKRVGj01yHWI5qdMTO0qzERireNL30uf+fXLeZ5OxKGDj7r8xpRK4XVxgqXhBbW8Tbg==" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-route/1.7.9/angular-route.min.js" integrity="sha512-xI+5CA/dWcCSEtcnBohNOo6SuqCjePmu4fOqPYOp70rhpbzd+KBYJPclQCsSX3iBc/Qe3s8LITKixOy1gZCGwg==" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.7.9/angular-sanitize.min.js" integrity="sha512-eY2WqVT7O50HLSp/1/tZOUWYlAcPUl+WH3wu5NynvKNV5l/sKowxffGe1I91y3AuMvpyVvevOBOA3LEOBaemTw==" crossorigin="anonymous"></script>
-		<script src="/assets/ode-ts-client.js" type="text/javascript"></script>
-		<script src="/assets/ode-ngjs-front.js" type="text/javascript"></script>
+		<script src="/assets/ode-ts-client/ode-ts-client.js" type="text/javascript"></script>
+		<script src="/assets/ode-ngjs-front/ode-ngjs-front.js" type="text/javascript"></script>
 		<script type="text/javascript" src="/timeline/public/dist/timeline2/application.js"></script>
 	</head>
 	<body>
 		<ode-portal title="{{#i18n}}timeline.title{{/i18n}}">
-			<span>
-				<div translate key="empty.wiki.consultation"></div>
-				<div translate content="empty.wiki.consultation"></div>
-				<div translate attr="funky" funky="empty.wiki.consultation"></div>
-				<div translate attrs="{title:'empty.wiki.consultation'}"></div>
-	
-				<i18n>empty.wiki.consultation</i18n>
-				<input type="text" i18n-placeholder="empty.wiki.consultation"></input>
-				<input i18n-value="empty.wiki.consultation"></input>
-				<input value="[['empty.wiki.consultation'|i18n]]"></input>
-			</span>
+			<div class="container">
+
+				<div class="row">
+		
+					<div class="col-md-4 col-xl-3" ode-widget-container="[[{position:'left'}]]"></div>
+
+					<div class="col-md-4 col-xl-6">
+		
+						<div class="feed">
+							<h2 class="subtitle">Fil de nouveautés</h2>
+		
+							<a class="filter-button" href="#">Filtrez vos nouveautés</a>
+		
+							<div class="feed-list">
+		
+								<div class="feed-item color-app-pages">
+									<div class="zone-avatar">
+		
+										<div class="avatar-social">
+											<div class="photo">
+												<img src="https://picsum.photos/100/100" alt="">
+											</div>
+		
+											<div class="circle bg-app-pages">
+												<i class="ic-app pages-large"></i>
+											</div>
+										</div>
+		
+									</div>
+									<div class="zone-text">
+		
+										<div class="meta">
+											<div class="app-name">Blog</div>
+											<div class="date">
+												Il y a 2 jours
+											</div>
+										</div>
+		
+										<div class="username">
+											<a class="link-discret" href="#">ATOUSA Pauline</a> - enseignant, Mathématiques
+										</div>
+		
+										<div class="report">
+											a partagé avec vous le Pages <a class="link" href="#">Quoi de neuf au Lycée ? | Nouvelle assistante d'éducation pour l'école primaire</a>
+										</div>
+									</div>
+		
+								</div>
+		
+								<div class="feed-item color-app-wiki">
+									<div class="zone-avatar">
+		
+										<div class="avatar-social">
+											<div class="photo">
+												<img src="https://picsum.photos/101/101" alt="">
+											</div>
+		
+											<div class="circle bg-app-wiki">
+												<i class="ic-app wiki"></i>
+											</div>
+										</div>
+		
+									</div>
+									<div class="zone-text">
+		
+										<div class="meta">
+											<div class="app-name">Wiki</div>
+											<div class="date">
+												Il y a 2 jours
+											</div>
+										</div>
+		
+										<div class="username">
+											<a class="link-discret" href="#">ATOUSA Pauline</a> - enseignant, Mathématiques
+										</div>
+		
+										<div class="report">
+											a partagé avec vous le Pages <a class="link" href="#">Quoi de neuf au Lycée ? | Nouvelle assistante d'éducation pour l'école primaire</a>
+										</div>
+									</div>
+		
+								</div>
+		
+							</div>
+		
+						</div>
+		
+					</div>
+
+					<div class="col-md-4 col-xl-3" ode-widget-container="[[{position:'right'}]]"></div>
+				</div>
+		
+			</div>			
 		</ode-portal>
 <!--
 		<assistant></assistant>
