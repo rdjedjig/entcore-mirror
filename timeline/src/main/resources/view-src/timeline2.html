@@ -4,6 +4,7 @@
 		<title>{{#i18n}}timeline.title{{/i18n}}</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="initial-scale=1, maximum-scale=1" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.9/angular.min.js" integrity="sha512-CjpXuCK2f47gfxIjQvOwKRVGj01yHWI5qdMTO0qzERireNL30uf+fXLeZ5OxKGDj7r8xpRK4XVxgqXhBbW8Tbg==" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-route/1.7.9/angular-route.min.js" integrity="sha512-xI+5CA/dWcCSEtcnBohNOo6SuqCjePmu4fOqPYOp70rhpbzd+KBYJPclQCsSX3iBc/Qe3s8LITKixOy1gZCGwg==" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.7.9/angular-sanitize.min.js" integrity="sha512-eY2WqVT7O50HLSp/1/tZOUWYlAcPUl+WH3wu5NynvKNV5l/sKowxffGe1I91y3AuMvpyVvevOBOA3LEOBaemTw==" crossorigin="anonymous"></script>
@@ -14,16 +15,21 @@
 	<body>
 		<ode-portal title="{{#i18n}}timeline.title{{/i18n}}">
 			<div class="container">
-
+				<smart-banner></smart-banner>
 				<div class="row">
-		
 					<div class="col-md-4 col-xl-3" ode-widget-container="[[{position:'left'}]]"></div>
 
-					<div class="col-md-4 col-xl-6">
-		
+					<div class="col-md-4 col-xl-6" ng-controller="appCtrl as app">
 						<div class="feed">
-							<h2 class="subtitle">Fil de nouveautés</h2>
+							<h2 app-title class="subtitle">{{#i18n}}timeline.title{{/i18n}}</h2>
 		
+							<div class="twelve cell" pulsar-highlight="1">
+								<i class="arrow"></i>
+								<label
+									pulsar="{ index: 1, i18n: 'timeline.pulsar.filters', position: 'bottom center', className: 'pulse-filters'}">
+									<i18n>filters.title</i18n>
+								</label>
+							</div>
 							<a class="filter-button" href="#">Filtrez vos nouveautés</a>
 		
 							<div class="feed-list">
@@ -107,8 +113,8 @@
 		
 			</div>			
 		</ode-portal>
-<!--
+
 		<assistant></assistant>
--->
+
 	</body>
 </html>
