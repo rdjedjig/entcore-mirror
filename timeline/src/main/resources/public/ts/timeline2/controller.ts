@@ -1,15 +1,19 @@
+import { IScope } from 'angular';
 import { ng, template, idiom as lang, ui, http, currentLanguage, $, _, moment, skin } from 'entcore';
 import * as timelineControllers from './controller';
 
-export let mainController = ng.controller('MainController', ['$rootScope', '$scope', 'model', async ($rootScope, $scope, model) => {
-	$scope.closePanel = function(){
-		$rootScope.$broadcast('close-panel');
-	};
+//export let mainController = ng.controller('MainController', ['$rootScope', '$scope', 'model', async ($rootScope, $scope, model) => {
+export class AppController {
+	constructor(
+		private $rootScope:IScope,
+		private $scope:IScope ){
+	}
 
-	$scope.widgets = model.widgets;
+	closePanel() {
+		this.$rootScope.$broadcast('close-panel');
+	}
 
 	template.open('main', 'main');
-	template.open('widgets', 'widgets');
 	template.open('settings', 'settings');
 	template.open('notifications', 'notifications');
 	template.open('notifspanel', 'notifspanel');
