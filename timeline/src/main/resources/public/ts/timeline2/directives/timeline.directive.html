@@ -1,0 +1,42 @@
+<div class="twelve cell" pulsar-highlight="1">
+    <i class="arrow"></i>
+    <label
+        pulsar="{ index: 1, i18n: 'timeline.pulsar.filters', position: 'bottom center', className: 'pulse-filters'}">
+        <i18n>filters.title</i18n>
+    </label>
+</div>
+<a class="filter-button" href="#"><i18n>filters.title</i18n></a>
+
+<div class="feed-list">
+    <div ng-repeat="notif in ctrl.app.notifications track by notif._id">
+        <div class="feed-item color-app-[[ctrl.getCssType(notif.model)]]">
+            <div class="zone-avatar">
+    
+                <div class="avatar-social">
+                    <div class="photo">
+                        <img ng-src="/userbook/avatar/[[notif.model.sender]]?thumbnail=100x100" ng-if="notif.model.sender" />
+                    </div>
+    
+                    <div class="circle bg-app-[[ctrl.getCssType(notif.model)]]">
+                        <i class="ic-app pages-large"></i>
+                    </div>
+                </div>
+    
+            </div>
+            <div class="zone-text">
+    
+                <div class="meta">
+                    <div class="app-name">Blog</div>
+                    <div class="date">[[ctrl.formatDate(notif.model.date.$date)]]</div>
+                </div>
+    
+                <div class="username">
+                    <a class="link-discret" href="[[notif.model.params.uri]]">[[notif.model.params.username]]</a><!-- TODO - enseignant, Mathématiques --> 
+                </div>
+    
+                <div class="report" ng-bind-html="notif.model.message"></div>
+            </div>
+    
+        </div>        
+    </div>
+</div>

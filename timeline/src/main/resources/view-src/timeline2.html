@@ -21,96 +21,19 @@
 
 					<div class="col-md-4 col-xl-6" ng-controller="appCtrl as app">
 						<div class="feed">
-							<h2 app-title class="subtitle">{{#i18n}}timeline.title{{/i18n}}</h2>
+							<h2 app-title 
+									class="subtitle"
+									pulsar="{ index: 0, i18n: 'timeline.pulsar.notifications', position: 'center right', className: 'pulse-notifications'}"
+								>{{#i18n}}timeline.title{{/i18n}}</h2>
 		
-							<div class="twelve cell" pulsar-highlight="1">
-								<i class="arrow"></i>
-								<label
-									pulsar="{ index: 1, i18n: 'timeline.pulsar.filters', position: 'bottom center', className: 'pulse-filters'}">
-									<i18n>filters.title</i18n>
-								</label>
-							</div>
-							<a class="filter-button" href="#">Filtrez vos nouveautés</a>
-		
-							<div class="feed-list">
-		
-								<div class="feed-item color-app-pages">
-									<div class="zone-avatar">
-		
-										<div class="avatar-social">
-											<div class="photo">
-												<img src="https://picsum.photos/100/100" alt="">
-											</div>
-		
-											<div class="circle bg-app-pages">
-												<i class="ic-app pages-large"></i>
-											</div>
-										</div>
-		
-									</div>
-									<div class="zone-text">
-		
-										<div class="meta">
-											<div class="app-name">Blog</div>
-											<div class="date">
-												Il y a 2 jours
-											</div>
-										</div>
-		
-										<div class="username">
-											<a class="link-discret" href="#">ATOUSA Pauline</a> - enseignant, Mathématiques
-										</div>
-		
-										<div class="report">
-											a partagé avec vous le Pages <a class="link" href="#">Quoi de neuf au Lycée ? | Nouvelle assistante d'éducation pour l'école primaire</a>
-										</div>
-									</div>
-		
-								</div>
-		
-								<div class="feed-item color-app-wiki">
-									<div class="zone-avatar">
-		
-										<div class="avatar-social">
-											<div class="photo">
-												<img src="https://picsum.photos/101/101" alt="">
-											</div>
-		
-											<div class="circle bg-app-wiki">
-												<i class="ic-app wiki"></i>
-											</div>
-										</div>
-		
-									</div>
-									<div class="zone-text">
-		
-										<div class="meta">
-											<div class="app-name">Wiki</div>
-											<div class="date">
-												Il y a 2 jours
-											</div>
-										</div>
-		
-										<div class="username">
-											<a class="link-discret" href="#">ATOUSA Pauline</a> - enseignant, Mathématiques
-										</div>
-		
-										<div class="report">
-											a partagé avec vous le Pages <a class="link" href="#">Quoi de neuf au Lycée ? | Nouvelle assistante d'éducation pour l'école primaire</a>
-										</div>
-									</div>
-		
-								</div>
-		
-							</div>
-		
+							<flash-messages></flash-messages>
+							
+							<timeline></timeline>
 						</div>
-		
 					</div>
 
 					<div class="col-md-4 col-xl-3" ode-widget-container="[[{position:'right'}]]"></div>
 				</div>
-		
 			</div>			
 		</ode-portal>
 

@@ -1,6 +1,7 @@
 import { template, moment, idiom as lang } from "entcore";
 import { models, workspaceService, WorkspacePreferenceView } from "../services";
 import { Subject, Observable } from "rxjs";
+import { debounceTime } from "rxjs/operators";
 
 export interface NavigationDelegateScope {
     //
@@ -241,7 +242,7 @@ export function NavigationDelegate($scope: NavigationDelegateScope, $location, $
     /**aply a debounce time to avoid reloading content every time (sync bugs + optimize perf)**/
     let reloadSubject = new Subject();
     let contentRevision = 0;
-    (reloadSubject as Observable<any>).debounceTime(350).subscribe(async e => {
+    (reloadSubject as Observable<any>).pipe( debounceTime(350) ).subscribe(async e => {
         contentRevision++;//set a new revision of content
         const currentRevision = contentRevision;
         //on refresh folder content => reset search
