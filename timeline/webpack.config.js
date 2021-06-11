@@ -31,10 +31,18 @@ module.exports = {
     devtool: "source-map",
     module: {
         loaders: [
+            // ts-loader will handle files with `.ts` extensions.
+            { test: /\.ts$/, loader: 'ts-loader' },
+            // html-loader will handle all files with `.html` but not `.lazy.html` extensions
             {
-                test: /\.ts$/,
-                loader: 'ts-loader'
-            }
-        ]
+                test: /\.html$/,
+                exclude: /\.lazy\.html$/,
+                loader: 'html-loader',
+                options: {
+                  minimize: true,
+                  sources: false, // Disables attributes processing
+                },
+            },
+        ],
     }
 }
