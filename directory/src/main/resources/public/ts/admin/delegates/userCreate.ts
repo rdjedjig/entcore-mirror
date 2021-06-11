@@ -3,6 +3,7 @@ import { directoryService } from "../service";
 import { template, idiom as lang, notify } from "entcore";
 import { EventDelegateScope } from "./events";
 import { Subject, Observable } from "rxjs";
+import { distinctUntilChanged, debounceTime } from "rxjs/operators";
 import moment = require("moment");
 
 export enum UserCreateField {
@@ -150,7 +151,7 @@ export async function UserCreateDelegate($scope: UserCreateDelegateScope) {
         }
     }
     // === Add listeners
-    (onSearchChange as Observable<string>).distinctUntilChanged().debounceTime(450).subscribe(value => {
+    (onSearchChange as Observable<string>).pipe( distinctUntilChanged(), debounceTime(450) ).subscribe(value => {
         search(value);
     });
     $scope.onClassLoaded.subscribe(c => {

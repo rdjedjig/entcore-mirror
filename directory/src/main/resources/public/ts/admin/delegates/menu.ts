@@ -3,6 +3,7 @@ import { EventDelegateScope } from "./events";
 import { ClassRoom, Network, PersonApiResult, School } from '../model';
 import { directoryService } from '../service';
 import { Observable, Subject } from 'rxjs';
+import { mergeMap } from "rxjs/operators";
 
 
 export interface MenuDelegateScope extends EventDelegateScope {
@@ -30,7 +31,7 @@ export function MenuDelegate($scope: MenuDelegateScope) {
     let lastSelectedId = null;
     let myClasses = [];
     let myClassePromise = ($scope.onSchoolLoaded as Observable<School[]>)//
-        .flatMap(schools => schools.map(sc => sc.classrooms))//
+        .pipe( mergeMap(schools => schools.map(sc => sc.classrooms)) )//
         .toPromise()
     const setSelectedClassById = async function (classroomId: string, savePref: boolean, forceReload: boolean = false) {
         console.log("[Directory][Menu.setSelectedClassById] selecting a classroom: ", classroomId, savePref)
