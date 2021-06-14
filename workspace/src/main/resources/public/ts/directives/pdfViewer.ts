@@ -1,6 +1,5 @@
 import { ng, http, $ } from 'entcore';
 import { Subject, Observable } from "rxjs";
-import { debounceTime } from "rxjs/operators";
 import moment = require('moment');
 
 interface ScopePdfViewer {
@@ -74,7 +73,7 @@ export const pdfViewer = ng.directive('pdfViewer', function () {
 			});
 
 			const reloadPdf = new Subject<number>();
-			(reloadPdf as Observable<number>).pipe( debounceTime(100) ).subscribe(pageNumber=>{
+			(reloadPdf as Observable<number>).debounceTime(100).subscribe(pageNumber=>{
 				pdf.getPage(pageNumber).then(function (page) {
 					var viewport;
 					if (!$(canvas).hasClass('fullscreen')) {
