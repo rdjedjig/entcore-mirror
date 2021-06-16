@@ -20,6 +20,7 @@ module.exports = {
         "entcore/libs/underscore/underscore": "_",
         "entcore/libs/jquery/jquery": "entcore",
         "angular": "window.angular",
+        "gsap": "window",
         "ode-ts-client": 'window.entcore["ode-ts-client"]',
         "ode-ngjs-front": 'window.entcore["ode-ngjs-front"]'
     },
@@ -39,8 +40,9 @@ module.exports = {
                 exclude: /\.lazy\.html$/,
                 loader: 'html-loader',
                 options: {
+                  attrs: false, // Disables attributes processing
                   minimize: true,
-                  sources: false, // Disables attributes processing
+//                  sources: false, // Disables attributes processing
                 },
             },
         ],
