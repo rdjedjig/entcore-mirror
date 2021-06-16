@@ -1,15 +1,36 @@
-<div class="twelve cell" pulsar-highlight="1">
-    <i class="arrow"></i>
-    <label
+<div pulsar-highlight="1">
+    <a class="filter-button" href="#" data-target="timeline-filter"
         pulsar="{ index: 1, i18n: 'timeline.pulsar.filters', position: 'bottom center', className: 'pulse-filters'}">
-        <i18n>filters.title</i18n>
-    </label>
+    <i18n>filters.title</i18n></a>
 </div>
-<a class="filter-button" href="#"><i18n>filters.title</i18n></a>
+
+<div class="filters filters-chips" id="timeline-filter">
+    <div class="filter color-app-multiselect"
+            ng-if="ctrl.app.notificationTypes.length > 0">
+        <input type="checkbox" class="hidden-checkbox" value="test"
+                ng-model="ctrl.isAllSelected" 
+                ng-change="ctrl.switchAll()">
+        <div class="icon">
+            <i class="ic-app multiselect"></i>
+        </div>
+        <div class="label"><i18n>filters.all.none</i18n></div>
+    </div>
+
+    <div ng-repeat="notifType in ctrl.app.notificationTypes"
+            ng-class="ctrl.getFilterClass(notifType)">
+        <input type="checkbox" class="hidden-checkbox" value="test"
+                ng-model="ctrl.selectedFilter[notifType]"
+                ng-change="ctrl.switchFilter(notifType)">
+        <div class="icon">
+            <i class="ic-app [[ctrl.getCssType(notifType)]]"></i>
+        </div>
+        <div class="label">[[ctrl.translateType(notifType)]]</div>
+    </div>
+</div>
 
 <div class="feed-list">
     <div ng-repeat="notif in ctrl.app.notifications track by notif._id">
-        <div class="feed-item color-app-[[ctrl.getCssType(notif.model)]]">
+        <div class="feed-item color-app-[[ctrl.getCssType(notif.model.type)]]">
             <div class="zone-avatar">
     
                 <div class="avatar-social">
@@ -17,7 +38,7 @@
                         <img ng-src="/userbook/avatar/[[notif.model.sender]]?thumbnail=100x100" ng-if="notif.model.sender" />
                     </div>
     
-                    <div class="circle bg-app-[[ctrl.getCssType(notif.model)]]">
+                    <div class="circle bg-app-[[ctrl.getCssType(notif.model.type)]]">
                         <i class="ic-app pages-large"></i>
                     </div>
                 </div>
@@ -26,15 +47,24 @@
             <div class="zone-text">
     
                 <div class="meta">
-                    <div class="app-name">Blog</div>
+                    <!-- div class="app-name">Blog</div -->
                     <div class="date">[[ctrl.formatDate(notif.model.date.$date)]]</div>
                 </div>
     
+                <!--
                 <div class="username">
-                    <a class="link-discret" href="[[notif.model.params.uri]]">[[notif.model.params.username]]</a><!-- TODO - enseignant, Mathématiques --> 
+                    <a class="link-discret" href="[[notif.model.params.uri]]">[[notif.model.params.username]]</a> - enseignant, Mathématiques
                 </div>
+                -->
     
                 <div class="report" ng-bind-html="notif.model.message"></div>
+
+                <div class="zone-tools">
+                    <div class="control"></div>
+                    <a href="" class="link" 
+                        ng-click="ctrl.doReport(notif)"><i18n>timeline.action.discard</i18n></a>
+                    <a href="" class="link"><i18n>timeline.action.report</i18n></a>
+                </div>
             </div>
     
         </div>        

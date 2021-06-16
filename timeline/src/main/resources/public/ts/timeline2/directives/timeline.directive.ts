@@ -1,6 +1,8 @@
 import { IAttributes, IController, IDirective, IScope } from "angular";
 import moment = require("moment");
-import { ConfigurationFrameworkFactory, ITimelineFactory, NotificationModel, SessionFrameworkFactory } from "ode-ts-client";
+import  gsap = require("gsap");
+import { ConfigurationFrameworkFactory, ITimelineFactory, ITimelineNotification, NotificationModel, SessionFrameworkFactory, TransportFrameworkFactory } from "ode-ts-client";
+import * as $ from "jquery";
 
 type Action = {
     label: string;
@@ -23,13 +25,54 @@ export class Controller implements IController {
 
     app = ITimelineFactory.createInstance();
 
-	filtered = {};
+	selectedFilter = {};
 	config = {
 		hideAdminv1Link: false
-	}
+	};
     userStructure = null;
 	userStructures = this.me.structures;
-	switchingFilters = false;
+
+	get isAdml() {
+		return this.me.functions && this.me.functions.ADMIN_LOCAL && this.me.functions.ADMIN_LOCAL.scope;
+	}
+
+	get isAdmc() {
+		return this.me.functions && this.me.functions.SUPER_ADMIN && this.me.functions.SUPER_ADMIN.scope;
+	}
+
+	showAdminv1Link() {
+		return !this.config.hideAdminv1Link;
+	}
+
+	showAdminv2HomeLink() {
+		return !this.showAdminv1Link() && this.userStructures && this.userStructures.length > 1;
+	}
+
+	showAdminv2AlertsLink() {
+		return !this.showAdminv1Link() && this.userStructures && this.userStructures.length == 1;
+	}
+
+	public initialize() {
+		const admx:Promise<any> = (this.isAdml || this.isAdmc)
+		// get platform config about admin version to create admin (v1 or v2) link for report notification
+		? TransportFrameworkFactory.instance().http
+			.get('/admin/api/platform/config')
+			.then(res => {
+				this.config.hideAdminv1Link = res['hide-adminv1-link'];
+			})
+		: Promise.resolve();
+
+		return Promise.all([
+			this.app.initialize(),
+			admx
+		])
+		.then( results => { /*void*/ } );
+	}
+
+
+	public isAllSelected:boolean = false;
+
+
 /*
 	actions = {
 		discard = {
@@ -111,26 +154,6 @@ export class Controller implements IController {
     */
 
 /*
-	removeFilter(){
-		if(model.notificationTypes.noFilter){
-			model.notificationTypes.deselectAll();
-		}
-		model.notifications.sync();
-	};
-
-	allFilters(){
-		this.switchingFilters = true;
-		if(model.notificationTypes.selection().length === model.notificationTypes.length()){
-			model.notificationTypes.deselectAll();
-		}else{
-			model.notificationTypes.selectAll();
-		}
-
-		model.notifications.page = 0;
-		model.notifications.lastPage = false;
-		model.notifications.all = [];
-		model.notifications.sync(false, () => this.switchingFilters = false);
-	};
 
 	isCache = () => (window as any).TIMELINE_CACHE;
 
@@ -158,11 +181,6 @@ export class Controller implements IController {
 		this.loadPage();
 	}
 	
-	switchFilter = (type) => {
-		this.switchingFilters = true;
-		type.apply(() => this.switchingFilters = false);
-	}
-
 	unactivesFilters(){
 		var unactives = model.notificationTypes.length() - model.notificationTypes.selection().length;
 		return unactives;
@@ -174,55 +192,6 @@ export class Controller implements IController {
 
 	display = {};
 
-	suffixTitle(type) {
-		return lang.translate(type === 'timeline' ? type + '.notification' : type);
-	}
-
-	let isAdml = () => {
-		return model.me.functions && model.me.functions.ADMIN_LOCAL && model.me.functions.ADMIN_LOCAL.scope;
-	}
-
-	let isAdmc = () => {
-		return model.me.functions && model.me.functions.SUPER_ADMIN && model.me.functions.SUPER_ADMIN.scope;
-	}
-
-	// get platform config about admin version to create admin (v1 or v2) link for report notification
-	if (isAdml() || isAdmc()) {
-		http()
-			.get('/admin/api/platform/config')
-			.done(res => {
-				this.config.hideAdminv1Link = res['hide-adminv1-link'];
-			});
-	}
-
-	showAdminv1Link() {
-		return !this.config.hideAdminv1Link;
-	}
-
-	showAdminv2HomeLink() {
-		return !this.showAdminv1Link() && this.userStructures && this.userStructures.length > 1;
-	}
-
-	showAdminv2AlertsLink() {
-		return !this.showAdminv1Link() && this.userStructures && this.userStructures.length == 1;
-	}
-
-	allFiltersOn = (): boolean => {
-		return this.notificationTypes.selection() 
-			&& this.notificationTypes.all.length > 0
-			&& this.notificationTypes.selection().length === this.notificationTypes.all.length;
-	}
-
-	isEmpty = (): boolean => {
-		return this.notifications.all 
-			&& this.notifications.all.length === 0 
-			&& this.allFiltersOn();
-	}
-
-	noFiltersSelected = (): boolean => {
-		return this.notificationTypes.selection().length == 0;
-	}
-
 	noResultsWithFilters = (): boolean => {
 		return this.notifications.all 
 			&& this.notifications.all.length === 0 
@@ -230,13 +199,77 @@ export class Controller implements IController {
 			&& this.notificationTypes.selection().length > 0;
 	}
 */
+	private checkIfAllSelected() {
+		return this.isAllSelected = (this.app.selectedNotificationTypes.length >= this.app.notificationTypes.length);
+	}
+
+	initFilters() {
+		this.app.notificationTypes.forEach( type => {
+			this.selectedFilter[type] = false;
+		});
+		this.app.selectedNotificationTypes.forEach( type => {
+			this.selectedFilter[type] = true;
+		});
+		this.checkIfAllSelected();
+	}
+
+	switchFilter( type:string ) {
+		const isSelected = this.selectedFilter[type]; // has just been updated by ng-model
+		const savedIndex = this.app.selectedNotificationTypes.findIndex( t=>t===type );
+		if( isSelected && savedIndex===-1 ) {
+			this.app.selectedNotificationTypes.push( type );
+			this.app.savePreferences();
+		} else if( !isSelected && savedIndex!==-1 ) {
+			this.app.selectedNotificationTypes.splice(savedIndex,1);
+			this.app.savePreferences();
+		}
+		this.checkIfAllSelected();
+	}
+
+	switchAll() {
+		if( this.checkIfAllSelected() ){
+			//Deselect all
+			this.app.selectedNotificationTypes.splice(0);
+			this.selectedFilter = {};
+			this.isAllSelected = false;
+		} else {
+			//Select all
+			this.app.selectedNotificationTypes.splice(0);
+			this.app.notificationTypes.forEach( type => {
+				this.app.selectedNotificationTypes.push( type );
+				this.selectedFilter[type] = true;
+			});
+			this.isAllSelected = true;
+		}
+		this.app.savePreferences();
+		this.app.resetPagination();
+	}
+
+	areAllFiltersOn(): boolean {
+		return (this.app.selectedNotificationTypes.length >= this.app.notificationTypes.length);
+	}
+
+
 
 	formatDate(dateString){
 		return moment(dateString).fromNow();
 	};
 
-	getCssType( n:NotificationModel ):string {
-		switch( n.type ) {
+	isEmpty(): boolean  {
+		return this.app.notifications.length === 0 
+			&& this.areAllFiltersOn();
+	}
+
+	noFiltersSelected = (): boolean => {
+		return this.app.selectedNotificationTypes.length === 0;
+	}
+
+	doReport(notification:ITimelineNotification) {
+		notification.report();
+	}
+
+	getCssType( notifType:string ):string {
+		switch( notifType ) {
 			case "USERBOOK":
 			case "WIKI":						return "wiki";
 			case "NEWS":
@@ -247,7 +280,7 @@ export class Controller implements IController {
 			case "SCRAPBOOK":
 			case "MINDMAP":
 			case "HOMEWORKS":
-			case "TIMELINEGENERATOR":
+			case "TIMELINEGENERATOR":			return "timelinegenerator"
 			case "PAGES":						return "pages";
 			case "RBS":
 			case "SUPPORT":
@@ -265,6 +298,18 @@ export class Controller implements IController {
 			default:							return "default";
 		}
 	}
+
+	getFilterClass(notifType:string) {
+		return "filter"+
+			" color-app-"+this.getCssType(notifType) +
+			(this.selectedFilter[notifType] ? " active" : "");
+	}
+
+	translateType(notifType:string) {
+		notifType=notifType.toLowerCase();
+		return this.lang.translate(notifType === 'timeline' ? notifType + '.notification' : notifType);
+	}
+
 };
 
 interface TimelineScope extends IScope {
@@ -273,7 +318,7 @@ interface TimelineScope extends IScope {
 /* Directive */
 class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IController[]> {
     restrict = 'E';
-	template = require("./timeline.directive.html").default;
+	template = require("./timeline.directive.html");
     scope = {
     };
 	bindToController = true;
@@ -285,14 +330,62 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
         let ctrl:Controller|null = controllers ? controllers[0] as Controller : null;
         if(!ctrl) return;
 
-        ctrl.lang.addBundle('/timeline/i18nNotifications?mergeall=true', function(){
-//            this.notifications = model.notifications;
-//            $scope.$apply('notifications');
-        });
-    
-		ctrl.app.initialize().then( () => {
-			
+        ctrl.lang.addBundle('/timeline/i18nNotifications?mergeall=true', () => {
+			ctrl.initialize().then( () => {
+				ctrl.initFilters();
+				scope.$apply();
+			});
 		});
+
+		// Advanced transitions for filters
+		$('.filter-button').each(function (i) {
+			var target = '#' + $(this).data('target');
+			var filterTween = gsap.gsap.timeline().reversed(true).pause();
+			filterTween.from(target, { duration: 0.5, height: 0, autoAlpha: 0, display: 'none' });
+			filterTween.from(target + " .filter", {
+				duration: 0.3, 
+				autoAlpha: 0, 
+				translateY: '100%',
+				stagger: 0.1
+			}, "-=0.1");
+			$(target).data('tween', filterTween);
+		});
+
+		$('.trigger').on("click", function (e) {
+			$(this).siblings('.trigger').removeClass('on');
+			$(this).addClass('on');
+			var classFocus = 'focus-' + $(this).data('target-focus');
+
+			$('.container-advanced').attr('class', 'container-advanced ' + classFocus);
+		});
+
+		$('.filter').on('click', function (e) {
+			$(this).toggleClass('active');
+		});
+
+		$('.zone-tools .control').on('click', function (e) {
+			$(this).parents('.zone-tools').toggleClass('open');
+		});
+
+		$('.filter-button').on('click', function (e) {
+			var target = '#' + $(this).data('target');
+			if ($(target).data("tween").reversed()) {
+				$(target).data("tween").play();
+			} else {
+				$(target).data("tween").reverse()
+			}
+		});
+
+
+		// $('.tool-option').on("click", function (e) {
+		// 	e.preventDefault();
+		// 	$('#theModal').modal('toggle');
+		// });
+
+
+		// $('#theModal').on('shown.bs.modal', function () {
+		// 	$('#myInput').trigger('focus')
+		// })
     }
 }
 
