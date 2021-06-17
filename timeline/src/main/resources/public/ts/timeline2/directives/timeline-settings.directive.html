@@ -1,0 +1,59 @@
+<div ng-class="{ 'toggle-panel': true, hide: !ctrl.showPanel }">
+	<div class="toggle cell">
+		<h1><i18n>panel.title</i18n></h1>
+		<div class="row">
+			<div class="twelve cell skins-picker">
+				<h2><i18n>panel.themes</i18n></h2>
+				<div class="twelve cell">
+					<div class="six cell reduce-block-four" ng-repeat="skin in ctrl.skins" ng-click="ctrl.saveTheme(skin, $event)" class="element">
+						<div class="twelve cell photo-preview">
+							<img ng-src="[[skin.path]]thumbnail.png" />
+						</div>
+						<em ng-click="ctrl.saveTheme(skin, $event)" class="medium-importance centered twelve cell skin-[[skin.displayName]]">[[lang.translate(skin.displayName)]]</em>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="twelve cell widgets-picker" ng-if="ctrl.widgets.length > 0">
+				<h2><i18n>panel.widgets</i18n></h2>
+				<div class="row">
+					<div ng-repeat="widget in ctrl.widgets" ng-click="ctrl.toggleWidget(widget, $event)" class="widget-picker four cell" 
+							ng-class="{ inactive: !widget.userPref.show, locked: widget.platformConf.mandatory }">
+						<i class="[[widget.platformConf.name]]-icon" ng-class="{ selected: widget.userPref.show }"></i>
+						<span class="widget-picker__name">[[lang.translate(widget.platformConf.name)]]</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row" workflow="timeline.allowLanguages">
+			<div class="twelve cell lang-picker" ng-if="ctrl.languages.length > 0">
+				<h2><i18n>panel.languages</i18n></h2>
+				<div class="row">
+					<div class="lang-current reduce-block-eight">
+						<i class="globe"></i>
+						<span>[[lang.translate('language.' + ctrl.languagePreference)]]</span>
+					</div>
+					<div class="flags">
+						<div ng-repeat="language in ctrl.languages" ng-click="ctrl.saveLang(language, $event)" class="flag reduce-block-eight">
+							<i class="flag-[[language]]"></i>
+							<em class="medium-importance">[[lang.translate('language.' + language)]]</em>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+<ul class="icons-tabs row"
+	pulsar="{ index: 2, i18n: 'timeline.pulsar.settings', position: 'center left', className: 'pulse-settings'}" tooltip="navbar.tools">
+
+	<li ng-click="ctrl.togglePanel($event)"
+		ng-class="{ active: ctrl.showPanel }">
+			<i class="tools">
+			</i>
+	</li>
+</ul>

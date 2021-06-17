@@ -13,7 +13,7 @@ type Action = {
 };
 
 /* Controller for the directive */
-export class Controller implements IController {
+export class TimelineController implements IController {
     private me = SessionFrameworkFactory.instance().session.user;
 	public lang =  ConfigurationFrameworkFactory.instance().Platform.idiom;
 
@@ -322,12 +322,12 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
     scope = {
     };
 	bindToController = true;
-	controller = [Controller];
+	controller = [TimelineController];
 	controllerAs = 'ctrl';
 	require = ['timeline'];
 
     link(scope:TimelineScope, elem:JQLite, attr:IAttributes, controllers:IController[]|undefined): void {
-        let ctrl:Controller|null = controllers ? controllers[0] as Controller : null;
+        let ctrl:TimelineController|null = controllers ? controllers[0] as TimelineController : null;
         if(!ctrl) return;
 
         ctrl.lang.addBundle('/timeline/i18nNotifications?mergeall=true', () => {
