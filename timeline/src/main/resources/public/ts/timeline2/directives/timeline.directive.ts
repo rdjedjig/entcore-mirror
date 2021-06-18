@@ -26,7 +26,7 @@ export class TimelineController implements IController {
     app = ITimelineFactory.createInstance();
 
 	selectedFilter = {};	// ng-model for filters chip.
-	
+
 	config = {
 		hideAdminv1Link: false
 	};
@@ -310,6 +310,7 @@ export class TimelineController implements IController {
 };
 
 interface TimelineScope extends IScope {
+	canRenderUi:boolean;
 }
 
 /* Directive */
@@ -334,9 +335,12 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
 			return; // Do not load the notifications in lightmode
 		}
 
+		scope.canRenderUi = false;
+
         ctrl.lang.addBundle('/timeline/i18nNotifications?mergeall=true', () => {
 			ctrl.initialize().then( () => {
 				ctrl.initFilters();
+				scope.canRenderUi = true;
 				scope.$apply();
 
 				// Advanced transitions for filters
