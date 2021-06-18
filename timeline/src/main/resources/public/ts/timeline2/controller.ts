@@ -29,10 +29,7 @@ export class AppController {
 			return SessionFrameworkFactory.instance().session.hasWorkflow('fr.openent.zimbra.controllers.ZimbraController|preauth');
 		};
 		
-		await Promise.all([
-			platformConf.apps.initialize(APP.TIMELINE),
-			platformConf.theme.listSkins()
-		])
+		await platformConf.theme.listSkins();
 		
 		this.$scope.display = {
 			pickTheme: (platformConf.theme.skins.length > 1),
