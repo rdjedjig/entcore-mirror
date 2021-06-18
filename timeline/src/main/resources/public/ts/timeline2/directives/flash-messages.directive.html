@@ -1,0 +1,6 @@
+<div class="twelve cell">
+    <div class="flashmsg" ng-repeat="message in ctrl.messages track by message.id" ng-class="message.color" ng-style="{ 'background-color': message.customColor }">
+        <i class="close-2x right-magnet" title="[['timeline.mark.flashmsg'|i18n]]" ng-click="ctrl.dismiss(message)"></i>
+        <div ng-bind-html="{{ message.contents[ctrl.currentLanguage] }}"></div>
+    </div>
+</div>
