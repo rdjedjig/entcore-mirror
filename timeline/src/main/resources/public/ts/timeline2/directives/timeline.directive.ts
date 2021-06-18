@@ -4,18 +4,12 @@ import  gsap = require("gsap");
 import { ConfigurationFrameworkFactory, ITimelineFactory, ITimelineNotification, NotificationModel, SessionFrameworkFactory, TransportFrameworkFactory } from "ode-ts-client";
 import * as $ from "jquery";
 
-type Action = {
-    label: string;
-    action: (notification:any) => void;
-    condition: (notif?:any) => string;
-    doneProperty?:string;
-    doneLabel?:string;
-};
-
 /* Controller for the directive */
 export class TimelineController implements IController {
     private me = SessionFrameworkFactory.instance().session.user;
 	public lang =  ConfigurationFrameworkFactory.instance().Platform.idiom;
+
+	public savePrefsAndReload: () => Promise<void>;
 
     constructor() {
         if (this.userStructures && this.userStructures.length == 1) {
@@ -70,9 +64,40 @@ export class TimelineController implements IController {
 		.then( results => { /*void*/ } );
 	}
 
+	public isAllSelected:boolean = false;	// ng-model for the "Select All / none" chip
 
-	public isAllSelected:boolean = false;
+	public get canDiscard():boolean {
+		return SessionFrameworkFactory.instance().session.hasWorkflow("org.entcore.timeline.controllers.TimelineController|discardNotification");
+	}
+	public doDiscard( notif:ITimelineNotification ) {
+		if( this.canDiscard ) {
+			const idx = this.app.notifications.findIndex( n => n._id===notif._id );
+			if( idx >= 0 ) {
+				this.app.notifications.splice( idx, 1 );
+				notif.discard();
+			}
+		}
+	}
 
+	display:{
+		confirmReport:boolean;
+	} = {
+		confirmReport: false
+	};
+
+	public canReport( notif:ITimelineNotification ):boolean {
+		return notif.model.sender && SessionFrameworkFactory.instance().session.hasWorkflow("org.entcore.timeline.controllers.TimelineController|reportNotification");
+	}
+	public confirmReport( notif:ITimelineNotification ) {
+		if( this.canReport(notif) ) {
+			this.display.confirmReport = true;
+		}
+	}
+	public doReport( notif:ITimelineNotification ) {
+		notif.report().then( () => {
+			notif.model.reported = true;
+		});
+	}
 
 /*
 	actions = {
@@ -181,29 +206,20 @@ export class TimelineController implements IController {
 			&& this.app.selectedNotificationTypes.length > 0;
 	}
 
+	loadPage( force?:boolean ) {
+		this.app.loadNotifications( force );
+	}
 
 /*
 
-	forceLoadPage = () =>{
-		this.notifications.lastPage = false;
-		model.notifications.page++
-		this.loadPage();
-	}
-	
 	unactivesFilters(){
 		var unactives = model.notificationTypes.length() - model.notificationTypes.selection().length;
 		return unactives;
 	}
 
-	loadPage(){
-		model.notifications.sync(true);
-	}
-
-	display = {};
-
 */
-	private checkIfAllSelected() {
-		return this.isAllSelected = (this.app.selectedNotificationTypes.length >= this.app.notificationTypes.length);
+	private updateSelectAllChip() {
+		this.isAllSelected = this.areAllFiltersOn();
 	}
 
 	initFilters() {
@@ -213,7 +229,7 @@ export class TimelineController implements IController {
 		this.app.selectedNotificationTypes.forEach( type => {
 			this.selectedFilter[type] = true;
 		});
-		this.checkIfAllSelected();
+		this.updateSelectAllChip();
 	}
 
 	switchFilter( type:string ) {
@@ -221,21 +237,23 @@ export class TimelineController implements IController {
 		const savedIndex = this.app.selectedNotificationTypes.findIndex( t=>t===type );
 		if( isSelected && savedIndex===-1 ) {
 			this.app.selectedNotificationTypes.push( type );
-			this.app.savePreferences();
+			this.savePrefsAndReload();
 		} else if( !isSelected && savedIndex!==-1 ) {
 			this.app.selectedNotificationTypes.splice(savedIndex,1);
-			this.app.savePreferences();
+			this.savePrefsAndReload();
 		}
-		this.checkIfAllSelected();
+		this.updateSelectAllChip();
 	}
 
 //	public switchingFilters = false;
 
 	switchAll() {
-		if( this.checkIfAllSelected() ){
+		if( this.areAllFiltersOn() ){
 			//Deselect all
 			this.app.selectedNotificationTypes.splice(0);
-			this.selectedFilter = {};
+			this.app.notificationTypes.forEach( type => {
+				this.selectedFilter[type] = false;
+			});
 			this.isAllSelected = false;
 		} else {
 			//Select all
@@ -246,8 +264,7 @@ export class TimelineController implements IController {
 			});
 			this.isAllSelected = true;
 		}
-		this.app.savePreferences();
-		this.app.resetPagination();
+		this.savePrefsAndReload();
 	}
 
 	areAllFiltersOn(): boolean {
@@ -324,12 +341,24 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
 	controllerAs = 'ctrl';
 	require = ['timeline'];
 
-    link(scope:TimelineScope, elem:JQLite, attr:IAttributes, controllers:IController[]|undefined): void {
-        let ctrl:TimelineController|null = controllers ? controllers[0] as TimelineController : null;
+    async link(scope:TimelineScope, elem:JQLite, attr:IAttributes, controllers:IController[]|undefined) {
+        const ctrl:TimelineController|null = controllers ? controllers[0] as TimelineController : null;
         if(!ctrl) return;
 
 		const lightmode = attr["lightmode"] == "true" || false;
 		ctrl.isCache = attr["cache"] == "true" || false;
+
+		ctrl.savePrefsAndReload = () => {
+			return ctrl.app.savePreferences()
+			.then( () => {
+				ctrl.app.notifications.splice(0);
+				ctrl.app.resetPagination();
+				return ctrl.app.loadNotifications();
+			})
+			.then( () => {
+				scope.$apply();
+			});
+		}
 
 		if( lightmode ) {
 			return; // Do not load the notifications in lightmode
@@ -337,50 +366,49 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
 
 		scope.canRenderUi = false;
 
-        ctrl.lang.addBundle('/timeline/i18nNotifications?mergeall=true', () => {
-			ctrl.initialize().then( () => {
-				ctrl.initFilters();
-				scope.canRenderUi = true;
-				scope.$apply();
+        await ctrl.lang.addBundlePromise('/timeline/i18nNotifications?mergeall=true')
+		.then( () => ctrl.initialize() )
+		.then( () => {
+			ctrl.initFilters();
+			return ctrl.loadPage();
+		})
+		.then( () => {
+			scope.canRenderUi = true;
+			scope.$apply();
 
-				// Advanced transitions for filters
-				$('.filter-button').each(function (i) {
-					var target = '#' + $(this).data('target');
-					var filterTween = gsap.gsap.timeline().reversed(true).pause();
-					filterTween.from(target, { duration: 0.5, height: 0, autoAlpha: 0, display: 'none' });
-					filterTween.from(target + " .filter", {
-						duration: 0.3, 
-						autoAlpha: 0, 
-						translateY: '100%',
-						stagger: 0.1
-					}, "-=0.1");
-					$(target).data('tween', filterTween);
-				});
+			// Advanced transitions for filters
+			$('.filter-button').each(function (i) {
+				var target = '#' + $(this).data('target');
+				var filterTween = gsap.gsap.timeline().reversed(true).pause();
+				filterTween.from(target, { duration: 0.5, height: 0, autoAlpha: 0, display: 'none' });
+				filterTween.from(target + " .filter", {
+					duration: 0.3, 
+					autoAlpha: 0, 
+					translateY: '100%',
+					stagger: 0.1
+				}, "-=0.1");
+				$(target).data('tween', filterTween);
+			});
 
-				$('.trigger').on("click", function (e) {
-					$(this).siblings('.trigger').removeClass('on');
-					$(this).addClass('on');
-					var classFocus = 'focus-' + $(this).data('target-focus');
+			$('.trigger').on("click", function (e) {
+				$(this).siblings('.trigger').removeClass('on');
+				$(this).addClass('on');
+				var classFocus = 'focus-' + $(this).data('target-focus');
 
-					$('.container-advanced').attr('class', 'container-advanced ' + classFocus);
-				});
+				$('.container-advanced').attr('class', 'container-advanced ' + classFocus);
+			});
 
-				$('.filter').on('click', function (e) {
-					$(this).toggleClass('active');
-				});
+			$('.zone-tools .control').on('click', function (e) {
+				$(this).parents('.zone-tools').toggleClass('open');
+			});
 
-				$('.zone-tools .control').on('click', function (e) {
-					$(this).parents('.zone-tools').toggleClass('open');
-				});
-
-				$('.filter-button').on('click', function (e) {
-					var target = '#' + $(this).data('target');
-					if ($(target).data("tween").reversed()) {
-						$(target).data("tween").play();
-					} else {
-						$(target).data("tween").reverse()
-					}
-				});
+			$('.filter-button').on('click', function (e) {
+				var target = '#' + $(this).data('target');
+				if ($(target).data("tween").reversed()) {
+					$(target).data("tween").play();
+				} else {
+					$(target).data("tween").reverse()
+				}
 			});
 		});
     }
