@@ -25,7 +25,8 @@ export class TimelineController implements IController {
 
     app = ITimelineFactory.createInstance();
 
-	selectedFilter = {};
+	selectedFilter = {};	// ng-model for filters chip.
+	
 	config = {
 		hideAdminv1Link: false
 	};
@@ -153,27 +154,35 @@ export class TimelineController implements IController {
 	});
     */
 
-/*
+	public isCache:boolean = false;
 
-	isCache = () => (window as any).TIMELINE_CACHE;
-
-	showSeeMore = () => {
-		if(this.notifications.loading){
+	showSeeMore() {
+		if(this.app.isLoading){
 			return false;
 		}
-		return (window as any).TIMELINE_CACHE && model.notifications.page==1 && !model.notifications.lastPage;
+		return this.isCache && this.app.page===1 && this.app.hasMorePage;
 	}
 
-	showSeeMoreOnEmpty = () => {
+	showSeeMoreOnEmpty() {
 		try{
-			if(this.notifications.loading){
+			if(this.app.isLoading){
 				return false;
 			}
-			return (window as any).TIMELINE_CACHE && model.notifications.page==0 && this.notifications.all.length === 0 && this.notifications.lastPage;
+			return this.isCache && this.app.page===0 && this.app.notifications.length===0 && !this.app.hasMorePage;
 		} catch(e){
 			return false;
 		}
 	}
+
+	noResultsWithFilters():boolean {
+		return this.app.notifications
+			&& this.app.notifications.length === 0 
+			&& this.app.selectedNotificationTypes.length < this.app.notificationTypes.length
+			&& this.app.selectedNotificationTypes.length > 0;
+	}
+
+
+/*
 
 	forceLoadPage = () =>{
 		this.notifications.lastPage = false;
@@ -192,12 +201,6 @@ export class TimelineController implements IController {
 
 	display = {};
 
-	noResultsWithFilters = (): boolean => {
-		return this.notifications.all 
-			&& this.notifications.all.length === 0 
-			&& this.notificationTypes.selection().length < this.notificationTypes.all.length
-			&& this.notificationTypes.selection().length > 0;
-	}
 */
 	private checkIfAllSelected() {
 		return this.isAllSelected = (this.app.selectedNotificationTypes.length >= this.app.notificationTypes.length);
@@ -226,6 +229,8 @@ export class TimelineController implements IController {
 		this.checkIfAllSelected();
 	}
 
+//	public switchingFilters = false;
+
 	switchAll() {
 		if( this.checkIfAllSelected() ){
 			//Deselect all
@@ -249,8 +254,6 @@ export class TimelineController implements IController {
 		return (this.app.selectedNotificationTypes.length >= this.app.notificationTypes.length);
 	}
 
-
-
 	formatDate(dateString){
 		return moment(dateString).fromNow();
 	};
@@ -262,10 +265,6 @@ export class TimelineController implements IController {
 
 	noFiltersSelected = (): boolean => {
 		return this.app.selectedNotificationTypes.length === 0;
-	}
-
-	doReport(notification:ITimelineNotification) {
-		notification.report();
 	}
 
 	getCssType( notifType:string ):string {
@@ -300,9 +299,7 @@ export class TimelineController implements IController {
 	}
 
 	getFilterClass(notifType:string) {
-		return "filter"+
-			" color-app-"+this.getCssType(notifType) +
-			(this.selectedFilter[notifType] ? " active" : "");
+		return "filter color-app-"+this.getCssType(notifType) + (this.selectedFilter[notifType]?" active":"");
 	}
 
 	translateType(notifType:string) {
@@ -330,62 +327,58 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
         let ctrl:TimelineController|null = controllers ? controllers[0] as TimelineController : null;
         if(!ctrl) return;
 
+		const lightmode = attr["lightmode"] == "true" || false;
+		ctrl.isCache = attr["cache"] == "true" || false;
+
+		if( lightmode ) {
+			return; // Do not load the notifications in lightmode
+		}
+
         ctrl.lang.addBundle('/timeline/i18nNotifications?mergeall=true', () => {
 			ctrl.initialize().then( () => {
 				ctrl.initFilters();
 				scope.$apply();
+
+				// Advanced transitions for filters
+				$('.filter-button').each(function (i) {
+					var target = '#' + $(this).data('target');
+					var filterTween = gsap.gsap.timeline().reversed(true).pause();
+					filterTween.from(target, { duration: 0.5, height: 0, autoAlpha: 0, display: 'none' });
+					filterTween.from(target + " .filter", {
+						duration: 0.3, 
+						autoAlpha: 0, 
+						translateY: '100%',
+						stagger: 0.1
+					}, "-=0.1");
+					$(target).data('tween', filterTween);
+				});
+
+				$('.trigger').on("click", function (e) {
+					$(this).siblings('.trigger').removeClass('on');
+					$(this).addClass('on');
+					var classFocus = 'focus-' + $(this).data('target-focus');
+
+					$('.container-advanced').attr('class', 'container-advanced ' + classFocus);
+				});
+
+				$('.filter').on('click', function (e) {
+					$(this).toggleClass('active');
+				});
+
+				$('.zone-tools .control').on('click', function (e) {
+					$(this).parents('.zone-tools').toggleClass('open');
+				});
+
+				$('.filter-button').on('click', function (e) {
+					var target = '#' + $(this).data('target');
+					if ($(target).data("tween").reversed()) {
+						$(target).data("tween").play();
+					} else {
+						$(target).data("tween").reverse()
+					}
+				});
 			});
 		});
-
-		// Advanced transitions for filters
-		$('.filter-button').each(function (i) {
-			var target = '#' + $(this).data('target');
-			var filterTween = gsap.gsap.timeline().reversed(true).pause();
-			filterTween.from(target, { duration: 0.5, height: 0, autoAlpha: 0, display: 'none' });
-			filterTween.from(target + " .filter", {
-				duration: 0.3, 
-				autoAlpha: 0, 
-				translateY: '100%',
-				stagger: 0.1
-			}, "-=0.1");
-			$(target).data('tween', filterTween);
-		});
-
-		$('.trigger').on("click", function (e) {
-			$(this).siblings('.trigger').removeClass('on');
-			$(this).addClass('on');
-			var classFocus = 'focus-' + $(this).data('target-focus');
-
-			$('.container-advanced').attr('class', 'container-advanced ' + classFocus);
-		});
-
-		$('.filter').on('click', function (e) {
-			$(this).toggleClass('active');
-		});
-
-		$('.zone-tools .control').on('click', function (e) {
-			$(this).parents('.zone-tools').toggleClass('open');
-		});
-
-		$('.filter-button').on('click', function (e) {
-			var target = '#' + $(this).data('target');
-			if ($(target).data("tween").reversed()) {
-				$(target).data("tween").play();
-			} else {
-				$(target).data("tween").reverse()
-			}
-		});
-
-
-		// $('.tool-option').on("click", function (e) {
-		// 	e.preventDefault();
-		// 	$('#theModal').modal('toggle');
-		// });
-
-
-		// $('#theModal').on('shown.bs.modal', function () {
-		// 	$('#myInput').trigger('focus')
-		// })
     }
 }
 
@@ -393,7 +386,7 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
  * The timeline directive.
  *
  * Usage:
- *   &lt;timeline></timeline&gt;
+ *   &lt;timeline lightmode="true|false" cache="true|false"></timeline&gt;
  */
 export function DirectiveFactory() {
 	return new Directive();
