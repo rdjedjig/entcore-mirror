@@ -7,27 +7,28 @@
 </div>
 
 <div class="filters filters-chips" id="timeline-filter">
-    <div class="filter color-app-multiselect"
+    <label class="filter color-app-multiselect"
+            ng-class="{active: ctrl.isAllSelected}"
             ng-if="ctrl.app.notificationTypes.length > 0">
         <input type="checkbox" class="hidden-checkbox" value="test"
-                ng-model="ctrl.isAllSelected" 
-                ng-change="ctrl.switchAll()">
+               ng-model="ctrl.isAllSelected" 
+               ng-change="ctrl.switchAll()">
         <!-- div class="icon">
             <i class="ic-app multiselect"></i>
         </div -->
         <div class="label"><i18n>filters.all.none</i18n></div>
-    </div>
+    </label>
 
-    <div ng-repeat="notifType in ctrl.app.notificationTypes"
-            ng-class="ctrl.getFilterClass(notifType)">
+    <label ng-repeat="notifType in ctrl.app.notificationTypes"
+           ng-class="ctrl.getFilterClass(notifType)">
         <input type="checkbox" class="hidden-checkbox" value="test"
-                ng-model="ctrl.selectedFilter[notifType]"
-                ng-change="ctrl.switchFilter(notifType)">
+               ng-model="ctrl.selectedFilter[notifType]"
+               ng-change="ctrl.switchFilter(notifType)">
         <div class="icon">
             <i class="ic-app [[ctrl.getCssType(notifType)]]"></i>
         </div>
         <div class="label">[[ctrl.translateType(notifType)]]</div>
-    </div>
+    </label>
 </div>
 
 <div class="feed-list">
@@ -115,7 +116,7 @@
             <div class="zone-text">
     
                 <div class="meta">
-                    <!-- div class="app-name">Blog</div -->
+                    <div class="app-name">[[ctrl.translateType(notif.model.type)]]</div>
                     <div class="date">[[ctrl.formatDate(notif.model.date.$date)]]</div>
                 </div>
     
@@ -131,13 +132,44 @@
             <div class="zone-tools">
                 <div class="control"></div>
                 <a href="" class="link" 
-                    ng-click="notif.discard()"><i18n>timeline.action.discard</i18n></a>
+                    ng-if="ctrl.canDiscard"
+                    ng-click="ctrl.doDiscard(notif)"><i18n>timeline.action.discard</i18n></a>
                 <a href="" class="link"
-                    ng-click="notif.report()"><i18n>timeline.action.report</i18n></a>
+                    ng-if="ctrl.canReport(notif)"
+                    ng-click="ctrl.confirmReport(notif)"><i18n>timeline.action.report</i18n></a>
             </div>
 
         </div>        
     </div>
+
+    <!--SHOW MORE -->
+    <div ng-if="ctrl.showSeeMore()" style="text-align: center;">
+        <a ng-click="ctrl.loadPage()"><i18n>timeline.seeold</i18n></a>
+    </div>
+
+    <div ng-if="ctrl.showSeeMoreOnEmpty()" style="justify-content: center;display:flex;">
+        <button ng-click="ctrl.loadPage(true)"><i18n>timeline.historyold</i18n></button>
+    </div>
+
+    <lightbox show="ctrl.display.confirmReport" on-close="ctrl.display.confirmReport = false">
+        <h2><i18n>timeline.confirm.report</i18n></h2>
+        <p>
+            <i18n>timeline.confirm.report.text</i18n>
+        </p>
+        <div class="row">
+            <button ng-click="ctrl.doReport(notification); ctrl.display.confirmReport = false" class="right-magnet">
+                <i18n>timeline.action.report</i18n>
+            </button>
+            <button type="button" ng-click="ctrl.display.confirmReport = false" class="right-magnet cancel">
+                <i18n>cancel</i18n>
+            </button>
+        </div>
+    </lightbox>
+
+    <div class="row notification" ng-show="ctrl.app.isLoading">
+        <h1 class="reduce-block-eight nomargin"><i18n>loading</i18n></h1>
+    </div>
+
 </div>
 
 <timeline-settings></timeline-settings>
