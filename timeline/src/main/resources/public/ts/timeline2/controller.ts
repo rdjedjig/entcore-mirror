@@ -1,43 +1,26 @@
-import { IScope } from 'angular';
-import { APP, ConfigurationFrameworkFactory, IIdiom, IUserInfo, SessionFrameworkFactory } from 'ode-ts-client';
+import { ConfigurationFrameworkFactory, IIdiom, IUserInfo, SessionFrameworkFactory } from 'ode-ts-client';
 
-interface AppScope extends IScope {
+export class AppController {
 	me: IUserInfo;
 	lang: IIdiom;
 	lightmode: string;
-	hasWorkflowZimbraExpert: ()=>boolean;
-	display:{
-		confirmReport?:boolean;
-		pickTheme?:boolean;
-	};
-}
 
-export class AppController {
-	constructor(
-			private $rootScope:IScope,
-			private $scope:AppScope 
-		){
+	constructor(){
 		this.initialize();
 	}
 
 	private async initialize():Promise<void> {
 		const platformConf = ConfigurationFrameworkFactory.instance().Platform;
-		this.$scope.me = SessionFrameworkFactory.instance().session.user;
-		this.$scope.lang = platformConf.idiom;
-		this.$scope.lightmode = (window as any).LIGHT_MODE;
-		this.$scope.hasWorkflowZimbraExpert = () => {
-			return SessionFrameworkFactory.instance().session.hasWorkflow('fr.openent.zimbra.controllers.ZimbraController|preauth');
-		};
-		
-		await platformConf.theme.listSkins();
-		
-		this.$scope.display = {
-			pickTheme: (platformConf.theme.skins.length > 1),
-			confirmReport: false
-		};
+		this.me = SessionFrameworkFactory.instance().session.user;
+		this.lang = platformConf.idiom;
+		this.lightmode = (window as any).LIGHT_MODE;
 	}
 
-	closePanel() {
-		this.$rootScope.$broadcast('close-panel');
+	public toggleContainer( ev:UIEvent, containerId:string ) {
+		$(".list-trigger .trigger").removeClass('on');
+		$(ev.currentTarget).addClass('on');
+		let classFocus = 'focus-' + containerId;
+		$('.container-advanced').attr('class', 'container-advanced ' + classFocus);
 	}
+
 };

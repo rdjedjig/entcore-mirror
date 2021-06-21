@@ -10,7 +10,7 @@ import { APP, ConfigurationFrameworkFactory } from "ode-ts-client";
 ConfigurationFrameworkFactory.instance().Platform.apps.initialize(APP.TIMELINE)
 .then( () => {
     angular.module("app", [OdeModules.getBase(), OdeModules.getI18n(), OdeModules.getUi(), OdeModules.getWidgets()])
-    .controller("appCtrl", ['$rootScope', '$scope', AppController])
+    .controller("appCtrl", ['$scope', AppController])
     .directive("timeline", TimelineApp.DirectiveFactory)
     .directive("flashMessages", FlashMsg.DirectiveFactory)
     .directive("timelineSettings", TimelineSettings.DirectiveFactory);

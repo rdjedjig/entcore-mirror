@@ -342,6 +342,7 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
     restrict = 'E';
 	template = require("./timeline.directive.html");
     scope = {
+		pickTheme: "="
     };
 	bindToController = true;
 	controller = [TimelineController];
@@ -395,14 +396,6 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
 					stagger: 0.1
 				}, "-=0.1");
 				$(target).data('tween', filterTween);
-			});
-
-			$('.trigger').on("click", function (e) {
-				$(this).siblings('.trigger').removeClass('on');
-				$(this).addClass('on');
-				var classFocus = 'focus-' + $(this).data('target-focus');
-
-				$('.container-advanced').attr('class', 'container-advanced ' + classFocus);
 			});
 
 			$('.filter-button').on('click', function (e) {
