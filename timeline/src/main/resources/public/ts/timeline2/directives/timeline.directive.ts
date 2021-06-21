@@ -84,18 +84,21 @@ export class TimelineController implements IController {
 	} = {
 		confirmReport: false
 	};
+	currentNotification:ITimelineNotification;
 
 	public canReport( notif:ITimelineNotification ):boolean {
 		return notif.model.sender && SessionFrameworkFactory.instance().session.hasWorkflow("org.entcore.timeline.controllers.TimelineController|reportNotification");
 	}
 	public confirmReport( notif:ITimelineNotification ) {
 		if( this.canReport(notif) ) {
+			this.currentNotification = notif;
 			this.display.confirmReport = true;
 		}
 	}
-	public doReport( notif:ITimelineNotification ) {
-		notif.report().then( () => {
-			notif.model.reported = true;
+	public doReport() {
+		this.currentNotification.report().then( () => {
+			this.currentNotification.model.reported = true;
+			this.currentNotification = null;
 		});
 	}
 
@@ -319,6 +322,10 @@ export class TimelineController implements IController {
 		return "filter color-app-"+this.getCssType(notifType) + (this.selectedFilter[notifType]?" active":"");
 	}
 
+	toggleTools(event:UIEvent) {
+		$((event.currentTarget as HTMLElement).parentNode).toggleClass('open');
+	}
+
 	translateType(notifType:string) {
 		notifType=notifType.toLowerCase();
 		return this.lang.translate(notifType === 'timeline' ? notifType + '.notification' : notifType);
@@ -396,10 +403,6 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
 				var classFocus = 'focus-' + $(this).data('target-focus');
 
 				$('.container-advanced').attr('class', 'container-advanced ' + classFocus);
-			});
-
-			$('.zone-tools .control').on('click', function (e) {
-				$(this).parents('.zone-tools').toggleClass('open');
 			});
 
 			$('.filter-button').on('click', function (e) {
