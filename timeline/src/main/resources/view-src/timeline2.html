@@ -14,18 +14,18 @@
 		<script type="text/javascript" src="/timeline/public/dist/timeline2/application.js"></script>
 	</head>
 	<body ng-controller="appCtrl as app">
-		<ode-portal title="{{#i18n}}timeline.title{{/i18n}}">
+		<ode-portal app="timeline" title="{{#i18n}}timeline.title{{/i18n}}">
 			
 			<div class="container-advanced-nav d-lg-none">
 				<div class="list-trigger">
 					<div class="trigger" ng-click="app.toggleContainer($event, 'left')">
-						Etablissement
+						<i18n>timeline.col.left</i18n>
 					</div>
 					<div class="trigger on" ng-click="app.toggleContainer($event, 'center')">
-						Fil de nouveautés
+						<i18n>timeline</i18n>
 					</div>
 					<div class="trigger" ng-click="app.toggleContainer($event, 'right')">
-						Mes widgets
+						<i18n>timeline.col.right</i18n>>
 					</div>
 				</div>
 			</div>
