@@ -23,6 +23,11 @@ export class Controller implements IController {
 		return SessionFrameworkFactory.instance().session.currentLanguage;
 	}
 
+	canTogglePanel():boolean {
+		const ww = $(window).width();
+		return (typeof ww!=="number" || ww >= 992);
+	}
+
 	togglePanel($event) {
 		this.showPanel = !this.showPanel;
 	}
