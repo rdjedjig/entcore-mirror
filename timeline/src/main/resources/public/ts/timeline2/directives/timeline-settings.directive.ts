@@ -12,7 +12,7 @@ export class Controller implements IController {
 	public widgets:IWidget[];
 	public languages:string[];
 
-    constructor( 
+    constructor(
 		private themeSvc:ThemeHelperService
 		) {
 		this.widgets = WidgetFrameworkFactory.instance().list;
