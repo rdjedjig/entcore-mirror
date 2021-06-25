@@ -118,32 +118,23 @@ testGradle () {
 }
 
 localDep () {
-  if [ -e $PWD/../ode-ts-client ]; then
-    docker-compose run --rm \
-      -u "$USER_UID:$GROUP_GID" \
-      -v $PWD/../ode-ts-client:/home/node/ode-ts-client \
-      node sh -c "npm install --no-save /home/node/ode-ts-client"
-  fi
-  if [ -e $PWD/../ode-ngjs-front ]; then
-    docker-compose run --rm \
-      -u "$USER_UID:$GROUP_GID" \
-      -v $PWD/../ode-ngjs-front:/home/node/ode-ngjs-front \
-      node sh -c "npm install --no-save /home/node/ode-ngjs-front"
-  fi
+  for dep in ode-ts-client ode-ngjs-front ; do
+    if [ -e $PWD/../$dep ]; then
+      rm -rf $dep.tar $dep.tar.gz
+      mkdir $dep.tar && mkdir $dep.tar/dist \
+        && cp -R $PWD/../$dep/dist $PWD/../$dep/package.json $dep.tar
+      tar cfzh $dep.tar.gz $dep.tar
+      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "npm install --no-save $dep.tar.gz"
+      rm -rf $dep.tar $dep.tar.gz
+    fi
+  done
 }
 
 watch () {
-  local bind_mounts=" -v $PWD/../$SPRINGBOARD:/home/node/springboard"
-  if [ -e $PWD/../ode-ts-client ]; then
-    bind_mounts=$bind_mounts" -v $PWD/../ode-ts-client:/home/node/ode-ts-client"
-  fi
-  if [ -e $PWD/../ode-ngjs-front ]; then
-    bind_mounts=$bind_mounts" -v $PWD/../ode-ngjs-front:/home/node/ode-ngjs-front"
-  fi
   docker-compose run \
     --rm \
     -u "$USER_UID:$GROUP_GID" \
-    $bind_mounts \
+    -v $PWD/../$SPRINGBOARD:/home/node/springboard \
     node sh -c "node_modules/gulp/bin/gulp.js watch-$MODULE --springboard=/home/node/springboard"
 }
 
