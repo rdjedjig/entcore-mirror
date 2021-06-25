@@ -1,59 +1,52 @@
-<div ng-class="{ 'toggle-panel': true, hide: !ctrl.showPanel }">
-	<div class="toggle cell">
-		<h1><i18n>panel.title</i18n></h1>
-		<div class="row">
-			<div class="twelve cell skins-picker">
-				<h2><i18n>panel.themes</i18n></h2>
-				<div class="twelve cell">
-					<div class="six cell reduce-block-four" ng-repeat="skin in ctrl.skins" ng-click="ctrl.saveTheme(skin, $event)" class="element">
-						<div class="twelve cell photo-preview">
-							<img ng-src="[[skin.path]]thumbnail.png" />
-						</div>
-						<em ng-click="ctrl.saveTheme(skin, $event)" class="medium-importance centered twelve cell skin-[[skin.displayName]]">[[lang.translate(skin.displayName)]]</em>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="twelve cell widgets-picker" ng-if="ctrl.widgets.length > 0">
-				<h2><i18n>panel.widgets</i18n></h2>
-				<div class="row">
-					<div ng-repeat="widget in ctrl.widgets" ng-click="ctrl.toggleWidget(widget, $event)" class="widget-picker four cell" 
-							ng-class="{ inactive: !widget.userPref.show, locked: widget.platformConf.mandatory }">
-						<i class="[[widget.platformConf.name]]-icon" ng-class="{ selected: widget.userPref.show }"></i>
-						<span class="widget-picker__name">[[lang.translate(widget.platformConf.name)]]</span>
-					</div>
-				</div>
+<div class="sticky-toolbox"
+		ng-class="{ open: ctrl.showPanel }">
+
+	<div class="link-tool toolbox"
+			i18n-title="navbar.tools"
+			pulsar="{ index: 2, i18n: 'timeline.pulsar.settings', position: 'center left', className: 'pulse-settings'}"
+			ng-click="ctrl.togglePanel($event)">
+		<i class="ic-tools"></i>
+	</div>
+
+
+	<div class="content">
+	
+		<p class="title"><i18n>panel.themes</i18n></p>
+		<div class="buttons-theme row">
+			<div class="col-6" ng-repeat="skin in ctrl.skins">
+				<a href="" class="bt skin-[[skin.displayName]]" ng-click="ctrl.saveTheme(skin, $event)" >
+					[[lang.translate(skin.displayName)]]
+				</a>
 			</div>
 		</div>
 
-		<div class="row" workflow="timeline.allowLanguages">
-			<div class="twelve cell lang-picker" ng-if="ctrl.languages.length > 0">
-				<h2><i18n>panel.languages</i18n></h2>
-				<div class="row">
-					<div class="lang-current reduce-block-eight">
-						<i class="globe"></i>
-						<span>[[lang.translate('language.' + ctrl.languagePreference)]]</span>
-					</div>
-					<div class="flags">
-						<div ng-repeat="language in ctrl.languages" ng-click="ctrl.saveLang(language, $event)" class="flag reduce-block-eight">
-							<i class="flag-[[language]]"></i>
-							<em class="medium-importance">[[lang.translate('language.' + language)]]</em>
-						</div>
-					</div>
+		<p class="title"><i18n>panel.widgets</i18n></p>
+		<div class="row buttons-widget">
+			<div class="col-3" ng-repeat="widget in ctrl.widgets">
+				<a href="" class="bt"
+						title="[[lang.translate(widget.platformConf.name)]]"
+						ng-class="{ selected: widget.userPref.show, locked: widget.platformConf.mandatory }"
+						ng-click="ctrl.toggleWidget(widget, $event)">
+					<span class="inner">
+						<i ng-class="ctrl.getWidgetIconClass(widget)"></i>
+					</span>
+				</a>
+			</div>
+		</div>
+
+		<p class="title"><i18n>panel.languages</i18n></p>
+		<div class="twelve cell lang-picker" workflow="timeline.allowLanguages" ng-if="ctrl.languages.length > 0">
+			<div class="lang-current reduce-block-eight">
+				<i class="globe"></i>
+				<span>[[lang.translate('language.' + ctrl.languagePreference)]]</span>
+			</div>
+			<div class="flags">
+				<div ng-repeat="language in ctrl.languages" ng-click="ctrl.saveLang(language, $event)">
+					<i class="flag-[[language]]"></i>
+					<em class="medium-importance">[[lang.translate('language.' + language)]]</em>
 				</div>
 			</div>
 		</div>
 
 	</div>
 </div>
-
-<ul class="icons-tabs row"
-	pulsar="{ index: 2, i18n: 'timeline.pulsar.settings', position: 'center left', className: 'pulse-settings'}" tooltip="navbar.tools">
-
-	<li ng-click="ctrl.togglePanel($event)"
-		ng-class="{ active: ctrl.showPanel }">
-			<i class="tools">
-			</i>
-	</li>
-</ul>
