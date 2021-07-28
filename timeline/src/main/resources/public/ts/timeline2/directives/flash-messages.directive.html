@@ -1,6 +1,11 @@
-<div class="twelve cell">
-    <div class="flashmsg" ng-repeat="message in ctrl.messages track by message.id" ng-class="message.color" ng-style="{ 'background-color': message.customColor }">
-        <i class="close-2x right-magnet" title="[['timeline.mark.flashmsg'|i18n]]" ng-click="ctrl.dismiss(message)"></i>
+<div class="widget widget-flash" ng-repeat="message in ctrl.messages track by message.id" ng-class="message.color" ng-style="{ 'background-color': message.customColor }">
+    <div class="widget-body">
         <div ng-bind-html="{{ message.contents[ctrl.currentLanguage] }}"></div>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="ctrl.dismiss(message)">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <div ng-if="message.signature" class="mt-3 font-italic" ng-style="{'color': message.signatureColor}">
+            {{ message.signature }}
+        </div>
     </div>
 </div>

@@ -6,6 +6,8 @@ export class FlashMsgController implements IController {
 	public app:ITimelineApp;
 	public currentLanguage:string;
 
+	constructor( private $scope:IScope ) {}
+
 	list() {
 		return this.app.loadFlashMessages();
 	}
@@ -16,7 +18,8 @@ export class FlashMsgController implements IController {
 
     dismiss( message:IFlashMessageModel ) {
 		this.app.markAsRead( message ).then( () => {
-            this.list();
+			this.app.flashMessages.splice(this.app.flashMessages.findIndex(m => m.id === message.id), 1);
+			this.$scope.$apply();
         });
     }
 };
@@ -28,7 +31,7 @@ class Directive implements IDirective<IScope,JQLite,IAttributes,IController[]> {
     scope = {
     };
 	bindToController = true;
-	controller = [FlashMsgController];
+	controller = ["$scope", FlashMsgController];
 	controllerAs = 'ctrl';
 	require = ['flashMessages'];
 
