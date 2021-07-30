@@ -15,10 +15,10 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-import { template, notify, idiom as lang, ng, ui, model, moment, $ } from 'entcore';
+import { template, notify, idiom as lang, ng, ui, model, moment, $, angular } from 'entcore';
 import { directory } from '../model';
 
-export const directoryController = ng.controller('DirectoryController',['$scope', '$window', 'route', ($scope, $window, route) => {
+export const directoryController = ng.controller('DirectoryController',['$scope', '$window', 'route', '$location', ($scope, $window, route, $location) => {
 	$scope.template = template;
 	template.open('userActions', 'user-actions');
 	$scope.users = {};
@@ -158,9 +158,8 @@ export const directoryController = ng.controller('DirectoryController',['$scope'
 
 			$scope.classesOrder = ['structId', 'label'];
 
-			/* RM#30674 FEAT (JCBE) : applies only to wide screens. */
-			if (!ui.breakpoints.checkMaxWidth("wideScreen"))
-				await $scope.selectDefaultValues();
+			// Pre-apply filters that are specified in the url parameters :
+			$scope.preApplyFilters();
 
 			template.open('page', 'directory');
 			template.close('list');
@@ -928,5 +927,58 @@ export const directoryController = ng.controller('DirectoryController',['$scope'
 
 	$scope.getTarget = function(target, type) {
 		return {...target, type}
+	}
+
+	/* Check and apply the URL parameters.
+	 * @param filters		"users" | "groups"
+	 * @param class			string | string[]
+	 * @param profile		an ID
+	 * @param structure		an ID
+	 * 
+	 * Example URL : /userbook/annuaire#/search?filters=groups&structure=an_id&profile=Teacher&class=TP1&class=TP2
+	 */
+	$scope.preApplyFilters = async function() {
+		const params:{
+			filters?:"users"|"groups",
+			class?:string|Array<string>,
+			profile?:string,
+			structure?:string
+		} = $location.search();
+
+		let filters;
+
+		switch( params.filters ) {
+			case 'users': $scope.search.index = 0; break;
+			case 'groups': $scope.search.index = 1; break;
+			default: params.filters = 'users'; break;
+		}
+
+		if( typeof params.profile === "string" ) {
+			filters = filters || {};
+			filters.profiles = [params.profile];
+		}
+
+		if( typeof params.structure === "string" ) {
+			filters = filters || {};
+			filters.structures = [params.structure];
+		}
+
+		if( typeof params.class === "string" ) {
+			filters = filters || {};
+			filters.classes = [params.class];
+		} else if( angular.isArray(params.class) ) {
+			filters = filters || {};
+			filters.classes = params.class;
+		}
+
+		if( filters ) {
+			$scope.showDefaultValue = false;
+			$scope.defaultValueTitle = "";
+			await directory.directory[params.filters].searchDirectory("", filters, null, false);
+		} else {
+			/* RM#30674 FEAT (JCBE) : applies only to wide screens. */
+			if (!ui.breakpoints.checkMaxWidth("wideScreen"))
+				await $scope.selectDefaultValues();
+		}
 	}
 }]);
