@@ -47,7 +47,7 @@ export class TimelineController implements IController {
 		return !this.showAdminv1Link() && this.userStructures && this.userStructures.length == 1;
 	}
 
-	public initialize() {
+	public async initialize() {
 		const admx:Promise<any> = (this.isAdml || this.isAdmc)
 		// get platform config about admin version to create admin (v1 or v2) link for report notification
 		? TransportFrameworkFactory.instance().http
@@ -57,11 +57,10 @@ export class TimelineController implements IController {
 			})
 		: Promise.resolve();
 
-		return Promise.all([
+		await Promise.all([
 			this.app.initialize(),
 			admx
-		])
-		.then( results => { /*void*/ } );
+		]);
 	}
 
 	public isAllSelected:boolean = false;	// ng-model for the "Select All / none" chip
@@ -374,38 +373,34 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
 
 		scope.canRenderUi = false;
 
-        await ctrl.lang.addBundlePromise('/timeline/i18nNotifications?mergeall=true')
-		.then( () => ctrl.initialize() )
-		.then( () => {
-			ctrl.initFilters();
-			return ctrl.loadPage();
-		})
-		.then( () => {
-			scope.canRenderUi = true;
-			scope.$apply();
+        await ctrl.lang.addBundlePromise('/timeline/i18nNotifications?mergeall=true');
+		await ctrl.initialize();
+		ctrl.initFilters();
+		ctrl.loadPage();
+		scope.canRenderUi = true;
+		scope.$apply();
 
-			// Advanced transitions for filters
-			$('.filter-button').each(function (i) {
-				var target = '#' + $(this).data('target');
-				var filterTween = gsap.gsap.timeline().reversed(true).pause();
-				filterTween.from(target, { duration: 0.5, height: 0, autoAlpha: 0, display: 'none' });
-				filterTween.from(target + " .filter", {
-					duration: 0.3, 
-					autoAlpha: 0, 
-					translateY: '100%',
-					stagger: 0.1
-				}, "-=0.1");
-				$(target).data('tween', filterTween);
-			});
+		// Advanced transitions for filters
+		$('.filter-button').each(function (i) {
+			var target = '#' + $(this).data('target');
+			var filterTween = gsap.gsap.timeline().reversed(true).pause();
+			filterTween.from(target, { duration: 0.5, height: 0, autoAlpha: 0, display: 'none' });
+			filterTween.from(target + " .filter", {
+				duration: 0.3, 
+				autoAlpha: 0, 
+				translateY: '100%',
+				stagger: 0.1
+			}, "-=0.1");
+			$(target).data('tween', filterTween);
+		});
 
-			$('.filter-button').on('click', function (e) {
-				var target = '#' + $(this).data('target');
-				if ($(target).data("tween").reversed()) {
-					$(target).data("tween").play();
-				} else {
-					$(target).data("tween").reverse()
-				}
-			});
+		$('.filter-button').on('click', function (e) {
+			var target = '#' + $(this).data('target');
+			if ($(target).data("tween").reversed()) {
+				$(target).data("tween").play();
+			} else {
+				$(target).data("tween").reverse()
+			}
 		});
     }
 }
