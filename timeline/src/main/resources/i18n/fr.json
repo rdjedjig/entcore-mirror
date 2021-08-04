@@ -40,6 +40,7 @@
     "timeline.empty.cache": "L'historique de vos notifications est masqué par défaut. Vous pouvez charger votre historique en cliquant ci-dessous.",
     "timeline.history.empty": "Vous n'avez partagé aucune information pour le moment !",
     "timeline.title": "Fil de nouveautés",
+    "timeline.title.responsive": "Accueil",
     "userbook": "Humeurs et devises",
     "workspace": "Espace documentaire",
     "admin.timeline": "Notifications",
