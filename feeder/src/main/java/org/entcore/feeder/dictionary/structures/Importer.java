@@ -580,22 +580,27 @@ public class Importer {
 					String query;
 					JsonObject p = new JsonObject().put("userExternalId", externalId);
 					if (structures.size() == 1) {
-						query = "MATCH (s:Structure {externalId : {structureAdmin}})<-[:DEPENDS]-(g:ProfileGroup)-[:HAS_PROFILE]->(p:Profile {externalId : {profileExternalId}}), " +
-								"(u:User { externalId : {userExternalId}}) " +
-								"WHERE NOT(HAS(u.mergedWith)) " +
-								"MERGE u-[:ADMINISTRATIVE_ATTACHMENT]->s " +
-								"WITH u, g " +
-								"MERGE u-[:IN]->g";
+						query =
+							"MATCH (u:User { externalId : {userExternalId}}) " +
+							"WHERE NOT(HAS(u.mergedWith)) " +
+							"WITH u " +
+							"MATCH (s:Structure {externalId : {structureAdmin}})<-[:DEPENDS]-(g:ProfileGroup)-[:HAS_PROFILE]->(p:Profile {externalId : {profileExternalId}}) " +
+							"MERGE u-[:ADMINISTRATIVE_ATTACHMENT]->s " +
+							"WITH u, g  " +
+							"MERGE u-[:IN]->g ";
 						p.put("structureAdmin", structures.getString(0))
 								.put("profileExternalId", profileExternalId);
 					} else {
-						query = "MATCH (s:Structure)<-[:DEPENDS]-(g:ProfileGroup)-[:HAS_PROFILE]->(p:Profile), " +
-								"(u:User { externalId : {userExternalId}})) " +
-								"WHERE s.externalId IN {structuresAdmin} AND NOT(HAS(u.mergedWith)) " +
-								"AND p.externalId = {profileExternalId} " +
-								"MERGE u-[:ADMINISTRATIVE_ATTACHMENT]->s " +
-								"WITH u, g " +
-								"MERGE u-[:IN]->g";
+						query =
+							"MATCH (u:User { externalId : {userExternalId}}) " +
+							"WHERE NOT(HAS(u.mergedWith)) " +
+							"WITH u " +
+							"MATCH (s:Structure)<-[:DEPENDS]-(g:ProfileGroup)-[:HAS_PROFILE]->(p:Profile) " +
+							"WHERE s.externalId IN {structuresAdmin} " +
+							"AND p.externalId = {profileExternalId} " +
+							"MERGE u-[:ADMINISTRATIVE_ATTACHMENT]->s " +
+							"WITH u, g " +
+							"MERGE u-[:IN]->g";
 						p.put("structuresAdmin", structures)
 								.put("profileExternalId", profileExternalId);
 					}
@@ -623,11 +628,13 @@ public class Importer {
 						}
 					}
 					String query =
-							"MATCH (c:Class)<-[:DEPENDS]-(g:ProfileGroup)" +
-							"-[:DEPENDS]->(:ProfileGroup)-[:HAS_PROFILE]->(:Profile {externalId : {profileExternalId}}), " +
-							"(u:User { externalId : {userExternalId}}) " +
-							"WHERE c.externalId IN {classes} AND NOT(HAS(u.mergedWith))  " +
-							"MERGE u-[:IN]->g";
+						"MATCH (u:User { externalId : {userExternalId}}) " +
+						"WHERE NOT(HAS(u.mergedWith)) " +
+						"WITH u " +
+						"MATCH (c:Class)<-[:DEPENDS]-(g:ProfileGroup) " +
+						"-[:DEPENDS]->(:ProfileGroup)-[:HAS_PROFILE]->(:Profile {externalId : {profileExternalId}}) " +
+						"WHERE c.externalId IN {classes} " +
+						"MERGE u-[:IN]->g";
 					JsonObject p0 = new JsonObject()
 							.put("userExternalId", externalId)
 							.put("profileExternalId", profileExternalId)
