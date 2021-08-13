@@ -124,16 +124,21 @@ public class PersEducNat extends AbstractUser {
 					structuresByFunctions = getMappingStructures(structuresByFunctions);
 					JsonObject p = new JsonObject().put("userExternalId", externalId);
 					if (structuresByFunctions.size() == 1) {
-						query = "MATCH (s:Structure {externalId : {structureAdmin}})<-[:DEPENDS]-(g:ProfileGroup)-[:HAS_PROFILE]->(p:Profile {externalId : {profileExternalId}}), " +
-								"(u:User { externalId : {userExternalId}}) " +
-								"WHERE NOT(HAS(u.mergedWith)) " +
-								"MERGE u-[:IN]->g";
+						query =
+							"MATCH (u:User { externalId : {userExternalId}}) " +
+							"WHERE NOT(HAS(u.mergedWith)) " +
+							"WITH u " +
+							"MATCH (s:Structure {externalId : {structureAdmin}})<-[:DEPENDS]-(g:ProfileGroup)-[:HAS_PROFILE]->(p:Profile {externalId : {profileExternalId}}) " +
+							"MERGE u-[:IN]->g";
 						p.put("structureAdmin", structuresByFunctions.getString(0))
 								.put("profileExternalId", profileExternalId);
 					} else {
-						query = "MATCH (s:Structure)<-[:DEPENDS]-(g:ProfileGroup)-[:HAS_PROFILE]->(p:Profile), " +
-								"(u:User { externalId : {userExternalId}}) " +
-								"WHERE s.externalId IN {structuresAdmin} AND NOT(HAS(u.mergedWith)) " +
+						query =
+								"MATCH (u:User { externalId : {userExternalId}}) " +
+								"WHERE NOT(HAS(u.mergedWith)) " +
+								"WITH u " +
+								"MATCH (s:Structure)<-[:DEPENDS]-(g:ProfileGroup)-[:HAS_PROFILE]->(p:Profile) " +
+								"WHERE s.externalId IN {structuresAdmin} " +
 								"AND p.externalId = {profileExternalId} " +
 								"MERGE u-[:IN]->g ";
 						p.put("structuresAdmin", structuresByFunctions)
@@ -177,10 +182,12 @@ public class PersEducNat extends AbstractUser {
 						}
 					}
 					String query =
+							"MATCH (u:User { externalId : {userExternalId}}) " +
+							"WHERE NOT(HAS(u.mergedWith)) " +
+							"WITH u " +
 							"MATCH (c:Class)<-[:DEPENDS]-(g:ProfileGroup)" +
-							"-[:DEPENDS]->(pg:ProfileGroup)-[:HAS_PROFILE]->(p:Profile {externalId : {profileExternalId}}), " +
-							"(u:User { externalId : {userExternalId}}) " +
-							"WHERE c.externalId IN {classes} AND NOT(HAS(u.mergedWith)) " +
+							"-[:DEPENDS]->(pg:ProfileGroup)-[:HAS_PROFILE]->(p:Profile {externalId : {profileExternalId}}) " +
+							"WHERE c.externalId IN {classes} " +
 							"MERGE u-[:IN]->g";
 					JsonObject p0 = new JsonObject()
 							.put("userExternalId", externalId)
