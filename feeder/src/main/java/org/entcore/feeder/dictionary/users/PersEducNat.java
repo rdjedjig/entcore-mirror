@@ -127,7 +127,6 @@ public class PersEducNat extends AbstractUser {
 						query =
 							"MATCH (u:User { externalId : {userExternalId}}) " +
 							"WHERE NOT(HAS(u.mergedWith)) " +
-							"WITH u " +
 							"MATCH (s:Structure {externalId : {structureAdmin}})<-[:DEPENDS]-(g:ProfileGroup)-[:HAS_PROFILE]->(p:Profile {externalId : {profileExternalId}}) " +
 							"MERGE u-[:IN]->g";
 						p.put("structureAdmin", structuresByFunctions.getString(0))
@@ -136,7 +135,6 @@ public class PersEducNat extends AbstractUser {
 						query =
 								"MATCH (u:User { externalId : {userExternalId}}) " +
 								"WHERE NOT(HAS(u.mergedWith)) " +
-								"WITH u " +
 								"MATCH (s:Structure)<-[:DEPENDS]-(g:ProfileGroup)-[:HAS_PROFILE]->(p:Profile) " +
 								"WHERE s.externalId IN {structuresAdmin} " +
 								"AND p.externalId = {profileExternalId} " +
@@ -184,7 +182,6 @@ public class PersEducNat extends AbstractUser {
 					String query =
 							"MATCH (u:User { externalId : {userExternalId}}) " +
 							"WHERE NOT(HAS(u.mergedWith)) " +
-							"WITH u " +
 							"MATCH (c:Class)<-[:DEPENDS]-(g:ProfileGroup)" +
 							"-[:DEPENDS]->(pg:ProfileGroup)-[:HAS_PROFILE]->(p:Profile {externalId : {profileExternalId}}) " +
 							"WHERE c.externalId IN {classes} " +

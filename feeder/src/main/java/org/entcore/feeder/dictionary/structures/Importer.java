@@ -583,7 +583,6 @@ public class Importer {
 						query =
 							"MATCH (u:User { externalId : {userExternalId}}) " +
 							"WHERE NOT(HAS(u.mergedWith)) " +
-							"WITH u " +
 							"MATCH (s:Structure {externalId : {structureAdmin}})<-[:DEPENDS]-(g:ProfileGroup)-[:HAS_PROFILE]->(p:Profile {externalId : {profileExternalId}}) " +
 							"MERGE u-[:ADMINISTRATIVE_ATTACHMENT]->s " +
 							"WITH u, g  " +
@@ -594,7 +593,6 @@ public class Importer {
 						query =
 							"MATCH (u:User { externalId : {userExternalId}}) " +
 							"WHERE NOT(HAS(u.mergedWith)) " +
-							"WITH u " +
 							"MATCH (s:Structure)<-[:DEPENDS]-(g:ProfileGroup)-[:HAS_PROFILE]->(p:Profile) " +
 							"WHERE s.externalId IN {structuresAdmin} " +
 							"AND p.externalId = {profileExternalId} " +
@@ -630,7 +628,6 @@ public class Importer {
 					String query =
 						"MATCH (u:User { externalId : {userExternalId}}) " +
 						"WHERE NOT(HAS(u.mergedWith)) " +
-						"WITH u " +
 						"MATCH (c:Class)<-[:DEPENDS]-(g:ProfileGroup) " +
 						"-[:DEPENDS]->(:ProfileGroup)-[:HAS_PROFILE]->(:Profile {externalId : {profileExternalId}}) " +
 						"WHERE c.externalId IN {classes} " +
@@ -662,7 +659,6 @@ public class Importer {
 					String query =
 							"MATCH (u:User { externalId: {userExternalId}}) " +
 							"WHERE NOT(HAS(u.mergedWith)) " +
-							"WITH u " +
 							"MATCH (g:Group) " +
 							"WHERE (g:FunctionalGroup OR g:FunctionGroup) AND g.externalId IN {groups} AND g.source = {source} " +
 							"MERGE (u)-[:IN]->(g) ";
