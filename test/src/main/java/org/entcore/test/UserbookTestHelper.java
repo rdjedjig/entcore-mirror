@@ -22,6 +22,11 @@ public class UserbookTestHelper {
         this.test = t;
     }
 
+    public UserbookTestHelper createMock(Handler<Message<JsonObject>> handler) {
+        vertx.eventBus().consumer("userbook.preferences", handler);
+        return this;
+    }
+
     public Future<Integer> setQuotaForUserId(String userId, Long quota) {
         Future<Integer> future = Future.future();
         test.database().executeNeo4jWithUniqueResult(

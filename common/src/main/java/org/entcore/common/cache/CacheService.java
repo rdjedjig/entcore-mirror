@@ -8,7 +8,9 @@ import org.entcore.common.redis.Redis;
 import org.entcore.common.user.UserInfos;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public interface CacheService {
 
@@ -44,6 +46,8 @@ public interface CacheService {
     void removeForUser(UserInfos user, String key, Handler<AsyncResult<Void>> handler);
 
     void removeForLang(String lang, String key, Handler<AsyncResult<Void>> handler);
+
+    void getAll(Set<String> key, Handler<AsyncResult<Map<String, String>>> handler);
 
     void get(String key, Handler<AsyncResult<Optional<String>>> handler);
 

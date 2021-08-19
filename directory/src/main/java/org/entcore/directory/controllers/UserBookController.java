@@ -794,4 +794,7 @@ public class UserBookController extends BaseController {
 		this.conversationNotification = conversationNotification;
 	}
 
+	public void setNeo(Neo neo) {
+		this.neo = neo;
+	}
 }

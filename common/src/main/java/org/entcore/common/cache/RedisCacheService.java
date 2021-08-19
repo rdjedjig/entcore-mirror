@@ -1,16 +1,13 @@
 package org.entcore.common.cache;
 
 import fr.wseduc.webutils.DefaultAsyncResult;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.RedisClient;
 import org.entcore.common.redis.Redis;
 import org.entcore.common.user.UserInfos;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class RedisCacheService implements CacheService {
@@ -149,5 +146,29 @@ public class RedisCacheService implements CacheService {
 
     public void getListLength(String key, Handler<AsyncResult<Long>> handler){
         redis.llen(key, handler);
+    }
+
+    public void getAll(final Set<String> keys, final Handler<AsyncResult<Map<String, String>>> handler){
+        final List<Future> promises = keys.stream().map(key->{
+            final Promise<Optional<String>> promise = Promise.promise();
+            this.get(key, promise);
+            return promise.future().map(e->{
+                return new AbstractMap.SimpleEntry<>(key, e);
+            });
+        }).collect(Collectors.toList());
+        CompositeFuture.all(promises).onComplete(e->{
+            if(e.succeeded()){
+                final List<AbstractMap.SimpleEntry<String, Optional<String>>> list = e.result().list();
+                final Map<String, String> map = new HashMap<>();
+                for(final AbstractMap.SimpleEntry<String, Optional<String>> entry : list){
+                    if(entry.getValue().isPresent()){
+                        map.put(entry.getKey(), entry.getValue().get());
+                    }
+                }
+                handler.handle(new DefaultAsyncResult<>(map));
+            }else{
+                handler.handle(new DefaultAsyncResult<>(e.cause()));
+            }
+        });
     }
 }

@@ -46,6 +46,7 @@ import org.entcore.common.http.response.SecurityHookRender;
 import org.entcore.common.http.response.OverrideThemeHookRender;
 import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.neo4j.Neo4jUtils;
+import org.entcore.common.notification.NotificationUtils;
 import org.entcore.common.redis.Redis;
 import org.entcore.common.search.SearchingEvents;
 import org.entcore.common.search.SearchingHandler;
@@ -188,6 +189,14 @@ public abstract class BaseServer extends Server {
 	}
 
 	protected void initModulesHelpers(String node) {
+		//cache notification
+		final LocalMap<Object, Object> server = vertx.sharedData().getLocalMap("server");
+		final Optional<Object> notificationCache = Optional.ofNullable(server.get("notificationCache"));
+		if(notificationCache.isPresent()){
+			final JsonObject notificationCacheJson = new JsonObject((String)notificationCache.get());
+			NotificationUtils.setCache(vertx, notificationCacheJson);
+		}
+		//end cache notification
 		if (config.getBoolean("neo4j", true)) {
 			if (config.getJsonObject("neo4jConfig") != null) {
 				final JsonObject neo4jConfigJson = config.getJsonObject("neo4jConfig").copy();
