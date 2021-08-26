@@ -1,6 +1,6 @@
 <div class="widget widget-flash" ng-repeat="message in ctrl.messages track by message.id" ng-class="message.color" ng-style="{ 'background-color': message.customColor }">
     <div class="widget-body">
-        <div ng-bind-html="{{ message.contents[ctrl.currentLanguage] }}"></div>
+        <div class="flash-content" ng-bind-html="{{ message.contents[ctrl.currentLanguage] }}"></div>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="ctrl.dismiss(message)">
             <span aria-hidden="true">&times;</span>
         </button>
