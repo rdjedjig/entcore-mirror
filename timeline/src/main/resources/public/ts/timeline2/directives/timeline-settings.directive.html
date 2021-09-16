@@ -15,7 +15,9 @@
 		<p class="title"><i18n>panel.themes</i18n></p>
 		<div class="buttons-theme row">
 			<div class="col-6" ng-repeat="skin in ctrl.skins">
-				<a href="" class="bt skin-[[skin.displayName]]" ng-click="ctrl.saveTheme(skin, $event)" >
+				<a href="" class="bt skin-[[skin.displayName]]"
+						ng-class="{ selected: ctrl.isCurrentTheme(skin) }"
+						ng-click="ctrl.saveTheme(skin, $event)" >
 					[[lang.translate(skin.displayName)]]
 				</a>
 			</div>
@@ -23,28 +25,30 @@
 
 		<p class="title"><i18n>panel.widgets</i18n></p>
 		<div class="row buttons-widget">
-			<div class="col-3" ng-repeat="widget in ctrl.widgets">
+			<div class="text-center col-3" ng-repeat="widget in ctrl.widgets">
 				<a href="" class="bt"
 						title="[[lang.translate(widget.platformConf.name)]]"
 						ng-class="{ selected: widget.userPref.show, locked: widget.platformConf.mandatory }"
 						ng-click="ctrl.toggleWidget(widget, $event)">
 					<span class="inner">
-						<i ng-class="ctrl.getWidgetIconClass(widget)"></i>
+						<i ng-class="ctrl.themeSvc.getWidgetIconClass(widget.platformConf.name)"></i>
 					</span>
 				</a>
+				<small>[[lang.translate(widget.platformConf.name)]]</small>
 			</div>
 		</div>
 
-		<p class="title"><i18n>panel.languages</i18n></p>
-		<div class="twelve cell lang-picker" workflow="timeline.allowLanguages" ng-if="ctrl.languages.length > 0">
-			<div class="lang-current reduce-block-eight">
-				<i class="globe"></i>
-				<span>[[lang.translate('language.' + ctrl.languagePreference)]]</span>
-			</div>
-			<div class="flags">
-				<div ng-repeat="language in ctrl.languages" ng-click="ctrl.saveLang(language, $event)">
-					<i class="flag-[[language]]"></i>
-					<em class="medium-importance">[[lang.translate('language.' + language)]]</em>
+		<div workflow="timeline.allowLanguages" ng-if="ctrl.languages.length > 1">
+			<p class="title"><i18n>panel.languages</i18n></p>
+			<div class="row buttons-lang">
+				<div class="col-3" 
+						ng-repeat="language in ctrl.languages" 
+						ng-click="ctrl.saveLang(language, $event)">
+					<a href="" class="bt-lang"
+							ng-class="{ selected: ctrl.languagePreference===language}">
+						<img class="flag" ng-src="[[ctrl.getFlagUrlFor(language)]]" alt="">
+						<div>[[lang.translate('language.' + language)]]</div>
+					</a>
 				</div>
 			</div>
 		</div>
