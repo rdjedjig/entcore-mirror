@@ -10,6 +10,7 @@ export class Controller implements IController {
 	public widgets:IWidget[];
 	public languages:string[];
 	public themeRoot:string;
+	public safeApply:()=>void;
 
     constructor(
 		public themeSvc:ThemeHelperService
@@ -35,8 +36,9 @@ export class Controller implements IController {
 		return ConfigurationFrameworkFactory.instance().Platform.theme.skinName == skin.displayName;
 	}
 
-	saveTheme(skin:IThemeDesc, $event) {
-		this.themeSvc.setTheme( skin );
+	async saveTheme(skin:IThemeDesc, $event) {
+		await this.themeSvc.setTheme( skin );
+		this.safeApply && this.safeApply();
 	}
 
 	toggleWidget( widget:IWidget, $event) {
@@ -95,6 +97,16 @@ class Directive implements IDirective<LocalScope,JQLite,IAttributes,IController[
 			ctrl.languages = results[0];
 			ctrl.skins = results[1];
 			ctrl.themeRoot = results[2];
+			ctrl.safeApply = ( fn?: string | ((scope:IScope)=>any) ) => {
+				const phase = scope.$root.$$phase;
+				if (phase == '$apply' || phase == '$digest') {
+					if (typeof (fn) === 'function') {
+						fn(scope);
+					}
+				} else {
+					scope.$apply(fn as string);
+				}
+			}
 			scope.$apply();
 		});
 
