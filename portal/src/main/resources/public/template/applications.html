@@ -1,9 +1,9 @@
 <span ng-controller="ApplicationController">
 	<div class="d-flex justify-content-between row">
-		<h1 class="application__title d-mobile-none col-lg-6"><i18n>portal.header.navigation.myapps</i18n></h1>
+		<h1 class="application-title d-mobile-none col-lg-6"><i18n>portal.header.navigation.myapps</i18n></h1>
 		
 		<!-- Search bar -->
-		<section class="applications__search col-lg-4">
+		<section class="applications-search col-lg-4">
 			<div class="input-searchbar">
 				<i class="ic-search form-control-feedback"></i>
 				<input
@@ -19,7 +19,7 @@
 	</div>
 
 	<!-- Bookmarks section -->
-	<section class="applications__favorite">
+	<section class="applications-favorite">
 				
 		<!-- "Empty screen" -->
 		<div class="text-center m-2" ng-if="!display.searchText && !bookmarks.length">
@@ -27,7 +27,7 @@
 				<i18n>apps.bookmarks.empty</i18n>
 			</p>
 			<button 
-				class="btn btn-outline-orange btn-sm"
+				class="btn btn-outline-primary btn-sm"
 				ng-class="{'active': display.modeBookmarkEdition}"
 				ng-click="toggleBookmarkEdition()"
 			>
@@ -36,7 +36,7 @@
 		</div>
 		
 		<!-- bookmarks list -->
-		<section class="applications__list" id="bookmarked-apps">
+		<section class="applications-list" id="bookmarked-apps">
 			<article
 				ng-repeat="application in filteredBookmarks = (bookmarks | filter:searchDisplayName)"
 				id="[[application.name]]"
@@ -46,7 +46,7 @@
 				<a
 					ng-if="!application.isExternal"
 					ng-href="[[application.address]]"  
-					class="application__item"
+					class="application-item"
 					target="[[application.target]]"
 					ng-class="{'no-hover': display.modeBookmarkEdition, 'pe-none': display.modeBookmarkEdition}"
 				>
@@ -70,7 +70,7 @@
 					ng-if="application.isExternal"
 					connector-lightbox-trigger="application"
 					href=""  
-					class="application__item"
+					class="application-item"
 					ng-class="{'no-hover': display.modeBookmarkEdition, 'pe-none': display.modeBookmarkEdition}"
 				>
 					<i ng-if="isIconUrl(application)" class="application">
@@ -89,7 +89,7 @@
 				</a>
 				
 				<button 
-					class="application__item--remove" 
+					class="application-item--remove" 
 					title="Retirer des favoris"
 					ng-if="display.modeBookmarkEdition"
 					ng-click="removeBookmark(application, $index, $event)"
@@ -107,7 +107,7 @@
 		<!-- section title and button to handle bookmarks -->
 		<div class="d-flex justify-content-end">
 			<button 
-				class="btn btn-outline-orange btn-sm"
+				class="btn btn-outline-primary btn-sm"
 				ng-class="{'active': display.modeBookmarkEdition}"
 				ng-click="toggleBookmarkEdition()"
 				ng-if="!display.searchText && bookmarks.length"
@@ -118,7 +118,7 @@
 	</section>
 
 	<!-- Applications section (may contain connectors if number of connectors is below 6 or the plaftorm configured number) -->
-	<section class="applications__list mt-2" id="apps">
+	<section class="applications-list mt-2" id="apps">
 		<article
 			ng-repeat="application in filteredApplications = (applications | filter:searchDisplayName)"
 			id="[[application.name]]"
@@ -128,7 +128,7 @@
 			<a
 				ng-if="!application.isExternal"
 				ng-href="[[application.address]]"
-				class="application__item"
+				class="application-item"
 				target="[[application.target]]"
 				ng-class="{'no-hover': display.modeBookmarkEdition, 'pe-none': display.modeBookmarkEdition}"
 			>
@@ -152,7 +152,7 @@
 				ng-if="application.isExternal"
 				connector-lightbox-trigger="application"
 				href=""
-				class="application__item" 
+				class="application-item" 
 				ng-class="{'no-hover': display.modeBookmarkEdition, 'pe-none': display.modeBookmarkEdition}"
 			>
 				<i ng-if="isIconUrl(application)" class="application">
@@ -171,7 +171,7 @@
 			</a>
 			
 			<button 
-				class="application__item--add" 
+				class="application-item--add" 
 				title="Ajouter aux favoris"
 				ng-if="display.modeBookmarkEdition"
 				ng-click="addBookmark(application, $index, $event)"
@@ -188,9 +188,9 @@
 	</section>
 
 	<!-- Connectors section -->
-	<section class="applications__connector" ng-if="display.showConnectorSection && connectors && connectors.length > 0">
+	<section class="applications-connector" ng-if="display.showConnectorSection && connectors && connectors.length > 0">
 		<h2><span><i18n>apps.connectors</i18n></span></h2>
-		<section class="applications__list" id="connectors">
+		<section class="applications-list" id="connectors">
 			<article
 				ng-repeat="connector in filteredConnectors = (connectors | filter:searchDisplayName)"
 				id="[[connector.name]]" 
@@ -199,7 +199,7 @@
 				<a 
 					href=""
 					connector-lightbox-trigger="connector"
-					class="application__item connector"
+					class="application-item connector"
 					ng-class="{'no-hover': display.modeBookmarkEdition, 'pe-none': display.modeBookmarkEdition}"
 				>
 					<i ng-if="isIconUrl(connector)" class="application">
@@ -217,7 +217,7 @@
 					<span class="text-truncate text-truncate--2">[[translatedDisplayName(connector)]]</span>
 				</a>
 				<button 
-					class="application__item--add" 
+					class="application-item--add" 
 					title="Ajouter aux favoris"
 					ng-if="display.modeBookmarkEdition"
 					ng-click="addBookmark(connector, $index, $event)"

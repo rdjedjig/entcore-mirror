@@ -94,26 +94,26 @@
 
 <!-- Theme 2D -->
 <header class="no-1d navbar navbar-dark bg-secondary">
-    <a class="d-mobile-none" href="/timeline/timeline?token=[[rand]]">
+    <a class="btn btn-secondary d-none me-auto d-md-none d-lg-block" href="/timeline/timeline?token=[[rand]]">
         <img class="logo" src="/assets/themes/[[skin.skin]]/img/illustrations/logo.png" alt="Logo de l'ENT">
     </a>
     
-    <a href="/welcome" class="application__title d-desktop-none text-truncate">
+    <a href="/welcome" class="application-title d-inline-block d-lg-none text-truncate me-auto text-white">
         <i18n>portal.header.navigation.myapps</i18n>
     </a>
     
     <nav class="navigation">
-        <div class="navigation__item">
+        <div class="btn btn-secondary">
             <a href="/timeline/timeline" title="[[lang.translate('navbar.home')]]"><i class="ic-home"></i></a>
         </div>
         
-        <div class="navigation__item" ng-if="me.hasWorkflow('net.atos.entng.community.controllers.CommunityController|view')">
-            <a href="/community" class="zero-mobile" title="[[lang.translate('navbar.community')]]">
+        <div class="btn btn-secondary d-none d-lg-inline-block" ng-if="me.hasWorkflow('net.atos.entng.community.controllers.CommunityController|view')">
+            <a href="/community" title="[[lang.translate('navbar.community')]]">
                 <i class="ic-community"></i>
             </a>
         </div>
         
-        <div class="navigation__item">
+        <div class="btn btn-secondary">
             <popover>
                 <a 
                     href="/welcome"
@@ -146,11 +146,11 @@
             </popover>
         </div>
         
-        <div class="navigation__item">
+        <div class="btn btn-secondary">
             <span ng-include="template.containers.portal.conversationUnread"></span>
         </div>
         
-        <div class="navigation__item" ng-if="me.hasWorkflow('fr.openent.searchengine.controllers.SearchEngineController|view')">
+        <div class="btn btn-secondary" ng-if="me.hasWorkflow('fr.openent.searchengine.controllers.SearchEngineController|view')">
             <popover class="searchengine">
                 <a href="/searchengine" popover-opener ng-click="openApps($event)" title="[[lang.translate('navbar.search')]]">
                     <i class="ic-search"></i>
@@ -169,7 +169,7 @@
             </popover>
         </div>
         
-        <div ng-if="currentLanguage == 'fr'" class="navigation__item">
+        <div ng-if="currentLanguage == 'fr'" class="btn btn-secondary">
             <a 
                 href=""
                 title="[[lang.translate('navbar.help')]]" 
@@ -179,7 +179,7 @@
             </a>
         </div>
         
-        <div class="navigation__item">
+        <div class="btn btn-secondary">
             <a 
                 href="/userbook/mon-compte" 
                 class="avatar" 
@@ -190,11 +190,22 @@
             </a>
         </div>
         
-        <div class="navigation__item">
+        <div class="btn btn-secondary">
             <a href="" logout title="[[lang.translate('navbar.disconnect')]]">
                 <i class="ic-disconnect"></i>
             </a>
         </div>
+
+        <!-- <div class="dropdown d-block d-sm-none">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false"></button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
+                <li><a class="dropdown-item" href="#"><i class="ic-community"></i> Communautés</a></li>
+                <li><a class="dropdown-item" href="#"><i class="ic-search"></i> Recherche transverse</a></li>
+                <li><a class="dropdown-item" href="#"><i class="ic-user"></i> Mon compte</a></li>
+                <div class="dropdown-divider"></div>
+                <li><a class="dropdown-item" href="#"><i class="ic-disconnect"></i> Déconnexion</a></li>
+            </ul>
+        </div> -->
     </nav>
 </header>
 
