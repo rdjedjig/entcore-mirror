@@ -287,33 +287,14 @@ export class TimelineController implements IController {
 	}
 
 	getCssType( notifType:string ):string {
+		notifType = notifType.toLowerCase();
+		// This mapping follows the CSS classes defined at https://support.web-education.net/issues/47239
 		switch( notifType ) {
-			case "USERBOOK":
-			case "WIKI":						return "wiki";
-			case "NEWS":
-			case "COLLABORATIVEWALL":
-			case "BLOG":						return "blog";
-			case "WORKSPACE":
-			case "MESSAGERIE":
-			case "SCRAPBOOK":
-			case "MINDMAP":
-			case "HOMEWORKS":
-			case "TIMELINEGENERATOR":			return "timelinegenerator"
-			case "PAGES":						return "pages";
-			case "RBS":
-			case "SUPPORT":
-			case "FORUM":
-			case "RACK":
-			case "EXERCIZER":
-			case "SCHOOLBOOK":
-			case "CALENDAR":
-			case "TIMELINE":
-			case "SHAREBIGFILES":
-			case "ARCHIVE":
-			case "POLL":
-			case "COMMUNITY":
-			case "COLLABORATIVEEDITOR":
-			default:							return "default";
+			case "news":						return "actualites";
+			case "collaborativewall":			return "collaborative-wall";
+			case "messagerie":					return "conversation";
+			case "homeworks":					return "cahier-textes";
+			default:							return notifType;
 		}
 	}
 
@@ -384,9 +365,9 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
 		$('.filter-button').each(function (i) {
 			var target = '#' + $(this).data('target');
 			var filterTween = gsap.gsap.timeline().reversed(true).pause();
-			filterTween.from(target, { duration: 0.3, height: 0, autoAlpha: 0, display: 'none' });
+			filterTween.from(target, { duration: 0.1, height: 0, autoAlpha: 0, display: 'none' });
 			filterTween.from(target + " .filter", {
-				duration: 0.3, 
+				duration: 0.1, 
 				autoAlpha: 0, 
 				translateY: '100%',
 				stagger: 0.1
