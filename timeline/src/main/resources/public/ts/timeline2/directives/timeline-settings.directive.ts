@@ -1,5 +1,5 @@
 import { IAttributes, IController, IDirective, IScope } from "angular";
-import { ConfigurationFrameworkFactory, IIdiom, IThemeDesc, IWidget, SessionFrameworkFactory, WidgetFrameworkFactory, WIDGET_NAME } from "ode-ts-client";
+import { ConfigurationFrameworkFactory, IIdiom, IThemeDesc, IWidget, SessionFrameworkFactory, WidgetFrameworkFactory } from "ode-ts-client";
 import * as $ from "jquery";
 import { TimelineController } from "./timeline.directive";
 import { ThemeHelperService } from "ode-ngjs-front";

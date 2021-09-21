@@ -1,5 +1,5 @@
 import { IAttributes, IController, IDirective, IScope } from "angular";
-import moment = require("moment");
+import { L10n } from "ode-ngjs-front";
 import  gsap = require("gsap");
 import { ConfigurationFrameworkFactory, ITimelineFactory, ITimelineNotification, NotificationModel, SessionFrameworkFactory, TransportFrameworkFactory } from "ode-ts-client";
 import * as $ from "jquery";
@@ -274,8 +274,8 @@ export class TimelineController implements IController {
 	}
 
 	formatDate(dateString){
-		return moment(dateString).fromNow();
-	};
+		return L10n.moment(dateString).fromNow();
+	}
 
 	isEmpty(): boolean  {
 		return this.app.notifications.length === 0 
