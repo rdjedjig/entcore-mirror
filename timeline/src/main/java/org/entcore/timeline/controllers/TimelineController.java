@@ -193,68 +193,53 @@ public class TimelineController extends BaseController {
 		// =================
 		// temporary hack to handle both new and old timeline app depending on user theme
 		// if 2D then new timeline else default timeline*
-		UserUtils.getSession(eb, request, new Handler<JsonObject>() {
-			public void handle(JsonObject session) {
-			    log.info("session = " + session);
+        String themeNameStr = getSkinFromConditions(request);
+        log.info("themeNameStr = " + themeNameStr);
+        String themeConfPath = config.getString("assets-path", ".") + "/assets/theme-conf.js";
+        vertx.fileSystem().readFile(themeConfPath, new Handler<AsyncResult<Buffer>>() {
+            @Override
+            public void handle(AsyncResult<Buffer> event) {
+                try {
+                    String themeConfStr = event
+                            .result()
+                            .toString()
+                            .replaceAll("\\s+", "")                // remove all blanks  [ \t\n\x0B\f\r]
+                            .replace("exports.conf=", "")        // remove unwanted JS
+                            .replace("};", "}")                    // remove unwanted JS
+                            .replace("'", "\"")                    // use " instead of ' => assume no quotes exist inside a string.
+                            .replaceAll("([^\\\"\\w_])([\\w_]+):", "$1\"$2\":") // wrap all keys with "" (except those beginning with ")
+                            .replace(",}", "}")                    // clean some rare JS syntax
+                            .replace(",]", "]")                    // clean some rare JS syntax
+                            ;
 
-				final JsonObject cache = session.getJsonObject("cache");
-				log.info("cache = " + cache);
+                    log.info("themeConfStr = " + themeConfStr);
 
-				if (cache.containsKey("preferences")) {
-					String themeNameStr = cache.getJsonObject("preferences").getString("theme");
-					if (StringUtils.isEmpty(themeNameStr)) {
-						themeNameStr = getSkinFromConditions(request);
-					}
-					String finalThemeNameStr = themeNameStr;
-					log.info("themeNameStr = " + themeNameStr);
-					String themeConfPath = config.getString("assets-path", ".") + "/assets/theme-conf.js";
-					vertx.fileSystem().readFile(themeConfPath, new Handler<AsyncResult<Buffer>>() {
-						@Override
-						public void handle(AsyncResult<Buffer> event) {
-							try {
-								String themeConfStr = event
-										.result()
-										.toString()
-										.replaceAll("\\s+", "")                // remove all blanks  [ \t\n\x0B\f\r]
-										.replace("exports.conf=", "")        // remove unwanted JS
-										.replace("};", "}")                    // remove unwanted JS
-										.replace("'", "\"")                    // use " instead of ' => assume no quotes exist inside a string.
-										.replaceAll("([^\\\"\\w_])([\\w_]+):", "$1\"$2\":") // wrap all keys with "" (except those beginning with ")
-										.replace(",}", "}")                    // clean some rare JS syntax
-										.replace(",]", "]")                    // clean some rare JS syntax
-										;
+                    JsonArray overriding = new JsonObject(themeConfStr).getJsonArray("overriding");
+                    Object overridingTheme = overriding
+                            .stream()
+                            .filter(x -> themeNameStr.equals(((JsonObject) x).getString("child")))
+                            .findFirst()
+                            .get();
 
-								log.info("themeConfStr = " + themeConfStr);
+                    String parentTheme = new JsonObject(overridingTheme.toString()).getString("parent");
+                    log.info("parentTheme = " + parentTheme);
 
-								JsonArray overriding = new JsonObject(themeConfStr).getJsonArray("overriding");
-								Object overridingTheme = overriding
-										.stream()
-										.filter(x -> finalThemeNameStr.equals(((JsonObject) x).getString("child")))
-										.findFirst()
-										.get();
+                    if ("theme-open-ent".equals(parentTheme)) {
+                        log.info("render timeline2.html");
+                        // render to new timeline2.html
+                        renderView(request, new JsonObject().put("lightMode", isLightmode()).put("cache", config.getBoolean("cache", false)), "timeline2.html", null);
+                        return;
+                    }
+                } catch (Exception e) {
+                    // void
+                    log.info("Exception while parsing theme-conf.js = " + e.toString());
+                }
 
-								String parentTheme = new JsonObject(overridingTheme.toString()).getString("parent");
-								log.info("parentTheme = " + parentTheme);
-
-								if ("theme-open-ent".equals(parentTheme)) {
-									// render to new timeline2.html
-									renderView(request, new JsonObject().put("lightMode", isLightmode()).put("cache", config.getBoolean("cache", false)), "timeline2.html", null);
-									return;
-								}
-							} catch (Exception e) {
-								// void
-								log.info("Exception while parsing theme-conf.js = " + e.toString());
-							}
-							// render to default timeline
-							renderView(request, new JsonObject().put("lightMode", isLightmode()).put("cache", config.getBoolean("cache", false)));
-						}
-					});
-				} else {
-					// render to default timeline
-					renderView(request, new JsonObject().put("lightMode",isLightmode()).put("cache", config.getBoolean("cache", false)));
-				}
-			}
-		});
+                // render to default timeline
+                log.info("render timeline.html");
+                renderView(request, new JsonObject().put("lightMode", isLightmode()).put("cache", config.getBoolean("cache", false)));
+            }
+        });
 	}
 
 	@Get("/timeline2")
