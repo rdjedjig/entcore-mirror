@@ -186,6 +186,8 @@ public class TimelineController extends BaseController {
 	@Get("/timeline")
 	@SecuredAction(value = "timeline.view", type = ActionType.AUTHENTICATED)
 	public void view(HttpServerRequest request) {
+	    log.info("GET /timeline/timeline");
+
 		// =================
 		// /!\ TEMPORARY /!\
 		// =================
@@ -193,7 +195,10 @@ public class TimelineController extends BaseController {
 		// if 2D then new timeline else default timeline*
 		UserUtils.getSession(eb, request, new Handler<JsonObject>() {
 			public void handle(JsonObject session) {
+			    log.info("session = " + session);
+
 				final JsonObject cache = session.getJsonObject("cache");
+				log.info("cache = " + cache);
 
 				if (cache.containsKey("preferences")) {
 					String themeNameStr = cache.getJsonObject("preferences").getString("theme");
