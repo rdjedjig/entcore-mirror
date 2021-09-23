@@ -7,6 +7,7 @@ import { ThemeHelperService } from "ode-ngjs-front";
 /* Controller for the directive */
 export class Controller implements IController {
 	public skins:IThemeDesc[];
+	public currentSkinName?:string;
 	public widgets:IWidget[];
 	public languages:string[];
 	public themeRoot:string;
@@ -32,13 +33,9 @@ export class Controller implements IController {
 		this.showPanel = !this.showPanel;
 	}
 
-	isCurrentTheme( skin:IThemeDesc ): boolean {
-		return ConfigurationFrameworkFactory.instance().Platform.theme.skinName == skin.displayName;
-	}
-
 	async saveTheme(skin:IThemeDesc, $event) {
+		this.currentSkinName = skin.displayName;
 		await this.themeSvc.setTheme( skin );
-		this.safeApply && this.safeApply();
 	}
 
 	toggleWidget( widget:IWidget, $event) {
@@ -96,6 +93,7 @@ class Directive implements IDirective<LocalScope,JQLite,IAttributes,IController[
 		]).then( results => {
 			ctrl.languages = results[0];
 			ctrl.skins = results[1];
+			ctrl.currentSkinName = ConfigurationFrameworkFactory.instance().Platform.theme.skinName;
 			ctrl.themeRoot = results[2];
 			ctrl.safeApply = ( fn?: string | ((scope:IScope)=>any) ) => {
 				const phase = scope.$root.$$phase;

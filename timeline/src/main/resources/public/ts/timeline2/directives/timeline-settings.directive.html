@@ -16,7 +16,7 @@
 		<div class="buttons-theme row">
 			<div class="col-6" ng-repeat="skin in ctrl.skins">
 				<a href="" class="bt skin-[[skin.displayName]]"
-						ng-class="{ selected: ctrl.isCurrentTheme(skin) }"
+						ng-class="{ selected: ctrl.currentSkinName==skin.displayName }"
 						ng-click="ctrl.saveTheme(skin, $event)" >
 					[[lang.translate(skin.displayName)]]
 				</a>
