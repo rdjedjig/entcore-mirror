@@ -975,6 +975,14 @@ export const directoryController = ng.controller('DirectoryController',['$scope'
 			$scope.showDefaultValue = false;
 			$scope.defaultValueTitle = "";
 			await directory.directory[params.filters].searchDirectory("", filters, null, false);
+			if ($scope.search.index === 0) {
+				$scope.users = directory.directory.users;
+				$scope.allUsers = Object.assign([], $scope.users);
+				template.open('dominosUser', 'dominos-user');
+			} else {
+				$scope.groups = directory.directory.groups;
+				template.open('dominosGroup', 'dominos-group');
+			}
 		} else {
 			/* RM#30674 FEAT (JCBE) : applies only to wide screens. */
 			if (!ui.breakpoints.checkMaxWidth("wideScreen"))
