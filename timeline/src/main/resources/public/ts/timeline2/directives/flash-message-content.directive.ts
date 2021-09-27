@@ -1,9 +1,12 @@
 import { IAttributes, IController, IDirective, IScope, ICompileService } from "angular";
 import { NgHelperService, RichContentService } from "ode-ngjs-front";
+import { IFlashMessageModel } from "ode-ts-client";
+import { FlashMsgController } from "./flash-messages.directive";
 
 interface Scope extends IScope {
+	flashMessageContent: IFlashMessageModel;
 	toggleContent?: () => void;
-	ellipsis: string;
+	ellipsis?: string;
 }
 
 /* Directive */
@@ -11,42 +14,49 @@ class Directive implements IDirective<Scope,JQLite,IAttributes,IController[]> {
 	constructor( 
 		private $compile:ICompileService,
 		private richContentSvc:RichContentService, 
-		private ngHelperSvc:NgHelperService ) {
+		private helperSvc:NgHelperService ) {
 	}
 
 	restrict= 'A';
 	scope= {
 		flashMessageContent: '='
 	};
+	require= ["^flashMessages"];
 
     link(scope:Scope, elem:JQLite, attr:IAttributes, controllers?:IController[]): void {
-		scope.$watch('flashMessageContent', (newVal)=> {
-			this.richContentSvc.apply(newVal as string ?? '', elem, scope);
+		const maxHeightPx	= 64;
+		const ellipsis		= "&nbsp;&#8230;";
+		const parentCtrl = controllers[0] as FlashMsgController;
+		if( !parentCtrl || !scope.flashMessageContent ) return;
 
-			// Limit to 4 lines of displayed text and add a button "See more"
-			scope.ellipsis = "&nbsp;";
+		this.richContentSvc.apply(scope.flashMessageContent?.contents[parentCtrl.currentLanguage] ?? '', elem, scope);
+
+		// If needed, limit the height of displayed text, and add a button "See more" which toggles the full message display back and forth.
+		if( this.helperSvc.height(elem) > maxHeightPx ) {
+			// Helper function for toggling long messages.
 			scope.toggleContent = () => {
-				if( scope.ellipsis === "&nbsp;" ) {
-					elem.css( {"max-height": "64px", "overflow-y": "hidden"} );
-					scope.ellipsis = "...";
+				if( scope.ellipsis !== ellipsis ) {
+					elem.css( {"max-height": ''+maxHeightPx+"px", "overflow-y": "hidden"} );
+					scope.ellipsis = ellipsis;
 				} else {
 					elem.css( {"max-height": "none", "overflow-y": "initial"} );
 					scope.ellipsis = "&nbsp;";
 				}
 			}
-			if( this.ngHelperSvc.height(elem) > 4 * 16 ) {
-				const moreContainer = $(`
-					<div class="position-relative mt-3">
-						<span ng-bind-html="[[ellipsis]]"></span>
-						<button class="btn btn-secondary position-absolute top-0 end-0 small" ng-click="toggleContent()">
-							<small><i18n>seemore</i18n></small>
-						</button>
-					</div>`
-				);
-				elem.parent().append( this.$compile(moreContainer)(scope) );
-				scope.toggleContent();
-			}
-		});
+
+			// Create a div for displaying the ellipsis.
+			const divEllipsis = $(`<div class="flash-ellipsis"><div ng-bind-html="[[ellipsis]]"></div></div>`);
+			elem.append( this.$compile(divEllipsis)(scope) );
+
+			const moreContainer = $(`
+				<a href="" class="btn-read-more"
+						ng-click="toggleContent()"><span class="btn-read-more-inner"><i18n>timeline.flash.message.seemore</i18n></span>
+				</a>
+			`);
+			elem.parent().append( this.$compile(moreContainer)(scope) );
+
+			scope.toggleContent();
+		}
     }
 }
 
@@ -56,7 +66,7 @@ class Directive implements IDirective<Scope,JQLite,IAttributes,IController[]> {
  * Usage:
  *   &lt;flash-message-content>The content to display which can be very very long</flash-message-content&gt;
  */
-export function DirectiveFactory($compile:ICompileService, richContentSvc:RichContentService, ngHelperService:NgHelperService) {
-	return new Directive($compile, richContentSvc, ngHelperService);
+export function DirectiveFactory($compile:ICompileService, richContentSvc:RichContentService, helperSvc:NgHelperService) {
+	return new Directive($compile, richContentSvc, helperSvc);
 }
 DirectiveFactory.$inject = ["$compile", "odeRichContentService", "odeNgHelperService"];
