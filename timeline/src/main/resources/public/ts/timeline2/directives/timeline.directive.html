@@ -143,12 +143,12 @@
     </div>
 
     <!--SHOW MORE -->
-    <div ng-if="ctrl.showSeeMore()" style="text-align: center;">
-        <a ng-click="ctrl.loadPage()"><i18n>timeline.seeold</i18n></a>
+    <div ng-if="ctrl.showSeeMore()" class="text-center">
+        <button type="button" class="btn btn-info" ng-click="ctrl.handleLoadPageClick()"><i18n>timeline.seeold</i18n></button>
     </div>
 
     <div ng-if="ctrl.showSeeMoreOnEmpty()" style="justify-content: center;display:flex;">
-        <button ng-click="ctrl.loadPage(true)"><i18n>timeline.historyold</i18n></button>
+        <button type="button" class="btn btn-info" ng-click="ctrl.handleLoadPageClick(true)"><i18n>timeline.historyold</i18n></button>
     </div>
 
     <ode-modal visible="ctrl.display.confirmReport" on-close="ctrl.display.confirmReport = false">
@@ -169,8 +169,11 @@
         </ode-modal-footer>
     </ode-modal>
 
-    <div class="row notification" ng-show="ctrl.app.isLoading">
-        <h1 class="reduce-block-eight nomargin"><i18n>loading</i18n></h1>
+    <div ng-show="ctrl.app.isLoading" class="text-center">
+        <button class="btn btn-info" type="button" disabled>
+            <span class="spinner-border" role="status" aria-hidden="true"></span>
+            <span><i18n>loading</i18n></span>
+        </button>
     </div>
 
 </div>

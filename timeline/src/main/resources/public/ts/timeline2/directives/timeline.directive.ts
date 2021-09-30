@@ -10,6 +10,7 @@ export class TimelineController implements IController {
 	public lang =  ConfigurationFrameworkFactory.instance().Platform.idiom;
 
 	public savePrefsAndReload: () => Promise<void>;
+	public handleLoadPageClick: (force: boolean) => Promise<void>;
 
     constructor() {
         if (this.userStructures && this.userStructures.length == 1) {
@@ -187,7 +188,7 @@ export class TimelineController implements IController {
 		if(this.app.isLoading){
 			return false;
 		}
-		return this.isCache && this.app.page===1 && this.app.hasMorePage;
+		return this.app.hasMorePage;
 	}
 
 	showSeeMoreOnEmpty() {
@@ -208,8 +209,8 @@ export class TimelineController implements IController {
 			&& this.app.selectedNotificationTypes.length > 0;
 	}
 
-	loadPage( force?:boolean ) {
-		this.app.loadNotifications( force );
+	loadPage( force?:boolean ): Promise<void> {
+		return this.app.loadNotifications( force );
 	}
 
 /*
@@ -383,6 +384,10 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
 				$(target).data("tween").reverse()
 			}
 		});
+
+		ctrl.handleLoadPageClick = (force: boolean): Promise<void> => {
+			return ctrl.loadPage(force).then(() => scope.$apply());
+		}
     }
 }
 
