@@ -4,8 +4,11 @@ import { IFlashMessageModel } from "ode-ts-client";
 import { FlashMsgController } from "./flash-messages.directive";
 
 interface Scope extends IScope {
-	flashMessageContent: IFlashMessageModel;
+	message: IFlashMessageModel;
+	/** Helper function for toggling long messages. */
 	toggleContent?: () => void;
+	/** Check if the message is fully readable. */
+	isFullyReadable?: () => Boolean;
 	ellipsis?: string;
 }
 
@@ -19,7 +22,7 @@ class Directive implements IDirective<Scope,JQLite,IAttributes,IController[]> {
 
 	restrict= 'A';
 	scope= {
-		flashMessageContent: '='
+		message: '=flashMessageContent'
 	};
 	require= ["^flashMessages"];
 
@@ -27,30 +30,35 @@ class Directive implements IDirective<Scope,JQLite,IAttributes,IController[]> {
 		const maxHeightPx	= 64;
 		const ellipsis		= "&nbsp;&#8230;";
 		const parentCtrl = controllers[0] as FlashMsgController;
-		if( !parentCtrl || !scope.flashMessageContent ) return;
+		if( !parentCtrl || !scope.message ) return;
 
-		this.richContentSvc.apply(scope.flashMessageContent?.contents[parentCtrl.currentLanguage] ?? '', elem, scope);
+		this.richContentSvc.apply(scope.message?.contents[parentCtrl.currentLanguage] ?? '', elem, scope);
 
 		// If needed, limit the height of displayed text, and add a button "See more" which toggles the full message display back and forth.
 		if( this.helperSvc.height(elem) > maxHeightPx ) {
-			// Helper function for toggling long messages.
+			scope.isFullyReadable = () => {
+				return scope.ellipsis !== ellipsis;
+			};
 			scope.toggleContent = () => {
-				if( scope.ellipsis !== ellipsis ) {
+				if( scope.isFullyReadable() ) {
 					elem.css( {"max-height": ''+maxHeightPx+"px", "overflow-y": "hidden"} );
 					scope.ellipsis = ellipsis;
 				} else {
 					elem.css( {"max-height": "none", "overflow-y": "initial"} );
-					scope.ellipsis = "&nbsp;";
+					scope.ellipsis = "";
 				}
 			}
 
 			// Create a div for displaying the ellipsis.
-			const divEllipsis = $(`<div class="flash-ellipsis"><div ng-bind-html="[[ellipsis]]"></div></div>`);
+			const divEllipsis = $(`<div class="widget-flash flash-ellipsis" ng-class="message.color" ng-style="{'background-color':message.customColor}"><div ng-bind-html="[[ellipsis]]"></div></div>`);
 			elem.append( this.$compile(divEllipsis)(scope) );
 
 			const moreContainer = $(`
-				<a href="" class="btn-read-more"
-						ng-click="toggleContent()"><span class="btn-read-more-inner"><i18n>timeline.flash.message.seemore</i18n></span>
+				<a href="" class="btn-read-more" ng-click="toggleContent()">
+					<span class="btn-read-more-inner">
+							<i18n ng-if="!isFullyReadable()">timeline.flash.message.seemore</i18n>
+							<i18n ng-if="isFullyReadable()">timeline.flash.message.seeless</i18n>
+					</span>
 				</a>
 			`);
 			elem.parent().append( this.$compile(moreContainer)(scope) );
