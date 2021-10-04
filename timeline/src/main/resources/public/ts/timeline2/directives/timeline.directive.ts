@@ -182,6 +182,7 @@ export class TimelineController implements IController {
 	});
     */
 
+	public lightmode: boolean = false;
 	public isCache:boolean = false;
 
 	showSeeMore() {
@@ -334,7 +335,7 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
         const ctrl:TimelineController|null = controllers ? controllers[0] as TimelineController : null;
         if(!ctrl) return;
 
-		const lightmode = attr["lightmode"] == "true" || false;
+		ctrl.lightmode = attr["lightmode"] == "true" || false;
 		ctrl.isCache = attr["cache"] == "true" || false;
 
 		ctrl.savePrefsAndReload = () => {
@@ -349,11 +350,13 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
 			});
 		}
 
-		if( lightmode ) {
+		scope.canRenderUi = false;
+
+		if( ctrl.lightmode ) {
+			scope.canRenderUi = true;
+			scope.$apply();
 			return; // Do not load the notifications in lightmode
 		}
-
-		scope.canRenderUi = false;
 
         await ctrl.lang.addBundlePromise('/timeline/i18nNotifications?mergeall=true');
 		await ctrl.initialize();
