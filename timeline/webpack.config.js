@@ -22,7 +22,8 @@ module.exports = {
         "angular": "window.angular",
         "gsap": "window",
         "ode-ts-client": 'window.entcore["ode-ts-client"]',
-        "ode-ngjs-front": 'window.entcore["ode-ngjs-front"]'
+        "ode-ngjs-front": 'window.entcore["ode-ngjs-front"]',
+        "jquery": "$"
     },
     resolve: {
         modulesDirectories: ['bower_components', 'node_modules'],

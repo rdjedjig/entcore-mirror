@@ -2,6 +2,7 @@ import { ConfigurationFrameworkFactory, IIdiom, IUserInfo, SessionFrameworkFacto
 
 export class AppController {
 	me: IUserInfo;
+	currentLanguage: string;
 	lang: IIdiom;
 	lightmode: string;
 
@@ -12,6 +13,7 @@ export class AppController {
 	private async initialize():Promise<void> {
 		const platformConf = ConfigurationFrameworkFactory.instance().Platform;
 		this.me = SessionFrameworkFactory.instance().session.user;
+		this.currentLanguage = SessionFrameworkFactory.instance().session.currentLanguage;
 		this.lang = platformConf.idiom;
 		this.lightmode = (window as any).LIGHT_MODE;
 	}
