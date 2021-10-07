@@ -1,13 +1,13 @@
 import { IAttributes, IController, IDirective, IScope } from "angular";
-import { L10n } from "ode-ngjs-front";
+import { L10n, conf, http, session } from "ode-ngjs-front";
 import  gsap = require("gsap");
-import { ConfigurationFrameworkFactory, ITimelineFactory, ITimelineNotification, NotificationModel, SessionFrameworkFactory, TransportFrameworkFactory } from "ode-ts-client";
+import { ITimelineFactory, ITimelineNotification } from "ode-ts-client";
 import * as $ from "jquery";
 
 /* Controller for the directive */
 export class TimelineController implements IController {
-    private me = SessionFrameworkFactory.instance().session.user;
-	public lang =  ConfigurationFrameworkFactory.instance().Platform.idiom;
+    private me = session().user;
+	public lang =  conf().Platform.idiom;
 
 	public savePrefsAndReload: () => Promise<void>;
 	public handleLoadPageClick: (force: boolean) => Promise<void>;
@@ -51,8 +51,7 @@ export class TimelineController implements IController {
 	public async initialize() {
 		const admx:Promise<any> = (this.isAdml || this.isAdmc)
 		// get platform config about admin version to create admin (v1 or v2) link for report notification
-		? TransportFrameworkFactory.instance().http
-			.get('/admin/api/platform/config')
+		? http().get('/admin/api/platform/config')
 			.then(res => {
 				this.config.hideAdminv1Link = res['hide-adminv1-link'];
 			})
@@ -67,7 +66,7 @@ export class TimelineController implements IController {
 	public isAllSelected:boolean = false;	// ng-model for the "Select All / none" chip
 
 	public get canDiscard():boolean {
-		return SessionFrameworkFactory.instance().session.hasWorkflow("org.entcore.timeline.controllers.TimelineController|discardNotification");
+		return session().hasWorkflow("org.entcore.timeline.controllers.TimelineController|discardNotification");
 	}
 	public doDiscard( notif:ITimelineNotification ) {
 		if( this.canDiscard ) {
@@ -87,7 +86,7 @@ export class TimelineController implements IController {
 	currentNotification:ITimelineNotification;
 
 	public canReport( notif:ITimelineNotification ):boolean {
-		return notif.model.sender && SessionFrameworkFactory.instance().session.hasWorkflow("org.entcore.timeline.controllers.TimelineController|reportNotification");
+		return notif.model.sender && session().hasWorkflow("org.entcore.timeline.controllers.TimelineController|reportNotification");
 	}
 	public confirmReport( notif:ITimelineNotification ) {
 		if( this.canReport(notif) ) {

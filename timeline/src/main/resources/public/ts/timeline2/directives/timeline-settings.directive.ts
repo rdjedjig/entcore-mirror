@@ -1,8 +1,8 @@
 import { IAttributes, IController, IDirective, IScope } from "angular";
-import { ConfigurationFrameworkFactory, IIdiom, IThemeDesc, IWidget, SessionFrameworkFactory, WidgetFrameworkFactory } from "ode-ts-client";
+import { IIdiom, IThemeDesc, IWidget, WidgetFrameworkFactory } from "ode-ts-client";
+import { ThemeHelperService, session, conf } from "ode-ngjs-front";
 import * as $ from "jquery";
 import { TimelineController } from "./timeline.directive";
-import { ThemeHelperService } from "ode-ngjs-front";
 
 /* Controller for the directive */
 export class Controller implements IController {
@@ -21,7 +21,7 @@ export class Controller implements IController {
 	showPanel:boolean = false;
 
 	get languagePreference():string {
-		return SessionFrameworkFactory.instance().session.currentLanguage;
+		return session().currentLanguage;
 	}
 
 	canTogglePanel():boolean {
@@ -56,7 +56,7 @@ export class Controller implements IController {
 	}
 
 	saveLang(language, $event) {
-		ConfigurationFrameworkFactory.instance().User.saveLanguage( language ).then( () => {
+		conf().User.saveLanguage( language ).then( () => {
 			location.reload();
 		});
 	};
@@ -84,16 +84,16 @@ class Directive implements IDirective<LocalScope,JQLite,IAttributes,IController[
         let timelineCtrl:TimelineController|null = controllers ? controllers[1] as TimelineController : null;
         if(!ctrl || !timelineCtrl) return;
 
-		scope.lang = ConfigurationFrameworkFactory.instance().Platform.idiom;
+		scope.lang = conf().Platform.idiom;
 
 		Promise.all([
-			ConfigurationFrameworkFactory.instance().Platform.listLanguages(),
-			ConfigurationFrameworkFactory.instance().Platform.theme.listThemes(),
+			conf().Platform.listLanguages(),
+			conf().Platform.theme.listThemes(),
 			ctrl.themeSvc.getBootstrapThemePath()
 		]).then( results => {
 			ctrl.languages = results[0];
 			ctrl.skins = results[1];
-			ctrl.currentSkinName = ConfigurationFrameworkFactory.instance().Platform.theme.skinName;
+			ctrl.currentSkinName = conf().Platform.theme.skinName;
 			ctrl.themeRoot = results[2];
 			ctrl.safeApply = ( fn?: string | ((scope:IScope)=>any) ) => {
 				const phase = scope.$root.$$phase;

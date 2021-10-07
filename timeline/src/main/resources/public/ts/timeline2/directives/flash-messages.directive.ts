@@ -1,5 +1,6 @@
 import { IAttributes, IController, IDirective, IScope } from "angular";
-import { IFlashMessageModel, ITimelineApp, ITimelineFactory, SessionFrameworkFactory } from "ode-ts-client";
+import { IFlashMessageModel, ITimelineApp, ITimelineFactory } from "ode-ts-client";
+import { session } from "ode-ngjs-front";
 
 /* Controller for the directive */
 export class FlashMsgController implements IController {
@@ -40,7 +41,7 @@ class Directive implements IDirective<IScope,JQLite,IAttributes,IController[]> {
         if(!ctrl) return;
 
 		ctrl.app = ITimelineFactory.createInstance();
-		ctrl.currentLanguage = SessionFrameworkFactory.instance().session.currentLanguage;
+		ctrl.currentLanguage = session().currentLanguage;
 
 		ctrl.list();
     }
