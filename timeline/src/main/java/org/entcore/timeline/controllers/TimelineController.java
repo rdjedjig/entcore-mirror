@@ -20,6 +20,7 @@
 package org.entcore.timeline.controllers;
 
 import fr.wseduc.webutils.request.CookieHelper;
+import fr.wseduc.webutils.security.SecureHttpServerRequest;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.logging.Logger;
@@ -44,6 +45,7 @@ import org.entcore.common.http.filter.AdmlOfStructures;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.filter.SuperAdminFilter;
 import org.entcore.common.http.request.JsonHttpServerRequest;
+import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.notification.TimelineHelper;
 import org.entcore.common.notification.TimelineNotificationsLoader;
 import org.entcore.common.notification.NotificationUtils;
@@ -74,6 +76,7 @@ import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static fr.wseduc.webutils.Utils.isEmpty;
 import static fr.wseduc.webutils.Utils.isNotEmpty;
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
 import static org.entcore.common.http.response.DefaultResponseHandler.defaultResponseHandler;
@@ -99,6 +102,7 @@ public class TimelineController extends BaseController {
 	// TEMPORARY to handle both timeline and timeline2 view
 	private String defaultSkin;
 	private Map<String, String> hostSkin;
+	private JsonObject skinLevels;
 
 	public void init(Vertx vertx, JsonObject config, RouteMatcher rm,
 			Map<String, fr.wseduc.webutils.security.SecuredAction> securedActions) {
@@ -131,6 +135,7 @@ public class TimelineController extends BaseController {
 		for (final String domain: skins.fieldNames()) {
 			this.hostSkin.put(domain, skins.getString(domain));
 		}
+		this.skinLevels = new JsonObject(vertx.sharedData().getLocalMap("skin-levels"));
 	}
 
 	/* Override i18n to use additional timeline translations and nested templates */
@@ -166,80 +171,33 @@ public class TimelineController extends BaseController {
 		return res;
 	}
 
-	// TEMPORARY to handle both timeline and timeline2 view
-	private String getSkinFromConditions(HttpServerRequest request) {
-		if (request == null) {
-			return defaultSkin;
-		}
-		final String overrideTheme = CookieHelper.get("theme", request);
-		if (isNotEmpty(overrideTheme)) {
-			return overrideTheme;
-		}
-		final String theme = I18n.getTheme(request);
-		if (isNotEmpty(theme)) {
-			return theme;
-		}
-		String skin = hostSkin.get(getHost(request));
-		return (skin != null && !skin.trim().isEmpty()) ? skin : defaultSkin;
-	}
-
 	@Get("/timeline")
 	@SecuredAction(value = "timeline.view", type = ActionType.AUTHENTICATED)
 	public void view(HttpServerRequest request) {
-	    log.info("GET /timeline/timeline");
-
 		// =================
 		// /!\ TEMPORARY /!\
 		// =================
-		// temporary hack to handle both new and old timeline app depending on user theme
-		// if 2D then new timeline else default timeline*
-        String themeNameStr = getSkinFromConditions(request);
-        log.info("themeNameStr = " + themeNameStr);
-        String themeConfPath = config.getString("assets-path", ".") + "/assets/theme-conf.js";
-        vertx.fileSystem().readFile(themeConfPath, new Handler<AsyncResult<Buffer>>() {
-            @Override
-            public void handle(AsyncResult<Buffer> event) {
-                try {
-                    String themeConfStr = event
-                            .result()
-                            .toString()
-                            .replaceAll("\\s+", "")                // remove all blanks  [ \t\n\x0B\f\r]
-                            .replace("exports.conf=", "")        // remove unwanted JS
-                            .replace("};", "}")                    // remove unwanted JS
-                            .replace("'", "\"")                    // use " instead of ' => assume no quotes exist inside a string.
-                            .replaceAll("([^\\\"\\w_])([\\w_]+):", "$1\"$2\":") // wrap all keys with "" (except those beginning with ")
-                            .replace(",}", "}")                    // clean some rare JS syntax
-                            .replace(",]", "]")                    // clean some rare JS syntax
-                            ;
+		// handle both new and old timeline app depending on user theme
+		// if 2D then new timeline else default timeline
+		if (this.skinLevels == null) {
+			renderView(request, new JsonObject().put("lightMode", isLightmode()).put("cache", config.getBoolean("cache", false)));
+			return;
+		}
 
-                    log.info("themeConfStr = " + themeConfStr);
+		UserUtils.getTheme(eb, request, this.hostSkin, userTheme -> {
+			if (isEmpty(userTheme)) {
+				renderView(request, new JsonObject().put("lightMode", isLightmode()).put("cache", config.getBoolean("cache", false)));
+				return;
+			}
 
-                    JsonArray overriding = new JsonObject(themeConfStr).getJsonArray("overriding");
-                    Object overridingTheme = overriding
-                            .stream()
-                            .filter(x -> themeNameStr.equals(((JsonObject) x).getString("child")))
-                            .findFirst()
-                            .get();
+			JsonArray userSkinLevels = this.skinLevels.getJsonArray(userTheme);
+			if (userSkinLevels != null && userSkinLevels.contains("2d")) {
+				renderView(request, new JsonObject().put("lightMode", isLightmode()).put("cache", config.getBoolean("cache", false)), "timeline2.html", null);
+			} else {
+				renderView(request, new JsonObject().put("lightMode", isLightmode()).put("cache", config.getBoolean("cache", false)));
+			}
+		});
 
-                    String parentTheme = new JsonObject(overridingTheme.toString()).getString("parent");
-                    log.info("parentTheme = " + parentTheme);
-
-                    if ("theme-open-ent".equals(parentTheme)) {
-                        log.info("render timeline2.html");
-                        // render to new timeline2.html
-                        renderView(request, new JsonObject().put("lightMode", isLightmode()).put("cache", config.getBoolean("cache", false)), "timeline2.html", null);
-                        return;
-                    }
-                } catch (Exception e) {
-                    // void
-                    log.info("Exception while parsing theme-conf.js = " + e.toString());
-                }
-
-                // render to default timeline
-                log.info("render timeline.html");
-                renderView(request, new JsonObject().put("lightMode", isLightmode()).put("cache", config.getBoolean("cache", false)));
-            }
-        });
 	}
 
 	@Get("/timeline2")
