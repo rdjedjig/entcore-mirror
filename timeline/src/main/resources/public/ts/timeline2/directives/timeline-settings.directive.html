@@ -31,7 +31,7 @@
 						ng-class="{ selected: widget.userPref.show, locked: widget.platformConf.mandatory }"
 						ng-click="ctrl.toggleWidget(widget, $event)">
 					<span class="inner">
-						<i ng-class="ctrl.themeSvc.getWidgetIconClass(widget.platformConf.name)"></i>
+						<i ng-class="ctrl.themeSvc.getWidgetIconClass(widget)"></i>
 					</span>
 				</a>
 				<small>[[lang.translate(widget.platformConf.name)]]</small>
