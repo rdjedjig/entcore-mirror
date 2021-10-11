@@ -368,13 +368,17 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
 		$('.filter-button').each(function (i) {
 			var target = '#' + $(this).data('target');
 			var filterTween = gsap.gsap.timeline().reversed(true).pause();
-			filterTween.from(target, { duration: 0.1, height: 0, autoAlpha: 0, display: 'none' });
+			filterTween.from(target, { duration:0.8, height:1, autoAlpha:0, ease:"sin.inOut", display:'none' });
 			filterTween.from(target + " .filter", {
-				duration: 0.1, 
+				duration: 0.4, 
 				autoAlpha: 0, 
-				translateY: '100%',
-				stagger: 0.1
-			}, "-=0.1");
+				translateY: '10px',
+				ease: "power1.inOut",
+				stagger: {
+					amount: 0.6,
+					ease: "sin.in",
+				}
+			}, "-=0.8");
 			$(target).data('tween', filterTween);
 		});
 
