@@ -972,16 +972,46 @@ export const directoryController = ng.controller('DirectoryController',['$scope'
 		}
 
 		if( filters ) {
+			// In responsive, display the results panel directly (not the search form)
+			let showResultsPanel = ui.breakpoints.checkMaxWidth("wideScreen");
 			$scope.showDefaultValue = false;
 			$scope.defaultValueTitle = "";
+
+			// Check the corresponding options in the search panel.
+			// Let's do some typings to make this clear as water.
+			type FilterOption = { label:string, type:/*id*/string, available?:boolean, checked?:boolean };
+			const options:{
+				structures:FilterOption[],
+				classes:FilterOption[],
+				profiles:FilterOption[],
+//				functions:FilterOption[], 	// unused
+//				types:FilterOption[]		// unused
+			} = $scope.search.index === 0 ? $scope.filtersOptions.users : $scope.filtersOptions.groups;
+			const checks = $scope.search.index === 0 ? $scope.filters.users : $scope.filters.groups;
+			// Check the option if it exists in the array of ids.
+			const checkIfExists = ( e:FilterOption, ids:string[], checkedFilters:string[] ) => {
+				if( (typeof e.available==="undefined" || e.available) && angular.isArray(ids) && ids.indexOf(e.type)!==-1 ) {
+					checkedFilters.push( e.type );
+				}
+			}
+			options.structures.forEach( e => checkIfExists(e, filters.structures, checks.structures) );
+			options.classes.forEach( e => checkIfExists(e, filters.classes, checks.classes) );
+			options.profiles.forEach( e => checkIfExists(e, filters.profiles, checks.profiles) );
+
+			// Search directory for filtered results and display them.
 			await directory.directory[params.filters].searchDirectory("", filters, null, false);
 			if ($scope.search.index === 0) {
 				$scope.users = directory.directory.users;
 				$scope.allUsers = Object.assign([], $scope.users);
 				template.open('dominosUser', 'dominos-user');
+				showResultsPanel = showResultsPanel && $scope.users.all.length > 0;
 			} else {
 				$scope.groups = directory.directory.groups;
 				template.open('dominosGroup', 'dominos-group');
+				showResultsPanel = showResultsPanel && $scope.groups.all.length > 0; 
+			}
+			if( showResultsPanel ) {
+				$scope.display.searchmobile = true;
 			}
 		} else {
 			/* RM#30674 FEAT (JCBE) : applies only to wide screens. */
