@@ -115,6 +115,7 @@
                         <div class="avatar-social">
                             <div class="photo">
                                 <img alt="[[notif.model.params.username]]" ng-src="/userbook/avatar/[[notif.model.sender]]?thumbnail=100x100" ng-if="notif.model.sender" />
+                                <img alt="system" skin-src="/img/illustrations/system-avatar.svg" ng-if="!notif.model.sender" />
                             </div>
             
                             <div class="circle bg-app-[[ctrl.getCssType(notif.model.type)]]">
