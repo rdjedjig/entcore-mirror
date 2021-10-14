@@ -25,7 +25,7 @@
                     ng-model="ctrl.isAllSelected" 
                     ng-change="ctrl.switchAll()">
                 <!-- div class="icon">
-                    <i class="ic-app multiselect"></i>
+                    <i class="ic-app-multiselect"></i>
                 </div -->
                 <div class="label"><i18n>filters.all.none</i18n></div>
             </label>
@@ -36,7 +36,7 @@
                     ng-model="ctrl.selectedFilter[notifType]"
                     ng-change="ctrl.switchFilter(notifType)">
                 <div class="icon">
-                    <i class="ic-app [[ctrl.getCssType(notifType)]]"></i>
+                    <i class="ic-app-[[ctrl.getCssType(notifType)]]"></i>
                 </div>
                 <div class="label">[[ctrl.translateType(notifType)]]</div>
             </label>
@@ -118,7 +118,7 @@
                             </div>
             
                             <div class="circle bg-app-[[ctrl.getCssType(notif.model.type)]]">
-                                <i class="ic-app pages-large"></i>
+                                <i class="ic-app-[[ctrl.getCssType(notif.model.type)]]"></i>
                             </div>
                         </div>
             
