@@ -1,4 +1,4 @@
-import { IAttributes, IController, IDirective, IScope } from "angular";
+import { IAttributes, IController, IDirective, IScope, ITimeoutService } from "angular";
 import { L10n, conf, http, session } from "ode-ngjs-front";
 import  gsap = require("gsap");
 import { ITimelineFactory, ITimelineNotification } from "ode-ts-client";
@@ -315,7 +315,13 @@ export class TimelineController implements IController {
 };
 
 interface TimelineScope extends IScope {
-	canRenderUi:boolean;
+	canRenderUi: boolean;
+
+	/* Needed for retro-compatibility with existing notifications text : they need these functions in the scope, directly. */
+	userStructure: string;
+	showAdminv1Link: () => boolean;
+	showAdminv2HomeLink: () => boolean;
+	showAdminv2AlertsLink: () => boolean;
 }
 
 /* Directive */
@@ -330,7 +336,7 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
 	controllerAs = 'ctrl';
 	require = ['timeline'];
 
-    async link(scope:TimelineScope, elem:JQLite, attr:IAttributes, controllers:IController[]|undefined) {
+    link(scope:TimelineScope, elem:JQLite, attr:IAttributes, controllers:IController[]|undefined) {
         const ctrl:TimelineController|null = controllers ? controllers[0] as TimelineController : null;
         if(!ctrl) return;
 
@@ -350,50 +356,56 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
 		}
 
 		scope.canRenderUi = false;
+		scope.userStructure = ctrl.userStructure;
+		scope.showAdminv1Link = ctrl.showAdminv1Link.bind(ctrl);
+		scope.showAdminv2HomeLink = ctrl.showAdminv2HomeLink.bind(ctrl);
+		scope.showAdminv2AlertsLink = ctrl.showAdminv2AlertsLink.bind(ctrl);
 
-		if( ctrl.lightmode ) {
-			scope.canRenderUi = true;
-			scope.$apply();
-			return; // Do not load the notifications in lightmode
-		}
-
-        await ctrl.lang.addBundlePromise('/timeline/i18nNotifications?mergeall=true');
-		await ctrl.initialize();
-		ctrl.initFilters();
-		ctrl.loadPage();
-		scope.canRenderUi = true;
-		scope.$apply();
-
-		// Advanced transitions for filters
-		$('.filter-button').each(function (i) {
-			var target = '#' + $(this).data('target');
-			var filterTween = gsap.gsap.timeline().reversed(true).pause();
-			filterTween.from(target, { duration:0.8, height:1, autoAlpha:0, ease:"sin.inOut", display:'none' });
-			filterTween.from(target + " .filter", {
-				duration: 0.4, 
-				autoAlpha: 0, 
-				translateY: '10px',
-				ease: "power1.inOut",
-				stagger: {
-					amount: 0.6,
-					ease: "sin.in",
+		// In lightmode, don't load nor show the notifications.
+		if( !ctrl.lightmode ) {
+			Promise.all([
+				ctrl.lang.addBundlePromise('/timeline/i18nNotifications?mergeall=true'),
+				ctrl.initialize()
+			])
+			.then( () => ctrl.initFilters() )
+			.then( () => ctrl.loadPage() )
+			.then( () => {
+				scope.canRenderUi = true;
+				scope.$apply();
+				
+				ctrl.handleLoadPageClick = (force: boolean): Promise<void> => {
+					return ctrl.loadPage(force).then(() => scope.$apply());
 				}
-			}, "-=0.8");
-			$(target).data('tween', filterTween);
-		});
 
-		$('.filter-button').on('click', function (e) {
-			var target = '#' + $(this).data('target');
-			if ($(target).data("tween").reversed()) {
-				$(target).data("tween").play();
-			} else {
-				$(target).data("tween").reverse()
-			}
-		});
+				// Only once the UI is up-to-date can we use the gsap animations.
+				// Advanced transitions for filters
+				$('.filter-button').each(function (i) {
+					var target = '#' + $(this).data('target');
+					var filterTween = gsap.gsap.timeline().reversed(true).pause();
+					filterTween.from(target, { duration:0.8, height:1, autoAlpha:0, ease:"sin.inOut", display:'none' });
+					filterTween.from(target + " .filter", {
+						duration: 0.4, 
+						autoAlpha: 0, 
+						translateY: '10px',
+						ease: "power1.inOut",
+						stagger: {
+							amount: 0.6,
+							ease: "sin.in",
+						}
+					}, "-=0.8");
+					$(target).data('tween', filterTween);
+				});
 
-		ctrl.handleLoadPageClick = (force: boolean): Promise<void> => {
-			return ctrl.loadPage(force).then(() => scope.$apply());
-		}
+				$('.filter-button').on('click', function (e) {
+					var target = '#' + $(this).data('target');
+					if ($(target).data("tween").reversed()) {
+						$(target).data("tween").play();
+					} else {
+						$(target).data("tween").reverse()
+					}
+				});
+			});
+		} // end if !ctrl.lightmode
     }
 }
 
