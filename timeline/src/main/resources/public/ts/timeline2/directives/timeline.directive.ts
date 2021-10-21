@@ -362,7 +362,9 @@ class Directive implements IDirective<TimelineScope,JQLite,IAttributes,IControll
 		scope.showAdminv2AlertsLink = ctrl.showAdminv2AlertsLink.bind(ctrl);
 
 		// In lightmode, don't load nor show the notifications.
-		if( !ctrl.lightmode ) {
+		if( ctrl.lightmode ) {
+			scope.canRenderUi = true;
+		} else {
 			Promise.all([
 				ctrl.lang.addBundlePromise('/timeline/i18nNotifications?mergeall=true'),
 				ctrl.initialize()
