@@ -119,18 +119,16 @@
                     <i class="ic-apps" aria-hidden="true"></i>
                     <span class="sr-only"><i18n>navbar.applications</i18n></span>
                 </a>
-
                 <popover-content class="widget">
                     <div class="widget-applications">
                         <div class="widget-body d-flex flex-wrap">
                             <div ng-if="me.bookmarkedApps.length === 0">
                                 <i18n>navbar.myapps.more</i18n>
                             </div>
-                            <div class="bookmarked-app" ng-repeat="app in ctrl.apps track by $index">
-                                <a connector-lightbox-trigger="app" href="[[app.address]]" target="[[app.target]]"
-                                    i18n-title="[[app.displayName]]" ng-switch="app.icon.indexOf('/')">
-                                    <i class="fs-1" ng-class="ctrl.getIconClass(app)" ng-switch-when="-1"></i>
-                                    <img skin-src="[[app.icon]]" ng-switch-default />
+                            <div class="bookmarked-app" ng-repeat="app in me.bookmarkedApps">
+                                <a href="[[app.address]]" target="[[app.target]]" title="[[translatedDisplayName(app)]]">
+                                    <i class="application [[app.icon]]" ng-if="app.icon.indexOf('/') === -1"></i>
+                                    <img skin-src="[[app.icon]]" ng-if="app.icon.indexOf('/') !== -1" />
                                 </a>
                             </div>
                         </div>
@@ -143,7 +141,7 @@
                 </popover-content>
             </popover>
 
-            <div class="btn"><span ng-include="template.containers.portal.conversationUnread"></span></div>
+            <div class="btn" ng-include="template.containers.portal.conversationUnread"></div>
 
             <popover class="btn d-none d-sm-inline-block"
                 ng-if="me.hasWorkflow('fr.openent.searchengine.controllers.SearchEngineController|view')">
