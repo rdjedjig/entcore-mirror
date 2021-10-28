@@ -1,25 +1,91 @@
-<span ng-controller="ApplicationController">
+
+<style id="humane-js">
+    .humane,
+    .humane-original {
+      position: fixed;
+      -moz-transition: all 0.2s ease-out;
+      -webkit-transition: all 0.2s ease-out;
+      -ms-transition: all 0.2s ease-out;
+      -o-transition: all 0.2s ease-out;
+      transition: all 0.2s ease-out;
+      z-index: 100000;
+      filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+    }
+    .humane,
+    .humane-original {
+      font-family: Ubuntu, Verdana, sans-serif;
+      line-height: 40px;
+      font-size: 25px;
+      top: 25%;
+      left: 25%;
+      opacity: 0;
+      width: 50%;
+      min-height: 40px;
+      padding: 10px;
+      text-align: center;
+      background-color: #000;
+      color: #fff;
+      -webkit-border-radius: 15px;
+      border-radius: 15px;
+    }
+    .humane p,
+    .humane-original p,
+    .humane ul,
+    .humane-original ul {
+      margin: 0;
+      padding: 0;
+    }
+    .humane ul,
+    .humane-original ul {
+      list-style: none;
+    }
+    .humane.humane-original-info,
+    .humane-original.humane-original-info {
+      background-color: #4bafd5;
+    }
+    .humane.humane-original-success,
+    .humane-original.humane-original-success {
+      background-color: #7DBF85;
+    }
+    .humane.humane-original-error,
+    .humane-original.humane-original-error {
+      background-color: #e13a3a;
+    }
+    .humane.humane-animate,
+    .humane-original.humane-original-animate {
+      opacity: 0.8;
+    }
+    .humane.humane-animate:hover,
+    .humane-original.humane-original-animate:hover {
+      opacity: 0.6;
+    }
+    .humane.humane-js-animate,
+    .humane-original.humane-original-js-animate {
+      opacity: 0.8;
+    }
+    .humane.humane-js-animate:hover,
+    .humane-original.humane-original-js-animate:hover {
+      opacity: 0.6;
+      filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);
+    }
+</style>
+<section ng-controller="ApplicationController">
 	<div class="d-flex justify-content-between row">
-		<h1 class="application__title d-mobile-none col-lg-6"><i18n>portal.header.navigation.myapps</i18n></h1>
-		
+		<h1 class="application-title d-mobile-none col-lg-6">
+			<i18n>portal.header.navigation.myapps</i18n>
+		</h1>
+
 		<!-- Search bar -->
-		<section class="applications__search col-lg-4">
+		<section class="applications-search col-lg-4">
 			<div class="input-searchbar">
 				<i class="ic-search form-control-feedback"></i>
-				<input
-					role="search" 
-					type="search" 
-					ng-model="display.searchText" 
-					class="form-control" 
-					i18n-placeholder="apps.search" 
-					autofocus
-				>
+				<input role="search" type="search" ng-model="display.searchText" class="form-control ng-pristine ng-untouched ng-valid ng-empty" i18n-placeholder="apps.search" autofocus="">
 			</div>
 		</section>
 	</div>
 
 	<!-- Bookmarks section -->
-	<section class="applications__favorite">
+	<section class="applications-favorite">
 				
 		<!-- "Empty screen" -->
 		<div class="text-center m-2" ng-if="!display.searchText && !bookmarks.length">
@@ -27,7 +93,7 @@
 				<i18n>apps.bookmarks.empty</i18n>
 			</p>
 			<button 
-				class="btn btn-outline-orange btn-sm"
+				class="btn btn-outline-primary btn-md"
 				ng-class="{'active': display.modeBookmarkEdition}"
 				ng-click="toggleBookmarkEdition()"
 			>
@@ -36,7 +102,7 @@
 		</div>
 		
 		<!-- bookmarks list -->
-		<section class="applications__list" id="bookmarked-apps">
+		<section class="applications-list" id="bookmarked-apps">
 			<article
 				ng-repeat="application in filteredBookmarks = (bookmarks | filter:searchDisplayName)"
 				id="[[application.name]]"
@@ -46,8 +112,8 @@
 				<a
 					ng-if="!application.isExternal"
 					ng-href="[[application.address]]"  
-					class="application__item"
 					target="[[application.target]]"
+					class="applications-item"
 					ng-class="{'no-hover': display.modeBookmarkEdition, 'pe-none': display.modeBookmarkEdition}"
 				>
 					<i ng-if="isIconUrl(application)" class="application">
@@ -69,8 +135,8 @@
 				<a
 					ng-if="application.isExternal"
 					connector-lightbox-trigger="application"
-					href=""  
-					class="application__item"
+					href="#"  
+					class="applications-item"
 					ng-class="{'no-hover': display.modeBookmarkEdition, 'pe-none': display.modeBookmarkEdition}"
 				>
 					<i ng-if="isIconUrl(application)" class="application">
@@ -89,7 +155,7 @@
 				</a>
 				
 				<button 
-					class="application__item--remove" 
+					class="applications-item remove"
 					title="Retirer des favoris"
 					ng-if="display.modeBookmarkEdition"
 					ng-click="removeBookmark(application, $index, $event)"
@@ -104,10 +170,9 @@
 				</p>
 			</div>
 		</section>
-		<!-- section title and button to handle bookmarks -->
 		<div class="d-flex justify-content-end">
 			<button 
-				class="btn btn-outline-orange btn-sm"
+				class="btn btn-outline-primary btn-md"
 				ng-class="{'active': display.modeBookmarkEdition}"
 				ng-click="toggleBookmarkEdition()"
 				ng-if="!display.searchText && bookmarks.length"
@@ -118,7 +183,7 @@
 	</section>
 
 	<!-- Applications section (may contain connectors if number of connectors is below 6 or the plaftorm configured number) -->
-	<section class="applications__list mt-2" id="apps">
+	<section class="applications-list mt-2" id="apps">
 		<article
 			ng-repeat="application in filteredApplications = (applications | filter:searchDisplayName)"
 			id="[[application.name]]"
@@ -128,8 +193,8 @@
 			<a
 				ng-if="!application.isExternal"
 				ng-href="[[application.address]]"
-				class="application__item"
 				target="[[application.target]]"
+				class="applications-item"
 				ng-class="{'no-hover': display.modeBookmarkEdition, 'pe-none': display.modeBookmarkEdition}"
 			>
 			<i ng-if="isIconUrl(application)" class="application">
@@ -151,8 +216,8 @@
 			<a
 				ng-if="application.isExternal"
 				connector-lightbox-trigger="application"
-				href=""
-				class="application__item" 
+				href="#"
+				class="applications-item"
 				ng-class="{'no-hover': display.modeBookmarkEdition, 'pe-none': display.modeBookmarkEdition}"
 			>
 				<i ng-if="isIconUrl(application)" class="application">
@@ -171,7 +236,7 @@
 			</a>
 			
 			<button 
-				class="application__item--add" 
+				class="applications-item add"
 				title="Ajouter aux favoris"
 				ng-if="display.modeBookmarkEdition"
 				ng-click="addBookmark(application, $index, $event)"
@@ -197,9 +262,9 @@
 				class="position-relative"
 			>
 				<a 
-					href=""
+					href="#"
 					connector-lightbox-trigger="connector"
-					class="application__item connector"
+					class="applications-item connector"
 					ng-class="{'no-hover': display.modeBookmarkEdition, 'pe-none': display.modeBookmarkEdition}"
 				>
 					<i ng-if="isIconUrl(connector)" class="application">
@@ -217,7 +282,7 @@
 					<span class="text-truncate text-truncate--2">[[translatedDisplayName(connector)]]</span>
 				</a>
 				<button 
-					class="application__item--add" 
+					class="applications-item add"
 					title="Ajouter aux favoris"
 					ng-if="display.modeBookmarkEdition"
 					ng-click="addBookmark(connector, $index, $event)"
@@ -235,4 +300,4 @@
 	</section>
 
 	<connector-lightbox></connector-lightbox>
-</span>
+</section>
