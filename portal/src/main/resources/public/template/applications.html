@@ -124,7 +124,7 @@
 					</i>
 					<i 
 						ng-if="!isIconUrl(application)" 
-						class="application [[application.icon]]"
+						class="application" ng-class="getIconClass(application)"
 						ng-class="{'opacity-50': display.modeBookmarkEdition}"
 					>
 					</i>
@@ -146,8 +146,8 @@
 						/>
 					</i>
 					<i 
-						ng-if="!isIconUrl(application)" 
-						class="application [[application.icon]]"
+						ng-if="!isIconUrl(application)"
+						class="application" ng-class="getIconClass(application)"
 						ng-class="{'opacity-50': display.modeBookmarkEdition}"
 					>
 					</i>
@@ -205,7 +205,7 @@
 			</i>
 				<i 
 					ng-if="!isIconUrl(application)" 
-					class="application [[application.icon]]"
+					class="application" ng-class="getIconClass(application)"
 					ng-class="{'opacity-50': display.modeBookmarkEdition}"
 				>
 				</i>
@@ -228,7 +228,7 @@
 				</i>
 				<i 
 					ng-if="!isIconUrl(application)" 
-					class="application [[application.icon]]"
+					class="application" ng-class="getIconClass(application)"
 					ng-class="{'opacity-50': display.modeBookmarkEdition}"
 				>
 				</i>
