@@ -46,7 +46,7 @@
 						ng-click="ctrl.saveLang(language, $event)">
 					<a href="" class="bt-lang"
 							ng-class="{ selected: ctrl.languagePreference===language}">
-						<img class="flag" ng-src="[[ctrl.getFlagUrlFor(language)]]" alt="">
+						<img class="flag" width="100" height="75" ng-src="[[ctrl.getFlagUrlFor(language)]]" alt="">
 						<div>[[lang.translate('language.' + language)]]</div>
 					</a>
 				</div>
