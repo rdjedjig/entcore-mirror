@@ -52,6 +52,7 @@
             <a 
                 href=""
                 title="[[lang.translate('navbar.help')]]" 
+                aria-label="[[lang.translate('navbar.help')]]" 
                 pulsar="{ index: 6, i18n: 'portal.pulsar.help', position: 'bottom center'}" 
             >
                 <i18n>help.icon</i18n>
@@ -163,7 +164,7 @@
                 </popover-content>
             </popover>
 
-            <a href="#" i18n-title="navbar.help" class="btn"
+            <a href="#" i18n-title="navbar.help" class="btn" aria-label="navbar.help"
                 pulsar="{ index:5, style:{zIndex:1021}, i18n:'portal.pulsar.help', position:'bottom center'}"
                 ng-if="currentLanguage == 'fr'">
                 <help></help><!-- i18n>help.icon</i18n -->
