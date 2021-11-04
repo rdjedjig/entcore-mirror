@@ -10,12 +10,12 @@
 	</div>
 
 
-	<div class="content">
+	<div class="sticky-toolbox-content">
 	
-		<p class="title"><i18n>panel.themes</i18n></p>
-		<div class="buttons-theme row">
+		<p class="sticky-toolbox-title"><i18n>panel.themes</i18n></p>
+		<div class="row buttons-theme">
 			<div class="col-6" ng-repeat="skin in ctrl.skins">
-				<a href="" class="bt skin-[[skin.displayName]]"
+				<a href="" class="sticky-toolbox-item skin-[[skin.displayName]]"
 						ng-class="{ selected: ctrl.currentSkinName==skin.displayName }"
 						ng-click="ctrl.saveTheme(skin, $event)" >
 					[[lang.translate(skin.displayName)]]
@@ -23,10 +23,10 @@
 			</div>
 		</div>
 
-		<p class="title"><i18n>panel.widgets</i18n></p>
+		<p class="sticky-toolbox-title"><i18n>panel.widgets</i18n></p>
 		<div class="row buttons-widget">
 			<div class="text-center col-3" ng-repeat="widget in ctrl.widgets">
-				<a href="" class="bt"
+				<a href="" class="sticky-toolbox-item"
 						title="[[lang.translate(widget.platformConf.name)]]"
 						ng-class="{ selected: widget.userPref.show, locked: widget.platformConf.mandatory }"
 						ng-click="ctrl.toggleWidget(widget, $event)">
@@ -39,12 +39,12 @@
 		</div>
 
 		<div workflow="timeline.allowLanguages" ng-if="ctrl.languages.length > 1">
-			<p class="title"><i18n>panel.languages</i18n></p>
-			<div class="row buttons-lang">
+			<p class="sticky-toolbox-title"><i18n>panel.languages</i18n></p>
+			<div class="row buttons-countries">
 				<div class="col-3" 
 						ng-repeat="language in ctrl.languages" 
 						ng-click="ctrl.saveLang(language, $event)">
-					<a href="" class="bt-lang"
+					<a href="#" class="sticky-toolbox-country"
 							ng-class="{ selected: ctrl.languagePreference===language}">
 						<img class="flag" width="100" height="75" ng-src="[[ctrl.getFlagUrlFor(language)]]" alt="">
 						<div>[[lang.translate('language.' + language)]]</div>
