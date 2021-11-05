@@ -5,7 +5,6 @@ export class AppController {
 	me: IUserInfo;
 	currentLanguage: string;
 	lang: IIdiom;
-	lightmode: string;
 
 	constructor(){
 		this.initialize();
@@ -16,7 +15,6 @@ export class AppController {
 		this.me = session().user;
 		this.currentLanguage = session().currentLanguage;
 		this.lang = platformConf.idiom;
-		this.lightmode = (window as any).LIGHT_MODE;
 	}
 
 	public toggleContainer( ev:UIEvent, containerId:string ) {
