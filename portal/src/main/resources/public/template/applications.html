@@ -124,9 +124,10 @@
 
 		<!-- Search bar -->
 		<section class="applications-search col-lg-4">
+			<label class="sr-only" for="app-search"><i18n>apps.search</i18n></label>
 			<div class="input-searchbar">
 				<i class="ic-search form-control-feedback"></i>
-				<input role="search" type="search" ng-model="display.searchText" class="form-control ng-pristine ng-untouched ng-valid ng-empty" i18n-placeholder="apps.search" autofocus="">
+				<input id="app-search" role="search" type="search" ng-model="display.searchText" class="form-control ng-pristine ng-untouched ng-valid ng-empty" i18n-placeholder="apps.search" autofocus="">
 			</div>
 		</section>
 	</div>
