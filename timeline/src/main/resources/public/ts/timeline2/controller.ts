@@ -21,7 +21,12 @@ export class AppController {
 		$(".list-trigger .trigger").removeClass('on');
 		$(ev.currentTarget).addClass('on');
 		let classFocus = 'focus-' + containerId;
+		$('.container-advanced').removeClass('hide');
 		$('.container-advanced').attr('class', 'container-advanced ' + classFocus);
+		$('.container-advanced-wrapper').on('transitionend webkitTransitionEnd oTransitionEnd', function () {
+			// your event handler
+			$('.container-advanced').addClass('hide');
+		});
 	}
 
 };
