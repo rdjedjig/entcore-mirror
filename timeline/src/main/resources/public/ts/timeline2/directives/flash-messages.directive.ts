@@ -1,5 +1,5 @@
 import { IAttributes, IController, IDirective, IScope } from "angular";
-import { IFlashMessageModel, ITimelineApp, ITimelineFactory } from "ode-ts-client";
+import { IFlashMessageModel, ITimelineApp, ITimelineFactory, NotifyFrameworkFactory } from "ode-ts-client";
 import { session } from "ode-ngjs-front";
 
 /* Controller for the directive */
@@ -36,14 +36,17 @@ class Directive implements IDirective<IScope,JQLite,IAttributes,IController[]> {
 	controllerAs = 'ctrl';
 	require = ['flashMessages'];
 
-    link(scope:IScope, elem:JQLite, attr:IAttributes, controllers:IController[]|undefined): void {
+    link(scope:IScope, elem:JQLite, attr:IAttributes, controllers:IController[]|undefined) {
         let ctrl:FlashMsgController|null = controllers ? controllers[0] as FlashMsgController : null;
         if(!ctrl) return;
 
 		ctrl.app = ITimelineFactory.createInstance();
-		ctrl.currentLanguage = session().currentLanguage;
-
-		ctrl.list();
+		NotifyFrameworkFactory.instance().onSessionReady().promise
+		.then( userinfo => {
+			ctrl.currentLanguage = session().currentLanguage;
+			ctrl.list();
+			scope.$apply();
+		});
     }
 }
 

@@ -34,7 +34,7 @@ class Directive implements IDirective<Scope,JQLite,IAttributes,IController[]> {
 		const parentCtrl = controllers[0] as FlashMsgController;
 		if( !parentCtrl || !scope.message ) return;
 
-		this.richContentSvc.apply(scope.message?.contents[parentCtrl.currentLanguage] ?? '', elem, scope);
+		this.richContentSvc.apply(scope.message.contents[parentCtrl.currentLanguage] ?? '', elem, scope);
 
 		// If needed, limit the height of displayed text, and add a button "See more" which toggles the full message display back and forth.
 		if( this.helperSvc ) {
