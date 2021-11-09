@@ -73,13 +73,15 @@
 		padding: 20px;
 		bottom: 10px !important;
 		right: 10px !important;
-		border-radius: 6px;
+		border-radius: 0;
+		width: 450px !important;
 		box-shadow: 0 0.5rem 1rem rgb(33 37 41 / 15%);
 	}
 	infotip.info {
 		background: linear-gradient(to right, #f0f9fc, #dceff7);
 	}
 	infotip .close {
+		cursor: pointer;
 		position: absolute;
 		right: 10px;
 		top: 10px;
@@ -95,18 +97,26 @@
 	}
 	infotip.info p {
 		margin-top: 20px;
-		color: var(--bs-secondary);
+		color: var(--bs-third);
 	}
 	infotip .right-magnet {
+		padding-top: 1.5rem;
+		margin-top: 1.5rem;
 		text-align: right;
 	}
 	infotip button {
 		padding: 0.475rem 1.2rem;
 		border: 0;
-		border-radius: 5px;
+		border-radius: 0;
 	}
 	infotip button.cancel {
+		margin-right: 1rem;
 		color: #000;
+		background-color: #e9ecef;
+		border-color: #e9ecef;
+	}
+	infotip button.cancel:hover {
+		color: var(--bs-primary);
 		background-color: #e9ecef;
 		border-color: #e9ecef;
 	}
@@ -114,6 +124,11 @@
 		color: #fff;
 		background-color: var(--bs-primary);
 		border-color: var(--bs-primary);
+	}
+	infotip button:not(.cancel):hover {
+		color: #fff;
+		background-color: #d97100;
+		border-color: #cc6a00;
 	}
 </style>
 <section ng-controller="ApplicationController">
