@@ -1,5 +1,5 @@
 /*
- * Copyright © "Open Digital Education", 2014
+ * Copyright © "Open Digital Education", 2020
  *
  * This program is published by "Open Digital Education".
  * You must indicate the name of the software and the company in any production /contribution
@@ -20,40 +20,37 @@
 package org.entcore.common.events.impl;
 
 import fr.wseduc.webutils.Server;
-import io.vertx.core.json.JsonObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 import org.entcore.common.events.EventStore;
 import org.entcore.common.events.EventStoreFactory;
 
-public class MongoDbEventStoreFactory extends EventStoreFactory {
+public class RedisEventStoreFactory extends EventStoreFactory {
 
 	@Override
 	public EventStore getEventStore(String module) {
-		final MongoDbEventStore eventStore =  new MongoDbEventStore();
+		final RedisEventStore eventStore =  new RedisEventStore();
 		eventStore.setEventBus(Server.getEventBus(vertx));
 		eventStore.setModule(module);
 		eventStore.setVertx(vertx);
-		final String eventStoreConf = (String) vertx.sharedData().getLocalMap("server").get("event-store");
-		if (eventStoreConf != null) {
-			final JsonObject eventStoreConfig = new JsonObject(eventStoreConf);
-			if (eventStoreConfig.containsKey("postgresql")) {
-				final PostgresqlEventStore pgEventStore =  new PostgresqlEventStore();
-				pgEventStore.setEventBus(Server.getEventBus(vertx));
-				pgEventStore.setModule(module);
-				pgEventStore.setVertx(vertx);
-				pgEventStore.init();
-				eventStore.setPostgresqlEventStore(pgEventStore);
-			}
-			if (eventStoreConfig.containsKey("redis")) {
-				final RedisEventStore redisEventStore =  new RedisEventStore();
-				redisEventStore.setEventBus(Server.getEventBus(vertx));
-				redisEventStore.setModule(module);
-				redisEventStore.setVertx(vertx);
-				redisEventStore.init();
-				eventStore.setRedisEventStore(redisEventStore);
-			}
-		}
+		eventStore.init();
 		return eventStore;
+	}
+
+	public void getEventStore(String module, Handler<AsyncResult<EventStore>> handler) {
+		final RedisEventStore eventStore =  new RedisEventStore();
+		eventStore.setEventBus(Server.getEventBus(vertx));
+		eventStore.setModule(module);
+		eventStore.setVertx(vertx);
+		eventStore.init(ar -> {
+			if (ar.succeeded()) {
+				handler.handle(Future.succeededFuture(eventStore));
+			} else {
+				handler.handle(Future.failedFuture(ar.cause()));
+			}
+		});
 	}
 
 }

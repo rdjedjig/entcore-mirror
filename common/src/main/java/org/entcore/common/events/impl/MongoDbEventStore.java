@@ -34,6 +34,7 @@ public class MongoDbEventStore extends GenericEventStore {
 	private final MongoDb mongoDb = MongoDb.getInstance();
 	private static final String COLLECTION = "events";
 	private PostgresqlEventStore postgresqlEventStore;
+	private RedisEventStore redisEventStore;
 
 	@Override
 	protected void storeEvent(final JsonObject event, final Handler<Either<String, Void>> handler) {
@@ -55,6 +56,10 @@ public class MongoDbEventStore extends GenericEventStore {
 			postgresqlEventStore.storeEvent(event.copy(), ar -> {
 			});
 		}
+		if (redisEventStore != null) {
+			redisEventStore.storeEvent(event.copy(), ar -> {
+			});
+		}
 	}
 
 	@Override
@@ -66,6 +71,10 @@ public class MongoDbEventStore extends GenericEventStore {
 
 	public void setPostgresqlEventStore(PostgresqlEventStore postgresqlEventStore) {
 		this.postgresqlEventStore = postgresqlEventStore;
+	}
+
+	public void setRedisEventStore(RedisEventStore redisEventStore) {
+		this.redisEventStore = redisEventStore;
 	}
 
 }

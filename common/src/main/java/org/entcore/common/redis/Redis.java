@@ -19,15 +19,28 @@
 
 package org.entcore.common.redis;
 
+import fr.wseduc.webutils.Utils;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.redis.RedisClient;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.redis.RedisOptions;
+import io.vertx.redis.client.RedisAPI;
+import io.vertx.redis.client.RedisConnection;
+import io.vertx.redis.RedisClient;
 
 public class Redis {
 
+    private static final int MAX_RECONNECT_RETRIES = 16;
+    private static final Logger log = LoggerFactory.getLogger(Redis.class);
+
+    private Vertx vertx;
     private RedisClient redisClient;
     private RedisOptions redisOptions;
+    private io.vertx.redis.client.RedisOptions newRedisOptions;
+    private RedisConnection redisConnection;
 
     private Redis() {
     }
@@ -41,6 +54,7 @@ public class Redis {
     }
 
     public void init(Vertx vertx, JsonObject redisConfig) {
+        this.vertx = vertx;
         this.redisOptions = new RedisOptions()
                 .setHost(redisConfig.getString("host"))
                 .setPort(redisConfig.getInteger("port"))
@@ -49,6 +63,24 @@ public class Redis {
             this.redisOptions.setAuth(redisConfig.getString("auth"));
         }
         this.redisClient = RedisClient.create(vertx, redisOptions);
+        this.newRedisOptions = new io.vertx.redis.client.RedisOptions()
+            .setConnectionString(formatConnectionString(redisConfig));
+        // io.vertx.redis.client.Redis.createClient(vertx, newRedisOptions).connect(onConnect -> {
+        //     if (onConnect.succeeded()) {
+        //         this.redisConnection = onConnect.result();
+        //     }
+        // });
+        createRedisClient(ar -> {
+            if (ar.failed()) {
+                attemptReconnect(0);
+                log.error("error creating redis client", ar.cause());
+            }
+        });
+    }
+
+    private final String formatConnectionString(JsonObject redisConfig) {
+        final String auth = Utils.isNotEmpty(redisConfig.getString("auth")) ? ":" + redisConfig.getString("auth") + "@" : "";
+        return "redis://" + auth + redisConfig.getString("host") + ":" + redisConfig.getInteger("port") + "/" + redisConfig.getInteger("select", 0);
     }
 
     public RedisClient getRedisClient() {
@@ -57,6 +89,10 @@ public class Redis {
 
     public RedisOptions getRedisOptions() {
         return this.redisOptions;
+    }
+
+    public RedisAPI getRedisAPI() {
+        return RedisAPI.api(redisConnection);
     }
 
     public static RedisClient getClient() {
@@ -72,6 +108,31 @@ public class Redis {
                                                 .setHost(options.getHost())
                                                 .setPort(options.getPort())
                                                 .setSelect(db));
+    }
+
+    private void createRedisClient(Handler<AsyncResult<RedisConnection>> handler) {
+        io.vertx.redis.client.Redis.createClient(vertx, newRedisOptions).connect(onConnect -> {
+            if (onConnect.succeeded()) {
+                this.redisConnection = onConnect.result();
+                this.redisConnection.exceptionHandler(e -> attemptReconnect(0));
+            }
+            handler.handle(onConnect);
+        });
+    }
+
+    private void attemptReconnect(int retry) {
+        if (retry > MAX_RECONNECT_RETRIES) {
+          // we should stop now, as there's nothing we can do.
+        } else {
+          // retry with backoff up to 10240 ms
+            long backoff = (long) (Math.pow(2, Math.min(retry, 10)) * 10);
+
+            vertx.setTimer(backoff, timer -> createRedisClient(onReconnect -> {
+                if (onReconnect.failed()) {
+                    attemptReconnect(retry + 1);
+                }
+            }));
+        }
     }
 
 }
