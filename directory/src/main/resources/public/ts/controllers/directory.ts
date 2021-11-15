@@ -994,9 +994,9 @@ export const directoryController = ng.controller('DirectoryController',['$scope'
 					checkedFilters.push( e.type );
 				}
 			}
-			options.structures.forEach( e => checkIfExists(e, filters.structures, checks.structures) );
-			options.classes.forEach( e => checkIfExists(e, filters.classes, checks.classes) );
-			options.profiles.forEach( e => checkIfExists(e, filters.profiles, checks.profiles) );
+			options.structures?.forEach( e => checkIfExists(e, filters.structures, checks.structures) );
+			options.classes?.forEach( e => checkIfExists(e, filters.classes, checks.classes) );
+			options.profiles?.forEach( e => checkIfExists(e, filters.profiles, checks.profiles) );
 
 			// Search directory for filtered results and display them.
 			await directory.directory[params.filters].searchDirectory("", filters, null, false);
