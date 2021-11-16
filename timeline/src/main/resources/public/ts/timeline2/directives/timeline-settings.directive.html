@@ -38,7 +38,7 @@
 			</div>
 		</div>
 
-		<div workflow="timeline.allowLanguages" ng-if="ctrl.languages.length > 1">
+		<div ng-if="ctrl.languages.length && me.hasWorkflow('org.entcore.timeline.controllers.TimelineController|allowLanguages')">
 			<p class="sticky-toolbox-title"><i18n>panel.languages</i18n></p>
 			<div class="row buttons-countries">
 				<div class="col-3" 

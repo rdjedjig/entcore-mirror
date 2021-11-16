@@ -65,6 +65,9 @@ export class Controller implements IController {
 
 interface LocalScope extends IScope {
 	lang?: IIdiom;
+	me?:{
+		hasWorkflow(right:string):boolean;
+	};
 }
 
 /* Directive */
@@ -85,6 +88,11 @@ class Directive implements IDirective<LocalScope,JQLite,IAttributes,IController[
         if(!ctrl || !timelineCtrl) return;
 
 		scope.lang = conf().Platform.idiom;
+		scope.me = {
+			hasWorkflow(right:string):boolean {
+				return session().hasWorkflow(right);
+			}
+		};
 
 		Promise.all([
 			conf().Platform.listLanguages(),
