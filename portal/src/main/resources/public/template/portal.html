@@ -94,28 +94,28 @@
 </div>
 
 <!-- Theme 2D -->
-<header class="no-1d navbar navbar-dark sticky-top bg-secondary">
+<header class="no-1d navbar sticky-top bg-secondary">
     <div class="container">
         <a class="navbar-brand" href="/timeline/timeline?token=[[rand]]">
             <img class="logo" src="/assets/themes/[[skin.skin]]/img/illustrations/logo.png" alt="Logo de l'ENT">
         </a>
 
-        <nav class="navigation">
-            <a href="/timeline/timeline" class="btn" i18n-title="navbar.home">
+        <nav class="navbar-nav">
+            <a href="/timeline/timeline" class="nav-link" i18n-title="navbar.home">
                 <i class="ic-home" aria-hidden="true"></i>
                 <span class="sr-only"><i18n>navbar.home</i18n></span>
             </a>
 
-            <a href="/community" class="btn zero-mobile" i18n-title="navbar.community"
+            <a href="/community" class="nav-link" i18n-title="navbar.community"
                 ng-if="me.hasWorkflow('net.atos.entng.community.controllers.CommunityController|view')">
                 <i class="ic-community" aria-hidden="true"></i>
                 <span class="sr-only"><i18n>navbar.community</i18n></span>
             </a>
 
-            <popover class="btn"
+            <popover
                 title="[[lang.translate('navbar.applications')]]" 
                 pulsar="{ index: 3, i18n: 'portal.pulsar.apps', position: 'bottom center'}" >
-                <a href="/welcome" class="text-light" i18n-title="navbar.applications" ng-click="openApps($event)"
+                <a href="/welcome" class="nav-link" i18n-title="navbar.applications" ng-click="openApps($event)"
                 popover-opener>
                     <i class="ic-apps" aria-hidden="true"></i>
                     <span class="sr-only"><i18n>navbar.applications</i18n></span>
@@ -142,11 +142,11 @@
                 </popover-content>
             </popover>
 
-            <div class="zimbra-btn" ng-include="template.containers.portal.conversationUnread"></div>
+            <div class="nav-link" ng-include="template.containers.portal.conversationUnread"></div>
 
-            <popover class="btn d-none d-sm-inline-block"
+            <popover class="nav-link d-none d-sm-inline-block"
                 ng-if="me.hasWorkflow('fr.openent.searchengine.controllers.SearchEngineController|view')">
-                <a href="/searchengine" class="text-light" i18n-title="navbar.search" popover-opener
+                <a href="/searchengine" i18n-title="navbar.search" popover-opener
                     ng-click="openApps($event)">
                     <i class="ic-search" aria-hidden="true"></i>
                     <span class="sr-only"><i18n>navbar.search</i18n></span>
@@ -165,19 +165,19 @@
                 </popover-content>
             </popover>
 
-            <a href="#" i18n-title="navbar.help" class="btn" aria-label="navbar.help"
+            <a href="#" i18n-title="navbar.help" class="nav-link" aria-label="navbar.help"
                 pulsar="{ index:5, style:{zIndex:1021}, i18n:'portal.pulsar.help', position:'bottom center'}"
                 ng-if="currentLanguage == 'fr'">
                 <help></help><!-- i18n>help.icon</i18n -->
             </a>
 
-            <a href="/userbook/mon-compte" i18n-title="navbar.myaccount" class="btn d-none d-sm-block"
+            <a href="/userbook/mon-compte" i18n-title="navbar.myaccount" class="nav-link d-none d-sm-block"
                 pulsar="{ index:4, style:{zIndex:1021}, i18n:'portal.pulsar.account', position:'bottom center'}">
                 <img class="avatar" width="30" height="30" data-ng-src="[[avatar ? avatar+'?thumbnail=48x48' : '']]" alt="avatar" />
                 <span class="sr-only"><i18n>navbar.myaccount</i18n></span>
             </a>
 
-            <a href="#" class="btn d-none d-sm-inline-flex" logout i18n-title="navbar.disconnect">
+            <a href="#" class="nav-link d-none d-sm-inline-flex" logout i18n-title="navbar.disconnect">
                 <i class="ic-disconnect" aria-hidden="true"></i>
                 <span class="sr-only"><i18n>navbar.disconnect</i18n></span>
             </a>
