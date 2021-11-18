@@ -27,14 +27,14 @@
 		<div class="row buttons-widget">
 			<div class="text-center col-3" ng-repeat="widget in ctrl.widgets">
 				<a href="" class="sticky-toolbox-item"
-						title="[[lang.translate(widget.platformConf.name)]]"
+						title="[[lang.translate('timeline.settings.'+widget.platformConf.name)]]"
 						ng-class="{ selected: widget.userPref.show, locked: widget.platformConf.mandatory }"
 						ng-click="ctrl.toggleWidget(widget, $event)">
 					<span class="inner">
 						<i ng-class="ctrl.themeSvc.getWidgetIconClass(widget)"></i>
 					</span>
 				</a>
-				<small>[[lang.translate(widget.platformConf.name)]]</small>
+				<small>[[lang.translate('timeline.settings.'+widget.platformConf.name)]]</small>
 			</div>
 		</div>
 
