@@ -1,4 +1,4 @@
-import { IAttributes, IController, IDirective, IScope, ITimeoutService } from "angular";
+import { IAttributes, IController, IDirective, IScope } from "angular";
 import { L10n, conf, http, session } from "ode-ngjs-front";
 import  gsap = require("gsap");
 import { ITimelineFactory, ITimelineNotification } from "ode-ts-client";
@@ -226,12 +226,22 @@ export class TimelineController implements IController {
 	}
 
 	initFilters() {
-		this.app.notificationTypes.forEach( type => {
-			this.selectedFilter[type] = false;
-		});
-		this.app.selectedNotificationTypes.forEach( type => {
-			this.selectedFilter[type] = true;
-		});
+		// If the user has not selected any preference, then show all notifications by default.
+		if( !this.app.preferences || typeof this.app.preferences.type==="undefined" ) {
+			this.app.notificationTypes.forEach( type => {
+				this.selectedFilter[type] = true;
+				this.app.selectedNotificationTypes.push( type );
+			});
+		} else {
+			// Deactivate all
+			this.app.notificationTypes.forEach( type => {
+				this.selectedFilter[type] = false;
+			});
+			// Then reactivate notifications whose type was explicitely selected by the user.
+			this.app.selectedNotificationTypes.forEach( type => {
+				this.selectedFilter[type] = true;
+			});
+		}
 		this.updateSelectAllChip();
 	}
 
