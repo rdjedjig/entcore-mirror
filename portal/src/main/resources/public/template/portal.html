@@ -110,7 +110,7 @@
                 <span class="sr-only"><i18n>navbar.home</i18n></span>
             </a>
 
-            <a href="/community" id="btn-community" class="nav-link d-none d-sm-inline-block" i18n-title="navbar.community"
+            <a href="/community" data-community class="nav-link d-none d-sm-inline-block" i18n-title="navbar.community"
                 ng-if="me.hasWorkflow('net.atos.entng.community.controllers.CommunityController|view')">
                 <i class="ic-community" aria-hidden="true"></i>
                 <span class="sr-only"><i18n>navbar.community</i18n></span>
@@ -203,7 +203,7 @@
                         &nbsp;<i18n>navbar.myaccount</i18n>
                     </a>
                   </li>
-                  <li ng-if="me.hasWorkflow('net.atos.entng.community.controllers.CommunityController|view')">
+                  <li data-community ng-if="me.hasWorkflow('net.atos.entng.community.controllers.CommunityController|view')">
                     <a class="dropdown-item" href="/community" i18n-title="navbar.community">
                         <i class="ic-community" aria-hidden="true"></i>
                         &nbsp;<i18n>navbar.community</i18n>
