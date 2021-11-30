@@ -599,7 +599,9 @@ public class DefaultCommunicationService implements CommunicationService {
 			}
 		}
 		query.append("OPTIONAL MATCH (sub:Subject)<-[:TEACHES]-m ");
-		union.append("OPTIONAL MATCH (sub:Subject)<-[:TEACHES]-m ");
+		if (union != null) {
+			union.append("OPTIONAL MATCH (sub:Subject)<-[:TEACHES]-m ");
+		}
 		if (customReturn != null && !customReturn.trim().isEmpty()) {
 			query.append("WITH DISTINCT m as visibles, COLLECT(DISTINCT sub.label) AS subjects ").append(pcr);
 			query.append(customReturn);
