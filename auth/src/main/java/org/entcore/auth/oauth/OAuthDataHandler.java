@@ -27,11 +27,14 @@ import fr.wseduc.webutils.security.NTLM;
 import fr.wseduc.webutils.security.Sha256;
 import jp.eisbahn.oauth2.server.async.Handler;
 import jp.eisbahn.oauth2.server.data.DataHandler;
+import jp.eisbahn.oauth2.server.exceptions.OAuthError;
 import jp.eisbahn.oauth2.server.exceptions.Try;
 import jp.eisbahn.oauth2.server.exceptions.OAuthError.AccessDenied;
 import jp.eisbahn.oauth2.server.models.AccessToken;
 import jp.eisbahn.oauth2.server.models.AuthInfo;
 import jp.eisbahn.oauth2.server.models.Request;
+
+import org.entcore.auth.security.SamlHelper;
 import org.entcore.auth.services.OpenIdConnectService;
 import org.entcore.common.events.EventStore;
 import org.entcore.common.neo4j.Neo4j;
@@ -76,10 +79,12 @@ public class OAuthDataHandler extends DataHandler {
 	private final int pwMaxRetry;
 	private final long pwBanDelay;
 	private final int defaultSyncValue;
+	private final SamlHelper samlHelper;
 
 	public OAuthDataHandler(Request request, Neo4j neo, MongoDb mongo, RedisClient redisClient,
 			OpenIdConnectService openIdConnectService, boolean checkFederatedLogin,
-			int pwMaxRetry, long pwBanDelay, String passwordEventMinDate, int defaultSyncValue, EventStore eventStore) {
+			int pwMaxRetry, long pwBanDelay, String passwordEventMinDate, int defaultSyncValue,
+			EventStore eventStore, SamlHelper samlHelper) {
 		super(request);
 		this.neo = neo;
 		this.mongo = mongo;
@@ -91,6 +96,7 @@ public class OAuthDataHandler extends DataHandler {
 		this.passwordEventMinDate = passwordEventMinDate;
 		this.eventStore = eventStore;
 		this.defaultSyncValue = defaultSyncValue;
+		this.samlHelper = samlHelper;
 	}
 
 	@Override
@@ -680,6 +686,24 @@ public class OAuthDataHandler extends DataHandler {
 				handler.handle(new Try<AccessDenied, String>(new AccessDenied(AUTH_ERROR_AUTHENTICATION_FAILED)));
 			}
 		});
+	}
+
+	@Override
+	public void getUserIdByAssertion(String samlResponse, Handler<Try<OAuthError, String>> handler) {
+		if (samlHelper != null) {
+			samlHelper.processACSOAuth2(samlResponse, handler);
+		} else {
+			handler.handle(new Try<OAuthError, String>(new AccessDenied(AUTH_ERROR_AUTHENTICATION_FAILED)));
+		}
+	}
+
+	@Override
+	public void getUserIdByCustomToken(String customToken, Handler<Try<AccessDenied, String>> handler) {
+		if (samlHelper != null) {
+			samlHelper.processCustomToken(customToken, handler);
+		} else {
+			handler.handle(new Try<AccessDenied, String>(new AccessDenied(AUTH_ERROR_AUTHENTICATION_FAILED)));
+		}
 	}
 
 }

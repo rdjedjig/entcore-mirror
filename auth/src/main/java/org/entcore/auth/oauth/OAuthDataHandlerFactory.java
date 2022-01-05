@@ -24,9 +24,12 @@ import io.vertx.redis.RedisClient;
 import jp.eisbahn.oauth2.server.data.DataHandler;
 import jp.eisbahn.oauth2.server.data.DataHandlerFactory;
 import jp.eisbahn.oauth2.server.models.Request;
+
+import org.entcore.auth.security.SamlHelper;
 import org.entcore.auth.services.OpenIdConnectService;
 import org.entcore.common.events.EventStore;
 import org.entcore.common.neo4j.Neo4j;
+import org.entcore.common.redis.Redis;
 
 public class OAuthDataHandlerFactory implements DataHandlerFactory {
 
@@ -40,15 +43,16 @@ public class OAuthDataHandlerFactory implements DataHandlerFactory {
 	private final EventStore eventStore;
 	private final String passwordEventMinDate;
 	private final int defaultSyncValue;
+	private SamlHelper samlHelper;
 
-	public OAuthDataHandlerFactory(Neo4j neo, MongoDb mongo, RedisClient redisClient,
+	public OAuthDataHandlerFactory(
 			OpenIdConnectService openIdConnectService, boolean cfl, int pwMaxRetry, long pwBanDelay,
 			String passwordEventMinDate, int defaultSyncValue, EventStore eventStore) {
-		this.neo = neo;
-		this.mongo = mongo;
+		this.neo = Neo4j.getInstance();
+		this.mongo = MongoDb.getInstance();
 		this.openIdConnectService = openIdConnectService;
 		this.checkFederatedLogin = cfl;
-		this.redisClient = redisClient;
+		this.redisClient = Redis.getClient();
 		this.pwMaxRetry = pwMaxRetry;
 		this.pwBanDelay = pwBanDelay;
 		this.eventStore = eventStore;
@@ -59,7 +63,11 @@ public class OAuthDataHandlerFactory implements DataHandlerFactory {
 	@Override
 	public DataHandler create(Request request) {
 		return new OAuthDataHandler(request, neo, mongo, redisClient, openIdConnectService, checkFederatedLogin,
-				pwMaxRetry, pwBanDelay, passwordEventMinDate, defaultSyncValue, eventStore);
+				pwMaxRetry, pwBanDelay, passwordEventMinDate, defaultSyncValue, eventStore, samlHelper);
+	}
+
+	public void setSamlHelper(SamlHelper samlHelper) {
+		this.samlHelper = samlHelper;
 	}
 
 }
