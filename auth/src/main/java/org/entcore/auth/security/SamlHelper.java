@@ -105,8 +105,10 @@ public class SamlHelper {
     }
 
     public void processACSOAuth2(String base64SamlResponse, jp.eisbahn.oauth2.server.async.Handler<Try<OAuthError, String>> handler) {
+        log.info("enter process ACS oauth2");
         if (isNotEmpty(base64SamlResponse)) {
             validateSamlResponseAndGetAssertion(new String(Base64.getDecoder().decode(base64SamlResponse)), ar -> {
+                log.info("after assertion validation");
                 if (ar.succeeded()) {
                     getUserFromAssertion(ar.result(), event -> {
                         if (event.isLeft()) {
@@ -115,6 +117,7 @@ public class SamlHelper {
                         } else {
                             if (event.right().getValue() != null && event.right().getValue() instanceof JsonObject) {
                                 final JsonObject res = (JsonObject) event.right().getValue();
+                                log.info("user " + res.encode());
                                 if (res.size() == 0) {
                                     handler.handle(new Try<OAuthError, String>(
                                             new AccessDenied(OAuthDataHandler.AUTH_ERROR_AUTHENTICATION_FAILED)));

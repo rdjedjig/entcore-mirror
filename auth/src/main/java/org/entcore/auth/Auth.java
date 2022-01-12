@@ -70,7 +70,8 @@ public class Auth extends BaseServer {
 		final boolean checkFederatedLogin = config.getBoolean("check-federated-login", false);
 		final OAuthDataHandlerFactory oauthDataFactory = new OAuthDataHandlerFactory(
 				openIdConnectService, checkFederatedLogin, config.getInteger("maxRetry", 5), config.getLong("banDelay", 900000L),
-				config.getString("password-event-min-date"), config.getInteger("password-event-sync-default-value", 0), eventStore);
+				config.getString("password-event-min-date"), config.getInteger("password-event-sync-default-value", 0),
+				config.getJsonArray("oauth2-pw-client-enable-saml2"), eventStore);
 
 		AuthController authController = new AuthController();
 		authController.setEventStore(eventStore);

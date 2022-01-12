@@ -79,12 +79,13 @@ public class OAuthDataHandler extends DataHandler {
 	private final int pwMaxRetry;
 	private final long pwBanDelay;
 	private final int defaultSyncValue;
+	private final JsonArray clientPWSupportSaml2;
 	private final SamlHelper samlHelper;
 
 	public OAuthDataHandler(Request request, Neo4j neo, MongoDb mongo, RedisClient redisClient,
 			OpenIdConnectService openIdConnectService, boolean checkFederatedLogin,
 			int pwMaxRetry, long pwBanDelay, String passwordEventMinDate, int defaultSyncValue,
-			EventStore eventStore, SamlHelper samlHelper) {
+			JsonArray clientPWSupportSaml2, EventStore eventStore, SamlHelper samlHelper) {
 		super(request);
 		this.neo = neo;
 		this.mongo = mongo;
@@ -96,6 +97,7 @@ public class OAuthDataHandler extends DataHandler {
 		this.passwordEventMinDate = passwordEventMinDate;
 		this.eventStore = eventStore;
 		this.defaultSyncValue = defaultSyncValue;
+		this.clientPWSupportSaml2 = clientPWSupportSaml2;
 		this.samlHelper = samlHelper;
 	}
 
@@ -114,7 +116,12 @@ public class OAuthDataHandler extends DataHandler {
 			Map<String, Object> params = new HashMap<>();
 			params.put("clientId", clientId);
 			params.put("secret", clientSecret);
-			params.put("grantType", grantType);
+			if (clientPWSupportSaml2 != null && clientPWSupportSaml2.contains(clientId) &&
+					("saml2".equals(grantType) || "custom_token".equals(grantType))) {
+				params.put("grantType", "password");
+			} else {
+				params.put("grantType", grantType);
+			}
 			neo.execute(query, params, new io.vertx.core.Handler<Message<JsonObject>>() {
 				@Override
 				public void handle(Message<JsonObject> res) {
@@ -690,6 +697,7 @@ public class OAuthDataHandler extends DataHandler {
 
 	@Override
 	public void getUserIdByAssertion(String samlResponse, Handler<Try<OAuthError, String>> handler) {
+		log.info("enter getUserIdByAssertion");
 		if (samlHelper != null) {
 			samlHelper.processACSOAuth2(samlResponse, handler);
 		} else {
@@ -699,6 +707,7 @@ public class OAuthDataHandler extends DataHandler {
 
 	@Override
 	public void getUserIdByCustomToken(String customToken, Handler<Try<AccessDenied, String>> handler) {
+		log.info("enter getUserIdByCustomToken");
 		if (samlHelper != null) {
 			samlHelper.processCustomToken(customToken, handler);
 		} else {

@@ -20,6 +20,7 @@
 package org.entcore.auth.oauth;
 
 import fr.wseduc.mongodb.MongoDb;
+import io.vertx.core.json.JsonArray;
 import io.vertx.redis.RedisClient;
 import jp.eisbahn.oauth2.server.data.DataHandler;
 import jp.eisbahn.oauth2.server.data.DataHandlerFactory;
@@ -43,11 +44,12 @@ public class OAuthDataHandlerFactory implements DataHandlerFactory {
 	private final EventStore eventStore;
 	private final String passwordEventMinDate;
 	private final int defaultSyncValue;
+	private final JsonArray clientPWSupportSaml2;
 	private SamlHelper samlHelper;
 
 	public OAuthDataHandlerFactory(
 			OpenIdConnectService openIdConnectService, boolean cfl, int pwMaxRetry, long pwBanDelay,
-			String passwordEventMinDate, int defaultSyncValue, EventStore eventStore) {
+			String passwordEventMinDate, int defaultSyncValue, JsonArray clientPWSupportSaml2, EventStore eventStore) {
 		this.neo = Neo4j.getInstance();
 		this.mongo = MongoDb.getInstance();
 		this.openIdConnectService = openIdConnectService;
@@ -58,12 +60,13 @@ public class OAuthDataHandlerFactory implements DataHandlerFactory {
 		this.eventStore = eventStore;
 		this.passwordEventMinDate = passwordEventMinDate;
 		this.defaultSyncValue = defaultSyncValue;
+		this.clientPWSupportSaml2 = clientPWSupportSaml2;
 	}
 
 	@Override
 	public DataHandler create(Request request) {
 		return new OAuthDataHandler(request, neo, mongo, redisClient, openIdConnectService, checkFederatedLogin,
-				pwMaxRetry, pwBanDelay, passwordEventMinDate, defaultSyncValue, eventStore, samlHelper);
+				pwMaxRetry, pwBanDelay, passwordEventMinDate, defaultSyncValue, clientPWSupportSaml2, eventStore, samlHelper);
 	}
 
 	public void setSamlHelper(SamlHelper samlHelper) {
