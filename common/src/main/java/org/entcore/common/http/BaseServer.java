@@ -44,6 +44,7 @@ import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.http.filter.*;
 import org.entcore.common.http.response.SecurityHookRender;
 import org.entcore.common.http.response.OverrideThemeHookRender;
+import org.entcore.common.mongodb.MongoDbAsync;
 import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.neo4j.Neo4jUtils;
 import org.entcore.common.redis.Redis;
@@ -203,6 +204,17 @@ public abstract class BaseServer extends Server {
 					FileResolver.absolutePath(config.getString("neo4j-init-scripts", "neo4j")));
 		}
 		if (config.getBoolean("mongodb", true)) {
+			if (config.getJsonObject("mongoConfig") != null) {
+				final JsonObject mongoConfigJson = config.getJsonObject("mongoConfig").copy();
+				final JsonObject mongoConfigOverride = config.getJsonObject("mongoConfigOverride", new JsonObject());
+				MongoDbAsync.getInstance(vertx, mongoConfigJson.mergeIn(mongoConfigOverride));
+			} else {
+				final String mongoConfig = (String) vertx.sharedData().getLocalMap("server").get("mongoConfig");
+				final JsonObject mongoConfigJson = new JsonObject(mongoConfig);
+				final JsonObject mongoConfigOverride = config.getJsonObject("mongoConfigOverride", new JsonObject());
+				
+				MongoDbAsync.getInstance(vertx, mongoConfigJson.mergeIn(mongoConfigOverride));
+			}
 			MongoDb.getInstance().init(getEventBus(vertx), node +
 					config.getString("mongo-address", "wse.mongodb.persistor"));
 		}

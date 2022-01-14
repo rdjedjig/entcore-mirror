@@ -103,13 +103,17 @@ public class MongoAsyncPersistor
   }
   public void save(String collection, JsonObject document, Handler<String> success, Handler<Throwable> error)
   {
+    this.save(collection, document, this.writeOption, success, error);
+  }
+  public void save(String collection, JsonObject document, WriteOption writeOption, Handler<String> success, Handler<Throwable> error)
+  {
     if (collection == null || document == null)
     {
         error.handle(new NullPointerException());
         return;
     }
 
-    this.client.saveWithOptions(collection, document, this.writeOption, new Handler<AsyncResult<String>>()
+    this.client.saveWithOptions(collection, document, writeOption, new Handler<AsyncResult<String>>()
     {
         @Override
         public void handle(AsyncResult<String> result)
@@ -190,11 +194,16 @@ public class MongoAsyncPersistor
     }
   }
 
-  public void update(String collection, JsonObject query, JsonObject update, boolean multi, boolean upsert, Handler<JsonObject> success)
+  public void update(String collection, JsonObject query, JsonObject update, boolean multi, boolean upsert, Handler<Long> success)
   {
       this.update(collection, query, update, multi, upsert, success, DEFAULT_ERROR_HANDLER);
   }
-  public void update(String collection, JsonObject query, JsonObject update, boolean multi, boolean upsert, Handler<JsonObject> success, Handler<Throwable> error)
+  public void update(String collection, JsonObject query, JsonObject update, boolean multi, boolean upsert, Handler<Long> success, Handler<Throwable> error)
+  {
+    this.update(collection, query, update, multi, upsert, this.writeOption, success, error);
+  }
+  public void update(String collection, JsonObject query, JsonObject update, boolean multi, boolean upsert, WriteOption writeOption,
+                      Handler<Long> success, Handler<Throwable> error)
   {
     if (collection == null || query == null || update == null)
     {
@@ -202,7 +211,7 @@ public class MongoAsyncPersistor
         return;
     }
 
-    UpdateOptions options = new UpdateOptions().setMulti(multi).setUpsert(upsert).setWriteOption(this.writeOption).setReturningNewDocument(true);
+    UpdateOptions options = new UpdateOptions().setMulti(multi).setUpsert(upsert).setWriteOption(writeOption).setReturningNewDocument(true);
     this.client.updateCollectionWithOptions(collection, query, update, options, new Handler<AsyncResult<MongoClientUpdateResult>>()
     {
         @Override
@@ -214,7 +223,7 @@ public class MongoAsyncPersistor
               if(res == null) // Happens sometimes smh
                 success.handle(null);
               else
-                success.handle(result.result().getDocUpsertedId());
+                success.handle(new Long(result.result().getDocModified()));
             }
             else
                 error.handle(result.cause());
@@ -223,6 +232,10 @@ public class MongoAsyncPersistor
   }
 
   public void bulk(String collection, JsonArray commands, Handler<JsonObject> handler, Handler<Throwable> error)
+  {
+    this.bulk(collection, commands, this.writeOption, handler, error);
+  }
+  public void bulk(String collection, JsonArray commands, WriteOption writeOption, Handler<JsonObject> handler, Handler<Throwable> error)
   {
     if (collection == null || commands == null) {
       error.handle(new NullPointerException());
@@ -284,7 +297,7 @@ public class MongoAsyncPersistor
       return;
     }
 
-    BulkWriteOptions options = new BulkWriteOptions().setOrdered(true).setWriteOption(this.writeOption);
+    BulkWriteOptions options = new BulkWriteOptions().setOrdered(true).setWriteOption(writeOption);
     this.client.bulkWriteWithOptions(collection, bulks, options, new Handler<AsyncResult<MongoClientBulkWriteResult>>()
     {
       @Override
@@ -461,10 +474,10 @@ public class MongoAsyncPersistor
               }
             }, error);
           else
-            update(collection, query, update, true, upsert, new Handler<JsonObject>()
+            update(collection, query, update, true, upsert, new Handler<Long>()
             {
               @Override
-              public void handle(JsonObject s)
+              public void handle(Long s)
               {
                 handler.handle(documents);
               }
@@ -485,10 +498,10 @@ public class MongoAsyncPersistor
     }
     else
     {
-      this.update(collection, query, update, true, upsert, new Handler<JsonObject>()
+      this.update(collection, query, update, true, upsert, new Handler<Long>()
       {
         @Override
-        public void handle(JsonObject s)
+        public void handle(Long s)
         {
           find(collection, query, fields, sort, null, handler, error);
         }
@@ -556,13 +569,17 @@ public class MongoAsyncPersistor
   }
   public void delete(String collection, JsonObject query, Handler<Long> handler, Handler<Throwable> error)
   {
+    this.delete(collection, query, this.writeOption, handler, error);
+  }
+  public void delete(String collection, JsonObject query, WriteOption writeOption, Handler<Long> handler, Handler<Throwable> error)
+  {
     if (collection == null || query == null)
     {
         error.handle(new NullPointerException());
         return;
     }
 
-    this.client.removeDocumentsWithOptions(collection, query, this.writeOption, new Handler<AsyncResult<MongoClientDeleteResult>>()
+    this.client.removeDocumentsWithOptions(collection, query, writeOption, new Handler<AsyncResult<MongoClientDeleteResult>>()
     {
       @Override
       public void handle(AsyncResult<MongoClientDeleteResult> res)

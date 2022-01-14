@@ -32,7 +32,7 @@ import org.entcore.common.share.ShareInfosQuery;
 
 import com.mongodb.QueryBuilder;
 
-import fr.wseduc.mongodb.MongoDb;
+import fr.wseduc.mongodb.MongoDbAPI;
 import fr.wseduc.mongodb.MongoQueryBuilder;
 import fr.wseduc.mongodb.MongoUpdateBuilder;
 import fr.wseduc.webutils.Either;
@@ -49,9 +49,9 @@ import io.vertx.core.json.JsonObject;
 public class MongoDbShareService extends GenericShareService {
 
 	private final String collection;
-	private final MongoDb mongo;
+	private final MongoDbAPI mongo;
 
-	public MongoDbShareService(EventBus eb, MongoDb mongo, String collection, Map<String, SecuredAction> securedActions,
+	public MongoDbShareService(EventBus eb, MongoDbAPI mongo, String collection, Map<String, SecuredAction> securedActions,
 			Map<String, List<String>> groupedActions) {
 		super(eb, securedActions, groupedActions);
 		this.mongo = mongo;
