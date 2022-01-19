@@ -69,6 +69,13 @@ clean () {
   docker-compose run --rm -u "$USER_UID:$GROUP_GID" gradle gradle clean
 }
 
+setVersions () {
+  if [ ! -z "$VERSION" ]; then
+    echo "[buildNode] Get version from jenkins param... $VERSION"
+    sed -i "s/^version=/version=$VERSION/g" gradle.properties
+  fi
+}
+
 buildNode () {
   if [ "$MODULE" = "" ] || [ ! "$MODULE" = "admin" ]; then
     #try jenkins branch name => then local git branch name => then jenkins params
@@ -174,6 +181,9 @@ do
   case $param in
     clean)
       clean
+      ;;
+    setVersions)
+      setVersions
       ;;
     buildAdminNode)
       buildAdminNode
