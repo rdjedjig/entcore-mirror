@@ -19,6 +19,8 @@
 package org.entcore.admin.controllers;
 
 import io.vertx.core.shareddata.LocalMap;
+
+import org.entcore.admin.controllers.api.IPlatformInfoController;
 import org.entcore.common.http.filter.AdminFilter;
 import org.entcore.common.http.filter.ResourceFilter;
 import io.vertx.core.http.HttpServerRequest;
@@ -36,7 +38,7 @@ import java.util.List;
 import static org.entcore.common.utils.Config.defaultDeleteUserDelay;
 import static org.entcore.common.utils.Config.defaultPreDeleteUserDelay;
 
-public class PlatformInfoController extends BaseController {
+public class PlatformInfoController extends BaseController implements IPlatformInfoController {
 
 	private boolean smsActivated;
 	private static final List<String> PROFILES = Arrays.asList("Personnel", "Teacher", "Student", "Relative", "Guest");
