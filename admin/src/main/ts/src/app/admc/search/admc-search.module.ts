@@ -5,10 +5,17 @@ import { RouterModule } from "@angular/router";
 import { NgxOdeSijilModule } from "ngx-ode-sijil";
 import { NgxOdeUiModule } from "ngx-ode-ui";
 import { UserListService } from "src/app/core/services/userlist.service";
+import { ConfigResolver } from "src/app/core/resolvers/config.resolver";
 import { AdmcSearchComponent } from "./admc-search.component";
 import { routes } from "./admc-search.routing";
 import { AdmcSearchService } from "./admc-search.service";
 import { AdmcSearchTransverseComponent } from "./transverse/admc-search-transverse.component";
+import { AdmcSearchUnlinkedComponent } from "./unlinked/admc-search-unlinked.component";
+import { AdmcSearchUnlinkedResolver } from "./unlinked/admc-search-unlinked.resolver";
+import { UnlinkedUserDetailsComponent } from "./unlinked/details/user-details.component";
+import { UserDetailsResolver } from "./unlinked/details/user-details.resolver";
+import { UnlinkedUserService } from "./unlinked/unlinked.service";
+import { UnlinkedUserStructuresSectionComponent } from "./unlinked/structures-section/user-structures-section.component";
 
 @NgModule({
     imports: [
@@ -20,13 +27,20 @@ import { AdmcSearchTransverseComponent } from "./transverse/admc-search-transver
     ],
     declarations: [
         AdmcSearchComponent,
-        AdmcSearchTransverseComponent
-    ],
-    exports: [
+        AdmcSearchTransverseComponent,
+        AdmcSearchUnlinkedComponent,
+        UnlinkedUserDetailsComponent,
+        UnlinkedUserStructuresSectionComponent
     ],
     providers: [
         UserListService,
-        AdmcSearchService
+        AdmcSearchService,
+        AdmcSearchUnlinkedResolver,
+        UserDetailsResolver,
+        ConfigResolver,
+        UnlinkedUserService
+    ],
+    exports: [
     ]
 })
 export class AdmcSearchModule {
