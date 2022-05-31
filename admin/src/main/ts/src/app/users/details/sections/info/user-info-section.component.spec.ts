@@ -2,10 +2,11 @@ import {ChangeDetectorRef} from '@angular/core';
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
 import {FormsModule} from '@angular/forms';
-import {SijilModule} from 'sijil';
-import {UxModule} from '../../../../shared/ux/ux.module';
+import {NgxOdeSijilModule} from 'ngx-ode-sijil';
+import {NgxOdeUiModule} from 'ngx-ode-ui';
 import {UserInfoSectionComponent} from './user-info-section.component';
-import {NotifyService, SpinnerService} from '../../../../core/services';
+import {NotifyService} from 'src/app/core/services/notify.service';
+import { SpinnerService } from 'ngx-ode-ui';
 import {UserInfoService} from './user-info.service';
 
 describe('UserInfoSectionComponent', () => {
@@ -38,15 +39,15 @@ describe('UserInfoSectionComponent', () => {
             ],
             imports: [
                 HttpClientTestingModule,
-                SijilModule.forRoot(),
-                UxModule.forRoot(null),
+                NgxOdeSijilModule.forRoot(),
+                NgxOdeUiModule.forRoot(null),
                 FormsModule
             ]
 
         }).compileComponents();
         fixture = TestBed.createComponent(UserInfoSectionComponent);
         component = fixture.debugElement.componentInstance;
-        httpController = TestBed.get(HttpTestingController);
+        httpController = TestBed.inject(HttpTestingController);
     }));
 
     it('should create the UserInfoSectionComponent component', async(() => {

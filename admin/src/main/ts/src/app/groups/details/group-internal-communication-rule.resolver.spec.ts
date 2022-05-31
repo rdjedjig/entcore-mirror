@@ -2,7 +2,7 @@ import {ActivatedRouteSnapshot, convertToParamMap, RouterStateSnapshot} from '@a
 import {async, TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
 import {CommunicationGroupResponse, GroupInternalCommunicationRuleResolver} from './group-internal-communication-rule.resolver';
-import {InternalCommunicationRule} from '../../core/store/models';
+import {InternalCommunicationRule} from 'src/app/core/store/models/group.model';
 
 describe('GroupInternalCommunicationRuleResolver', () => {
     let service: GroupInternalCommunicationRuleResolver;
@@ -17,8 +17,8 @@ describe('GroupInternalCommunicationRuleResolver', () => {
                 HttpClientTestingModule
             ]
         }).compileComponents();
-        service = TestBed.get(GroupInternalCommunicationRuleResolver);
-        httpController = TestBed.get(HttpTestingController);
+        service = TestBed.inject(GroupInternalCommunicationRuleResolver);
+        httpController = TestBed.inject(HttpTestingController);
     }));
 
     it(`should call '/communication/group/myGroupId' when the current group id is 'myGroupId'`, () => {

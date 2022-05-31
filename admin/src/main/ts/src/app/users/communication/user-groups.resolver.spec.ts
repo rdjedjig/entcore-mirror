@@ -2,7 +2,7 @@ import {UserGroupsResolver} from './user-groups.resolver';
 import {ActivatedRouteSnapshot, convertToParamMap} from '@angular/router';
 import {TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
-import {generateGroup} from '../../utils';
+import {generateGroup} from '../../utils/testing';
 import {GroupModel} from '../../core/store/models/group.model';
 
 describe('UserGroupsResolver', () => {
@@ -18,8 +18,8 @@ describe('UserGroupsResolver', () => {
                 HttpClientTestingModule
             ]
         });
-        userGroupsResolver = TestBed.get(UserGroupsResolver);
-        httpController = TestBed.get(HttpTestingController);
+        userGroupsResolver = TestBed.inject(UserGroupsResolver);
+        httpController = TestBed.inject(HttpTestingController);
     });
 
     it('should call the backend API for listing groups of a user', () => {
