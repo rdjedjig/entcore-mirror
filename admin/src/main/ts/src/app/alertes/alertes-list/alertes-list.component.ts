@@ -5,7 +5,7 @@ import {globalStore} from '../../core/store/global.store';
 import {routing} from '../../core/services/routing.service';
 import {mergeMap, tap} from 'rxjs/operators';
 import {Observable, Subject} from 'rxjs';
-import {AlerteModel} from '../../core/store/models/AlerteModel';
+import {AlerteModel} from '../../core/store/models/alerte.model';
 import { MatDialog } from '@angular/material/dialog';
 import {AlertesTraiteesListModalComponent} from '../alertes-traitees-list-modal/alertes-traitees-list-modal.component';
 import { StructureModel } from 'src/app/core/store/models/structure.model';

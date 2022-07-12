@@ -1,8 +1,6 @@
-import { Mix, Model } from "entcore-toolkit";
-import { BundlesService } from "ngx-ode-sijil";
 import { RoleModel } from "./role.model";
 
-export class WidgetModel extends Model<WidgetModel> {
+export class WidgetModel {
     id: string;
     name: string;
     displayName: string;
@@ -19,15 +17,4 @@ export class WidgetModel extends Model<WidgetModel> {
 
     roles: Array<RoleModel>;
     levelsOfEducation: Array<number>;
-
-    constructor() {
-        super({});
-    }
-
-    syncRoles = (structureId: string): Promise<void> => {
-        return this.http.get(`/appregistry/widget/${this.id}?structureId=${structureId}`)
-            .then(res => {
-                this.roles = new Array(Mix.castAs(RoleModel, res.data));
-            });
-    }
 }

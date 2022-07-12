@@ -1,4 +1,3 @@
-import {Model} from 'entcore-toolkit';
 import { UserCollection } from '../collections/user.collection';
 import { GroupCollection } from '../collections/group.collection';
 import { SubjectCollection } from '../collections/subject.collection';
@@ -8,7 +7,7 @@ import { WidgetCollection } from '../collections/widget.collection';
 
 export type ClassModel = { id: string, name: string };
 
-export class StructureModel extends Model<StructureModel> {
+export class StructureModel {
     UAI?: string;
     externalId?: string;
     name?: string;
@@ -35,7 +34,6 @@ export class StructureModel extends Model<StructureModel> {
     feederName?: string;
 
     constructor() {
-        super({});
         this.users = new UserCollection();
         this.removedUsers = new UserCollection("/directory/structure/:structureId/removedUsers");
         this.groups = new GroupCollection();
@@ -63,68 +61,5 @@ export class StructureModel extends Model<StructureModel> {
     static AUTOMATIC_SOURCES_REGEX = /AAF/;
     get isSourceAutomatic() {
         return this.source && StructureModel.AUTOMATIC_SOURCES_REGEX.test(this.source);
-    }
-
-    quickSearchUsers(input: string) {
-        return this.http.get(`/directory/structure/${this.id}/quicksearch/users`, {
-            params: {input}
-        });
-    }
-
-    syncClasses(force?: boolean) {
-        if (this.classes.length < 1 || force === true) {
-            return this.http.get('/directory/class/admin/list', {params: {structureId: this.id}})
-                .then(res => this.classes = res.data);
-        }
-        return Promise.resolve();
-    }
-
-    syncGroups(force?: boolean) {
-        if (this.groups.data.length < 1 || force === true) {
-            return this.groups.sync().then(() => Promise.resolve(this.groups));
-        }
-        return Promise.resolve();
-    }
-
-    syncSubjects(force?: boolean) {
-        if (this.subjects.data.length < 1 || force === true) {
-            return this.subjects.sync().then(() => Promise.resolve(this.subjects));
-        }
-        return Promise.resolve();
-    }
-
-    syncSources(force?: boolean) {
-        if (this.userSources.length < 1 || force === true) {
-            return this.http.get(`/directory/structure/${this.id}/sources`)
-                .then(res => {
-                    if (res.data && res.data.length > 0) {
-                        this.userSources = res.data[0].sources;
-                    }
-                });
-        }
-        return Promise.resolve();
-    }
-
-    syncAafFunctions(force?: boolean) {
-        if (this.aafFunctions.length < 1 || force === true) {
-            return this.http.get(`/directory/structure/${this.id}/aaffunctions`)
-                .then(res => {
-                    if (res.data && res.data.length > 0
-                        && res.data[0].aafFunctions && res.data[0].aafFunctions.length > 0) {
-                        this.aafFunctions = res.data[0].aafFunctions;
-                    }
-                });
-        }
-        return Promise.resolve();
-    }
-
-    is1D(): boolean
-    {
-        return this.levelsOfEducation.indexOf(1) != -1;
-    }
-
-    is2D(): boolean
-    {
-        return this.levelsOfEducation.indexOf(2) != -1;
     }
 }

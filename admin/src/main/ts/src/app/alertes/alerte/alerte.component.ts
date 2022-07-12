@@ -1,6 +1,6 @@
 import { OdeComponent } from 'ngx-ode-core';
 import {Component, OnInit, Injector, Input, Output} from '@angular/core';
-import {AlerteModel} from '../../core/store/models/AlerteModel';
+import {AlerteModel} from '../../core/store/models/alerte.model';
 import {ReplaySubject, Subject} from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import {TraitementAlerteModalComponent} from '../traitement-alerte-modal/traitement-alerte-modal.component';

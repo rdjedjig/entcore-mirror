@@ -1,6 +1,6 @@
 import {Component, Inject, Injector, OnInit} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
-import {AlerteModel} from '../../core/store/models/AlerteModel';
+import {AlerteModel} from '../../core/store/models/alerte.model';
 import {mergeMap, tap} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';

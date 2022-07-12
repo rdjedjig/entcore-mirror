@@ -1,6 +1,6 @@
+import {ValueProvider} from '@angular/core';
 import {AbstractStore} from './abstract.store';
 import {StructureCollection} from './collections/structure.collection';
-import {ValueProvider} from '@angular/core';
 
 export class GlobalStore extends AbstractStore {
     constructor() {

@@ -4,6 +4,8 @@ import { StructureModel } from '../store/models/structure.model';
 import { WidgetModel } from '../store/models/widget.model';
 import { NotifyService } from './notify.service';
 import http from 'axios';
+import { RoleModel } from '../store/models/role.model';
+import { Mix } from 'entcore-toolkit';
 
     // Example {\"Teacher\":[\"Blog\", \"Exercices et évaluations\"]}
 export type DefaultBookmarks = {
@@ -65,5 +67,12 @@ export class WidgetService {
         return http.put(url, {apps: bookmarks})
             .then( () => this.notify.success('widget.notify.ok') )
             .catch( () => this.notify.error('widget.notify.ko') );
+    }
+
+    syncRoles = (widget: WidgetModel, structureId: string): Promise<void> => {
+        return http.get(`/appregistry/widget/${widget.id}?structureId=${structureId}`)
+            .then(res => {
+                widget.roles = new Array(Mix.castAs(RoleModel, res.data));
+            });
     }
 }
