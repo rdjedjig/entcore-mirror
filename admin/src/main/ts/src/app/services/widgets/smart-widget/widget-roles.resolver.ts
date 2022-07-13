@@ -8,6 +8,7 @@ import { RoleModel } from 'src/app/core/store/models/role.model';
 import { StructureModel } from 'src/app/core/store/models/structure.model';
 import { WidgetModel } from 'src/app/core/store/models/widget.model';
 import { BundlesService } from "ngx-ode-sijil";
+import { WidgetService } from 'src/app/core/services/widgets.service';
 
 @Injectable()
 export class WidgetRolesResolver implements Resolve<Array<RoleModel>> {
@@ -16,7 +17,8 @@ export class WidgetRolesResolver implements Resolve<Array<RoleModel>> {
         private spinner: SpinnerService,
         private router: Router,
         private ns: NotifyService,
-        private bundlesService: BundlesService
+        private bundlesService: BundlesService,
+        private widgetService: WidgetService
     ) { }
 
     resolve(route: ActivatedRouteSnapshot): Promise<Array<RoleModel>> {
@@ -29,7 +31,7 @@ export class WidgetRolesResolver implements Resolve<Array<RoleModel>> {
         } else {
             return this.spinner.perform(
                 'portal-content', 
-                targetWidget.syncRoles(structure._id)
+                this.widgetService.syncRoles(targetWidget, structure._id)
                     .then(() => {
                         targetWidget.roles.forEach(role => {
                             role.name = `${this.bundlesService.translate('services.widget.roles.access')} ${this.bundlesService.translate(targetWidget.name)}`

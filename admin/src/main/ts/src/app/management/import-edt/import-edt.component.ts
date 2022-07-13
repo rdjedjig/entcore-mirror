@@ -9,6 +9,7 @@ import { SelectOption } from 'ngx-ode-ui';
 import { NotifyService } from 'src/app/core/services/notify.service';
 import { Session } from 'src/app/core/store/mappings/session';
 import { SessionModel } from 'src/app/core/store/models/session.model';
+import { StructureService } from 'src/app/core/services/structure.service';
 
 @Component(
 {
@@ -47,7 +48,11 @@ export class ImportEDTComponent extends OdeComponent implements OnInit, OnDestro
 
   private isADMC: boolean = false;
 
-  constructor(injector: Injector, private reportService: ImportEDTReportsService, private timetableService: ImportTimetableService, private notify: NotifyService)
+  constructor(injector: Injector, 
+    private reportService: ImportEDTReportsService, 
+    private timetableService: ImportTimetableService, 
+    private notify: NotifyService,
+    private structureService: StructureService)
   {
     super(injector);
   }
@@ -100,7 +105,7 @@ export class ImportEDTComponent extends OdeComponent implements OnInit, OnDestro
         {
           this.notify.success("management.edt.flux.notify.success.content", "management.edt.flux.notify.success.title");
           this.structure.timetable = this.mainFlux;
-          this.structure.syncGroups(true);
+          this.structureService.syncGroups(this.structure, true);
           this._getClassesMapping();
           this._getGroupsMapping();
         }
@@ -137,7 +142,7 @@ export class ImportEDTComponent extends OdeComponent implements OnInit, OnDestro
     {
       this.notify.success("management.edt.import.notify.success.content", "management.edt.import.notify.success.title");
       this._getReportsFromService();
-      this.structure.syncGroups(true);
+      this.structureService.syncGroups(this.structure, true);
       this._getClassesMapping();
       this._getGroupsMapping();
     }).catch((err) =>

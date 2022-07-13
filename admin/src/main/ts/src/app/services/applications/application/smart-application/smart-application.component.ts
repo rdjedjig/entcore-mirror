@@ -1,6 +1,8 @@
 import { Component, Injector, OnDestroy, OnInit } from '@angular/core';
 import { Data } from '@angular/router';
 import { OdeComponent } from 'ngx-ode-core';
+import { ApplicationService } from 'src/app/core/services/application.service';
+import { RoleService } from 'src/app/core/services/role.service';
 import { Session } from 'src/app/core/store/mappings/session';
 import { GroupModel } from 'src/app/core/store/models/group.model';
 import { RoleModel } from 'src/app/core/store/models/role.model';
@@ -20,8 +22,10 @@ export class SmartApplicationComponent extends OdeComponent implements OnInit, O
     public assignmentGroupPickerList: GroupModel[];
 
     constructor(injector: Injector,
-                public servicesStore: ServicesStore) {
-                    super(injector);
+        public servicesStore: ServicesStore,
+        private applicationService: ApplicationService,
+        private roleService: RoleService) {
+        super(injector);
     }
 
     ngOnInit(): void {
@@ -61,7 +65,7 @@ export class SmartApplicationComponent extends OdeComponent implements OnInit, O
     }
 
     public onMassAssignment(): void {
-        this.servicesStore.application.syncRoles(this.servicesStore.structure.id)
+        this.applicationService.syncRoles(this.servicesStore.application, this.servicesStore.structure.id)
             .then(async () => {
                 let roles: Array<RoleModel> = this.servicesStore.application.roles.filter(r => r.transverse == false);
 

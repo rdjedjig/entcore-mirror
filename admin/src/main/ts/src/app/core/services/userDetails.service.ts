@@ -21,8 +21,8 @@ export class UserDetailsService {
     constructor(private http: HttpClient,
         private structureService: StructureService) {}
 
-    fetch(userDetails: UserDetailsModel): Observable<UserDetailsModel> {
-        return this.http.get<UserDetailsModel>(`/directory/user/${userDetails.id}?manual-groups=true`);
+    fetch(userId: string): Observable<UserDetailsModel> {
+        return this.http.get<UserDetailsModel>(`/directory/user/${userId}?manual-groups=true`);
     }
 
     toggleBlock(userDetails: UserDetailsModel) {

@@ -1,5 +1,5 @@
 import { HttpClient } from "@angular/common/http";
-import { Component, Injector, Input, OnChanges, SimpleChanges } from "@angular/core";
+import { Component, Injector, OnChanges } from "@angular/core";
 import { Data, Params } from "@angular/router";
 import { OdeComponent } from "ngx-ode-core";
 import { SpinnerService } from "ngx-ode-ui";
@@ -7,12 +7,12 @@ import { NotifyService } from "src/app/core/services/notify.service";
 import { routing } from "src/app/core/services/routing.service";
 import { GroupModel } from "src/app/core/store/models/group.model";
 import { StructureModel } from "src/app/core/store/models/structure.model";
-import { filterRolesByDistributions } from "../../applications/application/smart-application/smart-application.component";
 import { ServicesStore } from "../../services.store";
 import { filterWidgetsByLevelsOfEducation } from "../../_shared/services-list/services-list.component";
 import { Assignment } from "../../_shared/services-types";
 import { SessionModel } from 'src/app/core/store/models/session.model';
 import { Session } from 'src/app/core/store/mappings/session';
+import { WidgetService } from "src/app/core/services/widgets.service";
 
 type SmartWidgetTab = 'assignment' | 'massAssignment' | 'myappsParameters';
 
@@ -52,7 +52,8 @@ export class SmartWidgetComponent extends OdeComponent implements OnChanges {
         public servicesStore: ServicesStore,
         private httpClient: HttpClient,
         private notifyService: NotifyService,
-        private spinnerService: SpinnerService) {
+        private spinnerService: SpinnerService,
+        private widgetService: WidgetService) {
         super(injector);
     }
 
@@ -236,6 +237,6 @@ export class SmartWidgetComponent extends OdeComponent implements OnChanges {
     }
 
     public onMassChange(): void {
-        this.servicesStore.widget.syncRoles(this.servicesStore.structure.id);
+        this.widgetService.syncRoles(this.servicesStore.widget, this.servicesStore.structure.id);
     }
 }

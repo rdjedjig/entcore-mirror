@@ -23,7 +23,15 @@ export class ApplicationService {
     }
 
     syncRoles = (application: ApplicationModel, structureId: string) => {
-        return this.http.get(`/appregistry/structure/${structureId}/application/${application.id}/groups/roles`)
-            .subscribe((res: Array<RoleModel>) => application.roles = Mix.castArrayAs(RoleModel, res));
+        return new Promise((resolve, reject) => {
+            this.http.get(`/appregistry/structure/${structureId}/application/${application.id}/groups/roles`)
+                .subscribe((res: Array<RoleModel>) => {
+                    application.roles = Mix.castArrayAs(RoleModel, res)
+                    return resolve(null);
+                });
+        })
+        
+        
+        
     }
 }
