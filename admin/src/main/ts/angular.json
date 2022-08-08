@@ -54,7 +54,10 @@
               "rxjs-compat",
               "chardet",
               "qs",
-              "entcore-toolkit"
+              "entcore-toolkit",
+              "flatpickr",
+              "jquery",
+              "noty"
             ]
           },
           "configurations": {
@@ -150,6 +153,6 @@
           "defaultConfiguration": "development"
         }
       }
-    }},
-  "defaultProject": "admin-app"
+    }
+  }
 }
