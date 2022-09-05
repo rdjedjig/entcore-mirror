@@ -279,6 +279,7 @@ public class DefaultImportService implements ImportService {
            } else {
                JsonObject reply = new JsonObject().put("importId", importId);
                JsonObject foundApps = new JsonObject();
+               JsonObject foundVersions = new JsonObject(); // extract archived app version for later migration
                JsonObject apps = res.result().toJsonObject();
                eb.send("portal", new JsonObject().put("action","getI18n").put("acceptLanguage",locale), map -> {
                    if (map.succeeded()) {
@@ -302,28 +303,28 @@ public class DefaultImportService implements ImportService {
 
                            if (o instanceof JsonObject) {
                                // case where Manifest contains folder name
-
-                               for (Map.Entry<String, Object> app: minimumImportVersions.getMap().entrySet()) {
-                                   if (app.getKey().equals(appName) &&
-                                           StringUtils.versionComparator.compare(((JsonObject)o).getString("version"), app.getValue().toString()) < 0) {
-                                       return;
-                                   }
-                               }
-
                                JsonObject jo = (JsonObject)o;
+                               String version = jo.getString("version");
+
+                               String minVersion = minimumImportVersions.getString(appName);
+                               if(!StringUtils.isEmpty(minVersion) && StringUtils.versionComparator.compare(version, minVersion) < 0)
+                                return;
+
+                               foundVersions.put(appName, version);
+
                                String folderName = jo.getString("folder");
                                if (folders.stream().anyMatch(f -> f.endsWith(folderName))) {
                                    foundApps.put(appName, folderName);
                                }
                            } else {
                                // case where Manifest doesn't contain folder name
+                               final String version = (String)o;
 
-                               for (Map.Entry<String, Object> app: minimumImportVersions.getMap().entrySet()) {
-                                   if (app.getKey().equals(appName) &&
-                                           StringUtils.versionComparator.compare((String)o, app.getValue().toString()) < 0) {
-                                       return;
-                                   }
-                               }
+                               String minVersion = minimumImportVersions.getString(appName);
+                               if(!StringUtils.isEmpty(minVersion) && StringUtils.versionComparator.compare(version, minVersion) < 0)
+                                return;
+
+                               foundVersions.put(appName, version);
 
                                String i = i18n.getString(appName);
                                String translated = StringUtils.stripAccents(i == null ? appName : i);
@@ -334,7 +335,7 @@ public class DefaultImportService implements ImportService {
 
                        });
 
-                       final JsonObject foundAppsWithSize = new JsonObject();
+                       final JsonObject foundAppsWithSizeAndVersion = new JsonObject();
                        final List<Future> getFoldersSize = new ArrayList<>();
 
                        foundApps.fieldNames().forEach(app -> {
@@ -356,13 +357,17 @@ public class DefaultImportService implements ImportService {
                                     if (exist.result()) {
                                         Future<Long> promise = recursiveSize(folderPath);
                                         promise.setHandler(result -> {
-                                            foundAppsWithSize.put(app, new JsonObject()
-                                                    .put("folder", folder).put("size", result.result()));
+                                            foundAppsWithSizeAndVersion.put(app, new JsonObject()
+                                                    .put("folder", folder)
+                                                    .put("size", result.result())
+                                                    .put("version", foundVersions.getString(app)));
                                             size.complete(result.result());
                                         });
                                     } else {
-                                        foundAppsWithSize.put(app, new JsonObject()
-                                                .put("folder", folder).put("size", 0l));
+                                        foundAppsWithSizeAndVersion.put(app, new JsonObject()
+                                                .put("folder", folder)
+                                                .put("size", 0l)
+                                                .put("version", foundVersions.getString(app)));
                                         size.complete(0l);
                                     }
                                 });
@@ -374,7 +379,7 @@ public class DefaultImportService implements ImportService {
 
                        });
                        CompositeFuture.join(getFoldersSize).setHandler(completed -> {
-                           reply.put("apps", foundAppsWithSize);
+                           reply.put("apps", foundAppsWithSizeAndVersion);
                            if(user != null)
                                getQuota(user, reply, replyWithQuota -> {
                                    handler.handle(new Either.Right<>(replyWithQuota));

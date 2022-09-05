@@ -109,17 +109,19 @@ public class RepositoryHandler implements Handler<Message<JsonObject>> {
 
 				if (!Utils.isEmpty(appTitle) && importApps.containsKey(appTitle.substring(1)))
 				{
+					final JsonObject importApp = importApps.getJsonObject(appTitle.substring(1));
 					final String importId = message.body().getString("importId", "");
 					String userId = message.body().getString("userId", "");
 					String userLogin = message.body().getString("userLogin", "");
 					String userName = message.body().getString("userName", "");
 					String path = message.body().getString("path", "");
 					String locale = message.body().getString("locale", "fr");
-					String folderPath = path + File.separator + importApps.getJsonObject(appTitle.substring(1)).getString("folder");
+					String folderPath = path + File.separator + importApp.getString("folder");
 					String host = message.body().getString("host", "");
+					String version = importApp.getString("version");
 
 					String finalBusAddress = importedBusAddress;
-					repositoryEvents.importResources(importId, userId, userLogin, userName, folderPath, locale, host, forceImportAsDuplication, success -> {
+					repositoryEvents.importResources(importId, userId, userLogin, userName, folderPath, locale, host, version, forceImportAsDuplication, success -> {
 							JsonObject imported = new JsonObject()
 									.put("action", "imported")
 									.put("importId", importId)
