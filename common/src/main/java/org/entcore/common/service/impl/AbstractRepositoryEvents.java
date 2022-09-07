@@ -244,4 +244,8 @@ public abstract class AbstractRepositoryEvents implements RepositoryEvents {
 		return promise;
 	}
 
+	/* */
+	protected Future<Void> migrateDocument(String version, JsonArray fields, JsonArray results) {
+		return Future.succeededFuture(); // No-op if not overriden (it is in exercizer)
+	}
 }

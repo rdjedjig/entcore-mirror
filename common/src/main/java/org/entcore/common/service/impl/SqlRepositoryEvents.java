@@ -12,6 +12,7 @@ import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.folders.FolderImporter;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlStatementsBuilder;
+import org.entcore.common.utils.StringUtils;
 
 import java.io.File;
 import java.util.HashMap;
@@ -136,7 +137,7 @@ public abstract class SqlRepositoryEvents extends AbstractRepositoryEvents {
 		}
 	}
 
-    protected void importTables(String importPath, String schema, List<String> tables, Map<String,String> tablesWithId,
+    protected void importTables(String version, String importPath, String schema, List<String> tables, Map<String,String> tablesWithId,
                                 String userId, String username, String locale, SqlStatementsBuilder builder,
                                 boolean forceImportAsDuplication, Handler<JsonObject> handler)
     {
@@ -145,13 +146,13 @@ public abstract class SqlRepositoryEvents extends AbstractRepositoryEvents {
             @Override
             public void handle(AsyncResult<String> suffix)
             {
-                importTables(importPath, schema, tables, tablesWithId, userId, username, locale, builder,
+                importTables(version, importPath, schema, tables, tablesWithId, userId, username, locale, builder,
                     forceImportAsDuplication, handler, new HashMap<String, JsonObject>(), suffix.result());
             }
         });
     }
 
-    protected void importTables(String importPath, String schema, List<String> tables, Map<String,String> tablesWithId,
+    protected void importTables(String version, String importPath, String schema, List<String> tables, Map<String,String> tablesWithId,
                                 String userId, String username, String locale, SqlStatementsBuilder builder, boolean forceImportAsDuplication,
                                 Handler<JsonObject> handler, Map<String, JsonObject> idsMapByTable, String duplicateSuffix)
     {
@@ -261,8 +262,11 @@ public abstract class SqlRepositoryEvents extends AbstractRepositoryEvents {
 
                     if (!results.isEmpty()) {
                         final JsonArray finalResults = transformResults(fields, results, userId, username, builder, table, forceImportAsDuplication, duplicateSuffix);
-
-                        beforeImportingResultsToTable(importPath, table, fields, finalResults)
+                        
+                        migrateDocument(version, fields, finalResults)
+                        .compose( r -> {
+                            return beforeImportingResultsToTable(importPath, table, fields, finalResults);
+                        })
                         .onComplete( r -> {
                             String insert = "WITH rows AS (INSERT INTO " + schema + "." + table + " (" + String.join(",",
                                     ((List<String>) fields.getList()).stream().map(f -> "\"" + f + "\"").toArray(String[]::new)) + ") VALUES ";
@@ -281,11 +285,11 @@ public abstract class SqlRepositoryEvents extends AbstractRepositoryEvents {
                                 builder.prepared(query + conflictNothing, entry);
                             }
 
-                            importTables(importPath, schema, tables, tablesWithId, userId, username, locale, builder,
+                            importTables(version, importPath, schema, tables, tablesWithId, userId, username, locale, builder,
                                 forceImportAsDuplication, handler, idsMapByTable, duplicateSuffix);
                         });
                     } else {
-                        importTables(importPath, schema, tables, tablesWithId, userId, username, locale, builder,
+                        importTables(version, importPath, schema, tables, tablesWithId, userId, username, locale, builder,
                             forceImportAsDuplication, handler, idsMapByTable, duplicateSuffix);
                     }
                 }

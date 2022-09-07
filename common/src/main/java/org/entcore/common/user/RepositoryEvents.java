@@ -33,6 +33,7 @@ public interface RepositoryEvents {
 	default void exportResources(JsonArray resourcesIds, boolean exportDocuments, boolean exportSharedResources, String exportId, String userId,
 			JsonArray groups, String exportPath, String locale, String host, Handler<Boolean> handler) {}
 
+	@Deprecated
 	default void importResources(String importId, String userId, String userLogin, String userName, String importPath,
 		String locale, String host, boolean forceImportAsDuplication, Handler<JsonObject> handler) {
 			this.importResources(importId, userId, userLogin, userName, importPath, locale, host, null, forceImportAsDuplication, handler);
