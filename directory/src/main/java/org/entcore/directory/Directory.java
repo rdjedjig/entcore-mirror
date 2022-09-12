@@ -38,6 +38,8 @@ import org.entcore.directory.security.DirectoryResourcesProvider;
 import org.entcore.directory.security.UserbookCsrfFilter;
 import org.entcore.directory.services.*;
 import org.entcore.directory.services.impl.*;
+import org.entcore.directory.utils.EmailState;
+import org.entcore.directory.utils.EmailStateHandler;
 
 import fr.wseduc.webutils.email.EmailSender;
 import io.vertx.core.Handler;
@@ -158,6 +160,12 @@ public class Directory extends BaseServer {
 
         vertx.eventBus().localConsumer("user.repository",
                 new RepositoryHandler(new UserbookRepositoryEvents(userBookService), eb));
+
+		// See client class {@link EmailState}
+		vertx.eventBus().localConsumer(EmailState.BUS_ADDRESS, new EmailStateHandler(
+			config.getJsonObject("mail-state", new JsonObject()),
+			new DefaultMailValidationService()
+		));
 
         final JsonObject remoteNodes = config.getJsonObject("remote-nodes");
         if (remoteNodes != null) {
