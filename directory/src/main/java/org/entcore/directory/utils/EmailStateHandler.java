@@ -12,7 +12,7 @@ import org.entcore.directory.services.MailValidationService;
  * @see {@link EmailState} utility class for easier use
  */
 public class EmailStateHandler implements Handler<Message<JsonObject>> {
-    private MailValidationService validationFlow = null;
+    private MailValidationService validationSvc = null;
     private int ttlInSeconds     = 600;  // Validation codes are valid 10 minutes by default
     private int retryNumber      = 5;    // Validation code can be typed in 5 times by default
     private int waitInSeconds    = 10;   // Email is awaited 10 seconds by default (it's a front-side parameter)
@@ -23,7 +23,7 @@ public class EmailStateHandler implements Handler<Message<JsonObject>> {
             retryNumber     = params.getInteger("retryNumber",  5);
             waitInSeconds   = params.getInteger("waitInSeconds", 10);
         }
-        validationFlow = svc;
+        validationSvc = svc;
     }
 
     private void replyWithOk(final Message<JsonObject> message, Object result) {
@@ -47,7 +47,7 @@ public class EmailStateHandler implements Handler<Message<JsonObject>> {
 		String action = getOrElse(message.body().getString("action"), "");
 		switch (action) {
 			case "set-pending" : {
-                validationFlow.setPendingMail(
+                validationSvc.setPendingMail(
                     message.body().getString("userId"), 
                     message.body().getString("email"), 
                     ttlInSeconds, 
@@ -58,13 +58,13 @@ public class EmailStateHandler implements Handler<Message<JsonObject>> {
 				break;
             }
             case "is-valid" : {
-                validationFlow.hasValidMail(message.body().getString("userId"))
+                validationSvc.hasValidMail(message.body().getString("userId"))
                 .onSuccess( t -> { replyWithOk(message, t); })
                 .onFailure( e -> { replyWithError(message, e.getMessage()); });
                 break;
             }
             case "try-validate" : {
-                validationFlow.tryValidateMail(
+                validationSvc.tryValidateMail(
                     message.body().getString("userId"), 
                     message.body().getString("code")
                 )
@@ -73,7 +73,7 @@ public class EmailStateHandler implements Handler<Message<JsonObject>> {
                 break;
             }
             case "get-details" : {
-                validationFlow.getMailState(message.body().getString("userId"))
+                validationSvc.getMailState(message.body().getString("userId"))
                 .onSuccess( t -> {
                     // Add missing data
                     t.put("waitInSeconds", waitInSeconds);
