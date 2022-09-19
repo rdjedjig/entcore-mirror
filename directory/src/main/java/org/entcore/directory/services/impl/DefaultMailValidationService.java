@@ -25,6 +25,8 @@ import org.entcore.common.neo4j.Neo4j;
 import static org.entcore.common.neo4j.Neo4jResult.*;
 import org.entcore.common.utils.StringUtils;
 import org.entcore.directory.services.MailValidationService;
+import org.entcore.directory.utils.EmailStateUtils;
+
 import static org.entcore.directory.utils.EmailStateUtils.*;
 
 import io.vertx.core.Future;
@@ -64,13 +66,19 @@ public class DefaultMailValidationService implements MailValidationService {
 	 */
 	private Future<JsonObject> updateMailState(String userId, final JsonObject emailState) {
 		final Promise<JsonObject> promise = Promise.promise();
-		String query =
-				"MATCH (u:`User` { id : {id}}) " +
-				"SET u.emailState = {state} ";
+		StringBuilder query = new StringBuilder(
+			"MATCH (u:`User` { id : {id}}) " +
+			"SET u.emailState = {state} "
+		);
 		JsonObject params = new JsonObject()
 			.put("id", userId)
 			.put("state", toRaw(emailState));
-		neo.execute(query, params, m -> {
+		if( EmailStateUtils.getState(emailState) == EmailStateUtils.VALID 
+				&& !StringUtils.isEmpty(EmailStateUtils.getValid(emailState)) ) {
+			query.append(", u.email = {email}, u.emailSearchField = LOWER({email}) ");
+			params.put("email", EmailStateUtils.getValid(emailState));
+		}
+		neo.execute(query.toString(), params, m -> {
 			Either<String, JsonObject> r = validEmpty(m);
 			if (r.isRight()) {
 				promise.complete(emailState);
@@ -158,21 +166,22 @@ public class DefaultMailValidationService implements MailValidationService {
 	public Future<JsonObject> hasValidMail(String userId) {
 		return retrieveFullMailState(userId)
 		.map( j -> {
-			final JsonObject json = new JsonObject();
+			Integer state = null;
 			String email = j.getString("email");
 			JsonObject emailState = j.getJsonObject("emailState");
 
 			if (email == null || emailState == null) {
-				setState(json, UNCHECKED);
+				state = UNCHECKED;
 			} else if( !email.equalsIgnoreCase( getValid(emailState) )) {
 				// Case where the email was first validated and then changed.
-				int state = getState(emailState);
-				if( state == VALID )	state = UNCHECKED;
-				setState(json, state);
+				state = getState(emailState);
+				if( state == VALID ) {
+					state = UNCHECKED;
+				}
 			} else {
-				setState(json, VALID);
+				state = VALID;
 			}
-			return json;
+			return formatAsResponse(state, null, null);
 		});
 	}
 
@@ -180,7 +189,6 @@ public class DefaultMailValidationService implements MailValidationService {
 	public Future<JsonObject> tryValidateMail(String userId, String code) {
 		return retrieveFullMailState(userId)
 		.compose( j -> {
-			final JsonObject json = new JsonObject();
 			JsonObject emailState = j.getJsonObject("emailState");
 
 			// Check business rules

@@ -23,14 +23,14 @@ public class EmailStateUtils {
 
     /** Email field state */
     static public int getState(final JsonObject json) {
-        return json.getInteger(STATE_FIELD, UNCHECKED);
+        return json==null ? UNCHECKED : json.getInteger(STATE_FIELD, UNCHECKED);
     }
     static public void setState(final JsonObject json, final int state) {
         json.put(STATE_FIELD, state);
     }
     /** Last known valid email address, or empty string */
     static public String getValid(final JsonObject json) {
-        return json.getString(VALID_FIELD, "");
+        return json==null ? "" : json.getString(VALID_FIELD, "");
     }
     static public void setValid(final JsonObject json, final String validMail) {
         if(validMail==null) {
@@ -41,7 +41,7 @@ public class EmailStateUtils {
     }
     /** Email address to check */
     static public String getPending(final JsonObject json) {
-        return json.getString(PENDING_FIELD);
+        return json==null ? null : json.getString(PENDING_FIELD);
     }
     static public void setPending(final JsonObject json, final String pendingMail) {
         if(pendingMail==null) {
@@ -52,7 +52,7 @@ public class EmailStateUtils {
     }
     /** Generated code to check */
     static public String getKey(final JsonObject json) {
-        return json.getString(KEY_FIELD);
+        return json==null ? null : json.getString(KEY_FIELD);
     }
     static public void setKey(final JsonObject json, final String key) {
         if(key==null) {
@@ -63,7 +63,7 @@ public class EmailStateUtils {
     }
     /** Limit date for checking */
     static public Long getTtl(final JsonObject json) {
-        return json.getLong(TTL_FIELD);
+        return json==null ? null : json.getLong(TTL_FIELD);
     }
     static public void setTtl(final JsonObject json, final Long ttl) {
         if(ttl==null || ttl<=0l) {
@@ -74,7 +74,7 @@ public class EmailStateUtils {
     }
     /** Limit retries number for checking */
     static public Integer getTries(final JsonObject json) {
-        return json.getInteger(TRIES_FIELD);
+        return json==null ? null : json.getInteger(TRIES_FIELD);
     }
     static public void setTries(final JsonObject json, final Integer tries) {
         if(tries==null || tries<=0l) {

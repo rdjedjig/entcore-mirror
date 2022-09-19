@@ -27,7 +27,7 @@ public interface MailValidationService {
 	/**
 	 * Check if a user has a verified email address
 	 * @param userId user ID
-	 * @return { state: unchecked|pending|outdated|valid }
+	 * @return { state: "unchecked"|"pending"|"outdated"|"valid" }
 	 */
 	Future<JsonObject> hasValidMail(String userId);
 
@@ -44,7 +44,7 @@ public interface MailValidationService {
 	 * @param userId user ID
 	 * @param code validation code to check
 	 * @return { 
-	 * 	state: unchecked|pending|outdated|valid, 
+	 * 	state: "unchecked"|"pending"|"outdated"|"valid", 
 	 * 	tries?: number of remaining retries,
 	 *  ttl: number of seconds remaining before expiration of the code
 	 * }
@@ -54,7 +54,7 @@ public interface MailValidationService {
 	/**
 	 * Get current mail validation state.
 	 * @param userId user ID
-	 * @return {email:string, emailState:object}
+	 * @return {email:string, emailState:object|null}
 	 */
 	Future<JsonObject> getMailState(String userId);
 }
