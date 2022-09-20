@@ -1,4 +1,4 @@
-package org.entcore.directory.utils;
+package org.entcore.directory.emailstate;
 
 import org.entcore.directory.services.MailValidationService;
 
@@ -81,6 +81,38 @@ public class EmailStateUtils {
             json.remove(TRIES_FIELD);
         } else {
             json.put(TRIES_FIELD, tries);
+        }
+    }
+
+    static public String stateToString(final int state) {
+        switch( state ) {
+			case VALID:     return "valid";
+			case PENDING:   return "pending";
+			case OUTDATED:  return "outdated";
+			default:        return "unchecked";
+		}
+    }
+
+    static public int ttlToRemainingSeconds(final long ttl) {
+        return Math.max(0, Math.round((ttl-System.currentTimeMillis()) / 1000l));
+    }
+
+    /** 
+     * Use before returning data to client apps.
+     * Remove or transform data considered server-only : 
+     * - key (removed),
+     * - state (formatted as string),
+     * - ttl (optional field, converted to seconds remaining before state becomes outdated)
+     * @param emailState not usable anymore with EmailStateUtils after this call.
+     */
+    static public void formatAsResponse(final JsonObject emailState) {
+        if( emailState != null ) {
+            emailState.remove(KEY_FIELD);
+            emailState.put(STATE_FIELD, stateToString(getState(emailState)));
+            Long ttl = getTtl(emailState);
+            if( ttl!=null ) {
+                emailState.put(TTL_FIELD, ttlToRemainingSeconds(ttl.longValue()) );
+            }
         }
     }
 }

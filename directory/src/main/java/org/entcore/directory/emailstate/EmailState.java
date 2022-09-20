@@ -1,12 +1,16 @@
-package org.entcore.directory.utils;
+package org.entcore.directory.emailstate;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
 
 import static fr.wseduc.webutils.Utils.handlerToAsyncHandler;
+
+import org.entcore.common.user.UserInfos;
 
 public class EmailState {
     static public String BUS_ADDRESS = "mail.state";
@@ -86,9 +90,44 @@ public class EmailState {
 	private static void completePromise(Message<JsonObject> res, Promise<JsonObject> promise) {
 		if ("ok".equals(res.body().getString("status"))) {
 			JsonObject r = res.body().getJsonObject("result", new JsonObject());
-            promise.complete( r );
+			promise.complete( r );
 		} else {
-            promise.fail( res.body().getString("message", "") );
+			promise.fail( res.body().getString("message", "") );
 		}
+	}
+
+	/** 
+	 * Send an email with actual validation code.
+	 * @param infos User infos
+	 * @param email address where to send
+	 * @param pendingEmailState with code to send
+	 * @return email ID
+	*/
+	static public Future<Long> sendMail(EventBus eb, final HttpServerRequest request, UserInfos infos, JsonObject pendingEmailState) {
+        Promise<Long> promise = Promise.promise();
+		if( infos==null || pendingEmailState==null ) {
+			promise.complete(null);
+		} else {
+			JsonObject action = new JsonObject()
+				.put("action", "send-mail")
+				.put("userId", infos.getUserId())
+				.put("firstName", infos.getFirstName())
+				.put("lastName", infos.getLastName())
+				.put("userName", infos.getUsername())
+				.put("email", EmailStateUtils.getPending(pendingEmailState))
+				.put("emailState", pendingEmailState);
+			eb.request( BUS_ADDRESS,
+						action, 
+						new DeliveryOptions().setHeaders(request.headers()), 
+						handlerToAsyncHandler( reply -> {
+				if ("ok".equals(reply.body().getString("status"))) {
+					Long r = reply.body().getLong("result");
+					promise.complete( r );
+				} else {
+					promise.fail( reply.body().getString("message", "") );
+				}
+			}));
+		}
+        return promise.future();
 	}
 }

@@ -6,10 +6,10 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
+import org.entcore.directory.emailstate.EmailState;
+import org.entcore.directory.emailstate.EmailStateHandler;
+import org.entcore.directory.emailstate.EmailStateUtils;
 import org.entcore.directory.services.impl.DefaultMailValidationService;
-import org.entcore.directory.utils.EmailState;
-import org.entcore.directory.utils.EmailStateHandler;
-import org.entcore.directory.utils.EmailStateUtils;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class EmailStateTest {
         // Instanciate an email validation service
 		test.vertx().eventBus().localConsumer(EmailState.BUS_ADDRESS, new EmailStateHandler(
 			new JsonObject(),
-			new DefaultMailValidationService()
+			new DefaultMailValidationService(null)
 		));
 
         final Async async = context.async();

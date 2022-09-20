@@ -20,6 +20,7 @@
 package org.entcore.directory.services;
 
 import io.vertx.core.Future;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
 
 public interface MailValidationService {
@@ -57,4 +58,13 @@ public interface MailValidationService {
 	 * @return {email:string, emailState:object|null}
 	 */
 	Future<JsonObject> getMailState(String userId);
+
+	/**
+	 * Send the validation email.
+	 * @param request required for EmailSender to translate things...
+	 * @param email address where to send
+	 * @param templateParams for the "email/emailValidationCode.html" template
+	 * @return the email ID
+	 */
+	Future<Long> sendValidationEmail(HttpServerRequest request, String email, JsonObject templateParams);
 }

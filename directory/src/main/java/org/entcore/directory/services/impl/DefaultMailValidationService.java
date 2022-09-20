@@ -20,23 +20,28 @@
 package org.entcore.directory.services.impl;
 
 import fr.wseduc.webutils.Either;
+import fr.wseduc.webutils.email.EmailSender;
 
 import org.entcore.common.neo4j.Neo4j;
 import static org.entcore.common.neo4j.Neo4jResult.*;
-import org.entcore.common.utils.StringUtils;
-import org.entcore.directory.services.MailValidationService;
-import org.entcore.directory.utils.EmailStateUtils;
+import static org.entcore.directory.emailstate.EmailStateUtils.*;
 
-import static org.entcore.directory.utils.EmailStateUtils.*;
+import org.entcore.common.utils.StringUtils;
+import org.entcore.directory.emailstate.EmailStateUtils;
+import org.entcore.directory.services.MailValidationService;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import io.vertx.core.eventbus.Message;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
 
 public class DefaultMailValidationService implements MailValidationService {
 	private final Neo4j neo = Neo4j.getInstance();
+	private EmailSender emailSender = null;
 
-	public DefaultMailValidationService() {
+	public DefaultMailValidationService(EmailSender sender) {
+		this.emailSender = sender;
 	}
 
 	/** 
@@ -46,7 +51,8 @@ public class DefaultMailValidationService implements MailValidationService {
 		final Promise<JsonObject> promise = Promise.promise();
 		String query =
 				"MATCH (u:`User` { id : {id}}) " +
-				"RETURN u.email as email, COALESCE(u.emailState, null) as emailState ";
+				"RETURN u.email as email, COALESCE(u.emailState, null) as emailState, " + 
+					   "u.firstName as firstName, u.lastName as lastName, u.displayName as displayName ";
 		JsonObject params = new JsonObject().put("id", userId);
 		neo.execute(query, params, m -> {
 			Either<String, JsonObject> r = validUniqueResult(m);
@@ -119,26 +125,11 @@ public class DefaultMailValidationService implements MailValidationService {
 	}
 
 	private JsonObject formatAsResponse(final int state, final Integer tries, final Long ttl) {
-		JsonObject o = new JsonObject();
-		switch( state ) {
-			case VALID: {
-				return o.put("state", "valid");
-			}
-			case PENDING: {
-				o.put("state", "pending");
-				break;
-			}
-			case OUTDATED: {
-				o.put("state", "outdated"); 
-				break;
-			}
-			case UNCHECKED: {
-				return o.put("state", "unchecked");
-			}
+		final JsonObject o = new JsonObject().put("state", stateToString(state));
+		if( state==PENDING || state==OUTDATED ) {
+			if(tries!=null) o.put("tries", tries);
+			if(ttl!=null) o.put("ttl", ttlToRemainingSeconds(ttl.longValue()));
 		}
-		if(tries!=null) o.put("tries", tries);
-		if(ttl!=null) o.put("ttl", Math.max(0, Math.round((ttl.longValue()-System.currentTimeMillis()) / 1000l) ));
-
 		return o;
 	}
 
@@ -251,5 +242,124 @@ public class DefaultMailValidationService implements MailValidationService {
 	public Future<JsonObject> getMailState(String userId) {
 		return retrieveFullMailState(userId);
 	}
+
+	@Override
+    public Future<Long> sendValidationEmail( final HttpServerRequest request, String email, JsonObject templateParams ) {
+    	Promise<Long> promise = Promise.promise();
+		if( emailSender == null ) {
+			promise.complete(null);
+		} else if( StringUtils.isEmpty((email)) ) {
+			promise.fail("Invalid email address.");
+		} else if( templateParams==null || StringUtils.isEmpty(templateParams.getString("code")) ) {
+			promise.fail("Invalid parameters.");
+		} else {
+			String code = templateParams.getString("code");
+			/*
+			JsonObject json = new JsonObject()
+				.put("activationUri", notification.getHost(request) +
+						"/auth/activation?login=" + login +
+						"&activationCode=" + activationCode)
+				.put("host", notification.getHost(request))
+				.put("login", login);
+			*/
+			//Promise<Message<JsonObject>> handleSend = Promise.promise();
+			emailSender.sendEmail(
+					request, email, null, null,
+					"email.validation.subject", "email/emailValidationCode.html", templateParams, true, ar -> {
+				if (ar.succeeded()) {
+					Message<JsonObject> reply = ar.result();
+					if ("ok".equals(reply.body().getString("status"))) {
+						Object r = reply.body().getValue("result");
+						promise.complete( 0l );
+					} else {
+						promise.fail( reply.body().getString("message", "") );
+					}
+				} else {
+					promise.fail(ar.cause().getMessage());
+				}
+			});
+
+		}
+
+/*
+		try {
+    		String locale = email.getString("locale");
+	        JsonObject i18n = I18n.getInstance().load( locale );
+	        JsonArray recipients = new JsonArray( email.getString("recipients", "[]") );
+	        JsonObject content = new JsonObject( email.getString("content", "{}") );
+	        JsonArray headers = new JsonArray( email.getString("headers", "[]") );
+	        String templateName = email.getString("template_name");
+	        String titleKey = email.getString("title_key");
+	        Long orderId = email.getLong("order_id");
+	        
+	        content.put("host", config.getString("host"));
+	        
+	        this.renderer.readTemplate(templateName).setHandler(templateBufferResult -> {
+	            if (templateBufferResult.failed()) {
+	                log.error("[CRM] Error reading template on file system: " + templateBufferResult.cause().toString());
+	                promise.complete(false);
+	                return;
+	            }
+                Buffer templateBuffer = templateBufferResult.result();
+                StringReader reader = new StringReader(templateBuffer.toString("UTF-8"));
+                HttpServerRequest request = new JsonHttpServerRequest(new JsonObject()
+                    .put("headers", new JsonObject().put("Accept-Language", locale)));
+                
+            	for (int i = 0; i < recipients.size(); i++) {
+                    JsonObject mail_data = recipients.getJsonObject(i);
+                    mail_data.mergeIn(content, true);
+                    
+                    this.renderer.generateHtmlFile(request, mail_data, templateName, reader).setHandler(htmlContentResult -> {
+                    	if( htmlContentResult.failed() ) {
+                    		log.error("[CRM] Error generating email from template: " + htmlContentResult.cause().toString());
+                    		promise.complete(false);
+                    		return;
+                    	}
+                    	final String mailTitle = i18n.getString(titleKey);
+                    	final String htmlContent = htmlContentResult.result();
+                        this.emailSender.sendEmail(
+                            request,
+                            mail_data.getString("email"),	// to
+                            null,							// cc
+                            null,							// bcc
+                            mailTitle,						// subject
+                            htmlContent,					// templateBody
+                            null,							// templateParams 
+                            false, 							// translateSubject
+                            headers,						// headers
+                            handlerToAsyncHandler( event -> {
+                                if ("error".equals(event.body().getString("status"))) {
+                                    log.error( "[CRM] Error while sending mail (" + event.body().getString("message", "") + ")" );
+                                    promise.complete( false );
+                                } else {
+                                	if( orderId!=null ) {
+                                		try {
+		                                    emailService.create(
+		                                		mail_data.getString("firstname"), mail_data.getString("lastname"),
+		                                		mail_data.getString("email"), mail_data.getString("relation", ""), 
+		                                        mailTitle, StringUtils.stripSpacesSentence(substringBetween(htmlContent, "<!--Content-->", "<!--End-->")),
+		                                        orderId, done -> {
+		                                        if (done.isLeft()) {
+		                                            log.error("[CRM] Error while creating email_history row (" + done.left().getValue() + ")");
+		                                        }
+		                                    });
+                                		} catch (NumberFormatException nfe ) {
+                                			// no order id => no email history.
+                                		}
+                                	}
+                                    promise.complete(true);
+                                }
+                            })
+                        );
+                	});
+                }
+            });
+    	} catch( Exception e ) {
+    		log.error("[CRM] Unknown error while sending an email from the sendbox", e);
+    		promise.complete(false);
+    	}
+ */		
+    	return promise.future();
+    }
 
 }

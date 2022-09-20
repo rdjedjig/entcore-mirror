@@ -23,7 +23,6 @@ import io.vertx.core.json.JsonObject;
 import org.entcore.common.bus.WorkspaceHelper;
 import org.entcore.common.email.EmailFactory;
 import org.entcore.common.http.BaseServer;
-import org.entcore.common.http.BasicFilter;
 import org.entcore.common.mongodb.MongoDbConf;
 import org.entcore.common.notification.ConversationNotification;
 import org.entcore.common.notification.TimelineHelper;
@@ -34,12 +33,12 @@ import org.entcore.common.storage.impl.FileStorage;
 import org.entcore.common.storage.impl.MongoDBApplicationStorage;
 import org.entcore.common.user.RepositoryHandler;
 import org.entcore.directory.controllers.*;
+import org.entcore.directory.emailstate.EmailState;
+import org.entcore.directory.emailstate.EmailStateHandler;
 import org.entcore.directory.security.DirectoryResourcesProvider;
 import org.entcore.directory.security.UserbookCsrfFilter;
 import org.entcore.directory.services.*;
 import org.entcore.directory.services.impl.*;
-import org.entcore.directory.utils.EmailState;
-import org.entcore.directory.utils.EmailStateHandler;
 
 import fr.wseduc.webutils.email.EmailSender;
 import io.vertx.core.Handler;
@@ -164,7 +163,7 @@ public class Directory extends BaseServer {
 		// See client class {@link EmailState}
 		vertx.eventBus().localConsumer(EmailState.BUS_ADDRESS, new EmailStateHandler(
 			config.getJsonObject("mail-state", new JsonObject()),
-			new DefaultMailValidationService()
+			new DefaultMailValidationService(emailSender)
 		));
 
         final JsonObject remoteNodes = config.getJsonObject("remote-nodes");

@@ -1,11 +1,13 @@
-package org.entcore.directory.utils;
+package org.entcore.directory.emailstate;
 
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
 
 import static fr.wseduc.webutils.Utils.getOrElse;
 
+import org.entcore.common.http.request.JsonHttpServerRequest;
 import org.entcore.directory.services.MailValidationService;
 
 /**
@@ -80,6 +82,26 @@ public class EmailStateHandler implements Handler<Message<JsonObject>> {
                     replyWithOk(message, t); 
                 })
                 .onFailure( e -> { replyWithError(message, e.getMessage()); });
+                break;
+            }
+            case "send-mail" : {
+                JsonObject emailState = message.body().getJsonObject("emailState");
+                String email = message.body().getString("email");
+                Long expires = getOrElse(EmailStateUtils.getTtl(emailState), waitInSeconds*1000l);
+
+                HttpServerRequest fakeRequest = new JsonHttpServerRequest(new JsonObject(), message.headers());
+
+                JsonObject templateParams = new JsonObject()
+                //.put("userId", message.body().getString("userId"))
+				.put("firstName", message.body().getString("firstName"))
+				.put("lastName", message.body().getString("lastName"))
+				.put("userName", message.body().getString("userName"))
+                .put("duration", EmailStateUtils.ttlToRemainingSeconds(expires))
+				.put("code", EmailStateUtils.getKey(emailState));
+
+                validationSvc.sendValidationEmail(fakeRequest, email, templateParams)
+                .onSuccess(t -> { replyWithOk(message, t); })
+                .onFailure(e -> { replyWithError(message, e.getMessage()); });
                 break;
             }
 			default:
