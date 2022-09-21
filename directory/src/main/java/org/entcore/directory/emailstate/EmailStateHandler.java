@@ -10,6 +10,8 @@ import static fr.wseduc.webutils.Utils.getOrElse;
 import org.entcore.common.http.request.JsonHttpServerRequest;
 import org.entcore.directory.services.MailValidationService;
 
+import fr.wseduc.webutils.http.Renders;
+
 /**
  * @see {@link EmailState} utility class for easier use
  */
@@ -92,11 +94,12 @@ public class EmailStateHandler implements Handler<Message<JsonObject>> {
                 HttpServerRequest fakeRequest = new JsonHttpServerRequest(new JsonObject(), message.headers());
 
                 JsonObject templateParams = new JsonObject()
-                //.put("userId", message.body().getString("userId"))
+                .put("scheme", Renders.getScheme(fakeRequest))
+                .put("host", Renders.getHost(fakeRequest))
 				.put("firstName", message.body().getString("firstName"))
 				.put("lastName", message.body().getString("lastName"))
 				.put("userName", message.body().getString("userName"))
-                .put("duration", EmailStateUtils.ttlToRemainingSeconds(expires))
+                .put("duration", Math.round(EmailStateUtils.ttlToRemainingSeconds(expires) / 60f))
 				.put("code", EmailStateUtils.getKey(emailState));
 
                 validationSvc.sendValidationEmail(fakeRequest, email, templateParams)

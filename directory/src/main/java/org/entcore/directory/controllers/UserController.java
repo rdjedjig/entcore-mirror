@@ -865,7 +865,7 @@ public class UserController extends BaseController {
 		userService.getAttachmentSchool(userId, structuresToExclude, notEmptyResponseHandler(request));
 	}
 
-	@Get("/user/mailState")
+	@Get("/user/mailstate")
 	@SecuredAction(value = "", type = ActionType.AUTHENTICATED)
 	public void getMailState(final HttpServerRequest request) {
 		UserUtils.getUserInfos(eb, request, infos -> {
@@ -884,7 +884,7 @@ public class UserController extends BaseController {
 		});
 	}
 
-	@Put("/user/mailState")
+	@Put("/user/mailstate")
 	@SecuredAction(value = "", type = ActionType.AUTHENTICATED)
 	public void putMailState(final HttpServerRequest request) {
 		RequestUtils.bodyToJson(request, pathPrefix + "putMailState", payload -> {
@@ -900,7 +900,7 @@ public class UserController extends BaseController {
 						ok(request);
 					})
 					.onFailure( e -> {
-						badRequest( request, e.getMessage() );
+						renderError( request, new JsonObject().put("error", e.getMessage()) );
 					});
 				} else {
 					notFound(request, "user.not.found");
