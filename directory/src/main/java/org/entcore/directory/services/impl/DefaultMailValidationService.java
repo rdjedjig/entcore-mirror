@@ -124,8 +124,10 @@ public class DefaultMailValidationService implements MailValidationService {
 		return String.format("%06d", Math.round(Math.random()*999999D));
 	}
 
-	private JsonObject formatAsResponse(final int state, final Integer tries, final Long ttl) {
-		final JsonObject o = new JsonObject().put("state", stateToString(state));
+	private JsonObject formatAsResponse(final int state, final String valid, final Integer tries, final Long ttl) {
+		final JsonObject o = new JsonObject()
+		.put("state", stateToString(state))
+		.put("valid", (valid!=null) ? valid : "");
 		if( state==PENDING || state==OUTDATED ) {
 			if(tries!=null) o.put("tries", tries);
 			if(ttl!=null) o.put("ttl", ttlToRemainingSeconds(ttl.longValue()));
@@ -170,9 +172,9 @@ public class DefaultMailValidationService implements MailValidationService {
 					state = UNCHECKED;
 				}
 			} else {
-				state = VALID;
+				state = getState(emailState);
 			}
-			return formatAsResponse(state, null, null);
+			return formatAsResponse(state, getValid(emailState), null, null);
 		});
 	}
 
@@ -233,7 +235,7 @@ public class DefaultMailValidationService implements MailValidationService {
 			// ---Validation results---
 			return updateMailState(userId, emailState)
 			.map( newState -> {
-				return formatAsResponse(getState(newState), getTries(newState), getTtl(newState));
+				return formatAsResponse(getState(newState), getValid(newState), getTries(newState), getTtl(newState));
 			});
 		});
 	}
