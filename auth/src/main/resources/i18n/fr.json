@@ -132,5 +132,14 @@
     "terms.revalidate.body": "Pour poursuivre la navigation sur l'ENT vous devez accepter les nouvelles Conditions Générales d'Utilisation.",
     "terms.revalidate.chartAndCguLinks": "Consulter la <a href=\"[[chartUrl]]\" target=\"_blank\" class=\"medium-text\" style=\"display: inline;\">charte d'utilisation</a> et les <a href=\"[[cguUrl]]\" target=\"_blank\" class=\"medium-text\" style=\"display: inline;\">Conditions Générales d'Utilisation</a>",
     "terms.revalidate.checkbox": "J'ai lu la charte d'utilisation et les Conditions Générales d'Utilisation",
-    "terms.revalidate.success": "Mise à jour réalisé avec succès"
+    "terms.revalidate.success": "Mise à jour réalisé avec succès",
+    "validate-mail.title": "Vérification de votre adresse mail",
+    "validate-mail.step1.title": "Vérification de votre adresse mail",
+    "validate-mail.step1.hint.force": "La sécurité sur votre plateforme évolue.",
+    "validate-mail.step1.hint.adml": "En tant qu’administrateur de votre établissement, vous avez accès à des informations sensibles.",
+    "validate-mail.step1.hint": "Pour améliorer la sécurité de votre compte vous devez vérifier votre adresse mail.",
+    "validate-mail.step1.form.mail": "Email",
+    "validate-mail.step1.form.placeholder": "exemple@exemple.com",
+    "validate-mail.step1.btn": "Vérifier mon email"
+    
 }
