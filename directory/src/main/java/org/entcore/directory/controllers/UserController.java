@@ -909,6 +909,27 @@ public class UserController extends BaseController {
 		});
 	}
 
+	@Post("/user/mailstate")
+	@SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+	public void postMailState(final HttpServerRequest request) {
+		RequestUtils.bodyToJson(request, pathPrefix + "postMailState", payload -> {
+			UserUtils.getUserInfos(eb, request, infos -> {
+				if (infos != null) {
+					// Try a validation code
+					EmailState.tryValidate(eb, infos.getUserId(), payload.getString("key"))
+					.onSuccess( emailState -> {
+						renderJson( request, emailState );
+					})
+					.onFailure( e -> {
+						renderError( request, new JsonObject().put("error", e.getMessage()) );
+					});
+				} else {
+					notFound(request, "user.not.found");
+				}
+			});
+		});
+	}
+
 
 	public void setUserService(UserService userService) {
 		this.userService = userService;
