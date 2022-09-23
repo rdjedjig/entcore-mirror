@@ -170,6 +170,8 @@ public abstract class BaseServer extends Server {
 
 		addFilter(new TermsRevalidationFilter(getEventBus(vertx)));
 
+		addFilter(new MandatoryUserValidationFilter(getEventBus(vertx)));
+
 		addFilter(new TraceFilter(getEventBus(vertx), securedUriBinding));
 	}
 

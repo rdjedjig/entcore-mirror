@@ -1,4 +1,4 @@
-package org.entcore.directory.emailstate;
+package org.entcore.common.emailstate;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -36,7 +36,7 @@ public class EmailState {
 	/**
 	 * Check if a user has a verified email address
 	 * @param userId user ID
-	 * @return { state: "unchecked"|"pending"|"outdated"|"valid" }
+	 * @return { state: "unchecked"|"pending"|"outdated"|"valid", valid: latest known valid email address }
 	 */
     static public Future<JsonObject> isValid(EventBus eb, String userId) {
         Promise<JsonObject> promise = Promise.promise();

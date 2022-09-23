@@ -7,6 +7,8 @@ import io.vertx.core.json.JsonObject;
 
 import static fr.wseduc.webutils.Utils.getOrElse;
 
+import org.entcore.common.emailstate.EmailState;
+import org.entcore.common.emailstate.EmailStateUtils;
 import org.entcore.common.http.request.JsonHttpServerRequest;
 import org.entcore.directory.services.MailValidationService;
 

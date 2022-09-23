@@ -23,11 +23,12 @@ import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.email.EmailSender;
 
 import org.entcore.common.neo4j.Neo4j;
-import static org.entcore.common.neo4j.Neo4jResult.*;
-import static org.entcore.directory.emailstate.EmailStateUtils.*;
 
+import static org.entcore.common.emailstate.EmailStateUtils.*;
+import static org.entcore.common.neo4j.Neo4jResult.*;
+
+import org.entcore.common.emailstate.EmailStateUtils;
 import org.entcore.common.utils.StringUtils;
-import org.entcore.directory.emailstate.EmailStateUtils;
 import org.entcore.directory.services.MailValidationService;
 
 import io.vertx.core.Future;
@@ -172,7 +173,8 @@ public class DefaultMailValidationService implements MailValidationService {
 					state = UNCHECKED;
 				}
 			} else {
-				state = getState(emailState);
+				// If email===valid, then state must be valid
+				state = VALID; // /!\ do not replace by   state = getState(emailState); /!\
 			}
 			return formatAsResponse(state, getValid(emailState), null, null);
 		});

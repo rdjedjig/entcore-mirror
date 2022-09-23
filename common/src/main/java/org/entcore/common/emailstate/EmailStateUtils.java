@@ -1,12 +1,10 @@
-package org.entcore.directory.emailstate;
-
-import org.entcore.directory.services.MailValidationService;
+package org.entcore.common.emailstate;
 
 import io.vertx.core.json.JsonObject;
 
 /**
  * Accessors for the "emailState" of a Neo4j User.
- * @see {@link MailValidationService}
+ * @see {@link org.entcore.directory.services.MailValidationService MailValidationService}
  */
 public class EmailStateUtils {
     static public final int OUTDATED = -1;

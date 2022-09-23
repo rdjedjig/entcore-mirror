@@ -6,9 +6,9 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
-import org.entcore.directory.emailstate.EmailState;
+import org.entcore.common.emailstate.EmailState;
+import org.entcore.common.emailstate.EmailStateUtils;
 import org.entcore.directory.emailstate.EmailStateHandler;
-import org.entcore.directory.emailstate.EmailStateUtils;
 import org.entcore.directory.services.impl.DefaultMailValidationService;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
