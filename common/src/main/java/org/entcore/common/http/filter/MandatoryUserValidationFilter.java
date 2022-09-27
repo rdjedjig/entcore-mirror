@@ -30,9 +30,13 @@ public class MandatoryUserValidationFilter implements Filter {
     
     private final static int    TERMS_OF_USE_IDX  = 0;
     private final static int    EMAIL_ADDRESS_IDX = 1;
-    private final static String[][] whiteListedUrlsByStep = {
+    private final static String[] whiteListAlways = {
+        "/directory/user/mailstate"
+    };
+    private final static String[][] whiteListByStep = {
         {"/auth/revalidate-terms"},
-        {"/auth/validate-mail", "/internal/userinfo", "/oauth2/userinfo", "/directory/user/mailstate"}
+        {"/auth/validate-mail", "/internal/userinfo", "/oauth2/userinfo", 
+         "/userbook/", "/theme"}
     };
 
     private final static String REDIRECT_TO_KEY = "MandatoryUserValidationFilterRedirectsTo";
@@ -48,7 +52,6 @@ public class MandatoryUserValidationFilter implements Filter {
             handler.handle(true);
             return;
         }
-        final boolean isGET = request.method().name().equalsIgnoreCase("GET");
         UserUtils.getUserInfos(this.eventBus, request, userInfos -> {
             if (userInfos == null) {
                 // Mandatory validations for deconnected users :
@@ -66,10 +69,10 @@ public class MandatoryUserValidationFilter implements Filter {
                 // A failure will deny the filter and then cause a redirection.
                 Future.succeededFuture()
                 .compose( ignored -> {
-                    return checkTermsOfUse(sreq, userInfos, isGET);
+                    return checkTermsOfUse(sreq, userInfos);
                 })
                 .compose( ignored -> {
-                    return checkEmailAddress(sreq, userInfos, isGET);
+                    return checkEmailAddress(sreq, userInfos);
                 })
                 .onComplete( ar -> {
                     if( ar.succeeded() ) {
@@ -84,10 +87,17 @@ public class MandatoryUserValidationFilter implements Filter {
         });
     }
 
-    private boolean isInWhiteList(final String path, final int step) {
-        // At every step we must also whitelist the previous steps URLs, to avoid deadlocks between filters.
-        for( int i=0; i<=step; i++ ) {
-            final String[] whiteList = whiteListedUrlsByStep[i];
+    private boolean isInWhiteList(final String path, final String methodName, final int step) {
+        for( int j=0; j<whiteListAlways.length; j++ ) {
+            if( path.contains(whiteListAlways[j]) ){
+                return true;
+            }
+        }
+        // At every step we must also check the white list of the previous steps URLs, 
+        // to avoid deadlocks between filters (but only for GET requests)
+        final boolean isGET = methodName.equalsIgnoreCase("GET");
+        for( int i=0; isGET && i<=step; i++ ) {
+            final String[] whiteList = whiteListByStep[i];
             for( int j=0; j<whiteList.length; j++ ) {
                 if( path.contains(whiteList[j]) ){
                     return true;
@@ -97,45 +107,42 @@ public class MandatoryUserValidationFilter implements Filter {
         return false;
     }
 
-    private Future<Void> checkTermsOfUse(final SecureHttpServerRequest request, UserInfos userInfos, final boolean isGET) {
-        if( isGET && isInWhiteList(request.path(), TERMS_OF_USE_IDX) ) {
+    private Future<Void> checkTermsOfUse(final SecureHttpServerRequest request, UserInfos userInfos) {
+        if( isInWhiteList(request.path(), request.method().name(), TERMS_OF_USE_IDX) ) {
             return Future.succeededFuture(); // white-listed url
         }
-        return checkTermsOfUse(request, userInfos);
+        
+        return request.headers().contains("Authorization") ? Future.succeededFuture() : checkTermsOfUse(userInfos);
     }
 
-    private Future<Void> checkEmailAddress(final SecureHttpServerRequest request, UserInfos userInfos, final boolean isGET) {
-        if( isGET && isInWhiteList(request.path(), EMAIL_ADDRESS_IDX) ) {
+    private Future<Void> checkEmailAddress(final SecureHttpServerRequest request, UserInfos userInfos) {
+        if( isInWhiteList(request.path(), request.method().name(), EMAIL_ADDRESS_IDX) ) {
             return Future.succeededFuture(); // white-listed url
         }
-        return checkEmailAddress(request, userInfos);
+        return checkEmailAddress(userInfos);
     }
 
     /** 
      * Connected users with a truthy "needRevalidateTerms" attributes are required to validate the Terms of use.
      */
-    private Future<Void> checkTermsOfUse(SecureHttpServerRequest request, UserInfos userInfos) {
+    private Future<Void> checkTermsOfUse(UserInfos userInfos) {
         Promise<Void> promise = Promise.promise();
-        if (!request.headers().contains("Authorization")) {
-            boolean needRevalidateTerms = false;
-            //check whether user has validate terms in current session
-            final Object needRevalidateTermsFromSession = userInfos.getAttribute(NEED_REVALIDATE_TERMS);
-            if (needRevalidateTermsFromSession != null) {
-                needRevalidateTerms = Boolean.valueOf(needRevalidateTermsFromSession.toString());
+        boolean needRevalidateTerms = false;
+        //check whether user has validate terms in current session
+        final Object needRevalidateTermsFromSession = userInfos.getAttribute(NEED_REVALIDATE_TERMS);
+        if (needRevalidateTermsFromSession != null) {
+            needRevalidateTerms = Boolean.valueOf(needRevalidateTermsFromSession.toString());
+        } else {
+            //check whether he has validated previously
+            final Map<String, Object> otherProperties = userInfos.getOtherProperties();
+            if (otherProperties != null && otherProperties.get(NEED_REVALIDATE_TERMS) != null) {
+                needRevalidateTerms = (Boolean) otherProperties.get(NEED_REVALIDATE_TERMS);
             } else {
-                //check whether he has validated previously
-                final Map<String, Object> otherProperties = userInfos.getOtherProperties();
-                if (otherProperties != null && otherProperties.get(NEED_REVALIDATE_TERMS) != null) {
-                    needRevalidateTerms = (Boolean) otherProperties.get(NEED_REVALIDATE_TERMS);
-                } else {
-                    needRevalidateTerms = true;
-                }
+                needRevalidateTerms = true;
             }
-            if( needRevalidateTerms ) {
-                promise.fail("/auth/revalidate-terms"); // Where to redirect. Must be white-listed...
-            } else {
-                promise.complete();
-            }
+        }
+        if( needRevalidateTerms ) {
+            promise.fail("/auth/revalidate-terms"); // Where to redirect. Must be white-listed...
         } else {
             promise.complete();
         }
@@ -145,7 +152,7 @@ public class MandatoryUserValidationFilter implements Filter {
     /**
      * Only ADMLs are currently required to validate their email address.
      */
-    private Future<Void> checkEmailAddress(SecureHttpServerRequest request, UserInfos userInfos) {
+    private Future<Void> checkEmailAddress(UserInfos userInfos) {
         if (userInfos.isADML()) {
             Promise<Void> promise = Promise.promise();
             EmailState.isValid(eventBus, userInfos.getUserId())

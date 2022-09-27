@@ -140,6 +140,8 @@
     "validate-mail.step1.hint": "Pour améliorer la sécurité de votre compte vous devez vérifier votre adresse mail.",
     "validate-mail.step1.form.mail": "Email",
     "validate-mail.step1.form.placeholder": "exemple@exemple.com",
-    "validate-mail.step1.btn": "Vérifier mon email"
-    
+    "validate-mail.step1.btn": "Vérifier mon email",
+    "validate-mail.error.network": "Un problème technique empêche actuellement la vérification de votre adresse mail, merci de réessayer dans quelques instants ou de contacter votre administrateur.",
+    "validate-mail.error.same": "L’adresse mail saisie est déjà celle actuellement renseignée et vérifiée."
+
 }

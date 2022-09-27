@@ -1,13 +1,58 @@
-<div ng-if="canRenderUi">
-    <img src="/auth/public/img/validate-mail.svg"></img>
-    <h2><i18n>validate-mail.step1.title</i18n></h2>
-    <p ng-if="ctrl.force"><i18n>validate-mail.step1.hint.force</i18n></p>
-    <p ng-if="ctrl.isAdml || ctrl.isAdmc"><i18n>validate-mail.step1.hint.adml</i18n></p>
-    <p><i18n>validate-mail.step1.hint</i18n></p>
-    <form>
-        <label for="input-mail"><i18n>validate-mail.step1.form.mail</i18n></label>
-        <input type="email" id="input-mail" name="input-mail" 
-                i18n-placeholder="validate-mail.step1.form.placeholder" />
-        <button type="button"><i18n>validate-mail.step1.btn</i18n></button>
-    </form>
+<div ng-if="canRenderUi" ng-switch="ctrl.step">
+    <div class="container" ng-switch-when="email">
+        <div class="row justify-content-center">
+            <div class="col-md-9 col-sm-12">
+                <div class="mb-5 text-center">
+                    <img src="/auth/public/img/validate-mail.svg" height="150"></img>
+                </div>
+
+                <div class="mb-5 text-center">
+                    <span class="fs-2" translate content="validate-mail.step1.title"></span>
+                </div>
+
+                <div class="mb-5 text-center">
+                    <span ng-if="ctrl.force"><i18n>validate-mail.step1.hint.force</i18n></span>
+                    <br/>
+                    <span ng-if="ctrl.isAdml || ctrl.isAdmc"><i18n>validate-mail.step1.hint.adml</i18n></span>
+                    <br/>
+                    <span><i18n>validate-mail.step1.hint</i18n></span>
+                </div>
+
+                <div class="">
+                    <form novalidate name="formEmail" ng-submit="ctrl.onValidateMail()">
+                        <label class="mb-2" for="input-data"><i18n>validate-mail.step1.form.mail</i18n></label>
+                        <input type="email" id="input-data" name="inputEmail" required
+                                pattern="[[ctrl.acceptableEmailPattern]]"
+                                ng-model="ctrl.emailAddress"
+                                ng-class="ctrl.inputToBTCss(formEmail.inputEmail)"
+                                i18n-placeholder="validate-mail.step1.form.placeholder" />
+
+                        <small class="form-text">
+                            <label>&nbsp;</label>
+                            <label for="input-data" ng-if="formEmail.inputEmail.$error.required"><i18n>required</i18n></label>
+                            <label for="input-data" ng-if="formEmail.inputEmail.$error.email"><i18n>email</i18n></label>
+                            <label for="input-data" ng-if="formEmail.inputEmail.$error.pattern"><i18n>validate-mail.error.same</i18n></label>
+                        </small>
+
+                        <div class="row mt-4">
+                            <button type="submit" class="btn btn-primary fs-5 align-middle"
+                                    ng-disabled="!formEmail.$valid">
+                                <i18n>validate-mail.step1.btn</i18n>
+                                <span>&nbsp;&gt;</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" ng-switch-when="code">
+        <form novalidate name="formCode" ng-submit="ctrl.onValidateCode()">
+            <label for="input-data"><i18n>validate-mail.step2.form.code</i18n></label>
+            <input type="text" id="input-data" name="inputCode" ng-model="ctrl.inputCode"
+                    i18n-placeholder="validate-mail.step2.form.placeholder" />
+            <button type="submit"><i18n>validate-mail.step2.btn</i18n></button>
+        </form>
+    </div>
 </div>

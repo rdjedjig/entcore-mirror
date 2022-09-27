@@ -46,13 +46,16 @@ public class DefaultMailValidationService implements MailValidationService {
 	}
 
 	/** 
-	 * @return { email: String|null, emailState: JsonObject|null }
+	 * @return {
+	 * 	email: String|null, emailState: JsonObject|null,
+	 *  firstName:string, lastName:string, displayName:string
+	 * }
 	 */
 	private Future<JsonObject> retrieveFullMailState(String userId) {
 		final Promise<JsonObject> promise = Promise.promise();
 		String query =
 				"MATCH (u:`User` { id : {id}}) " +
-				"RETURN u.email as email, COALESCE(u.emailState, null) as emailState, " + 
+				"RETURN COALESCE(u.email, null) as email, COALESCE(u.emailState, null) as emailState, " + 
 					   "u.firstName as firstName, u.lastName as lastName, u.displayName as displayName ";
 		JsonObject params = new JsonObject().put("id", userId);
 		neo.execute(query, params, m -> {
