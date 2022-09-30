@@ -205,9 +205,11 @@ public class DefaultMailValidationService implements MailValidationService {
 					Integer tries = getTries(emailState);
 					if(tries==null) {
 						tries = 0;
-						setState(emailState, OUTDATED);
 					} else {
 						tries = Math.max(0, tries.intValue() - 1 );
+					}
+					if( tries <= 0 ) {
+						setState(emailState, OUTDATED);
 					}
 					setTries(emailState, tries);
 					break;
@@ -217,7 +219,6 @@ public class DefaultMailValidationService implements MailValidationService {
 				if( ttl==null || ttl.compareTo(System.currentTimeMillis()) < 0 ) {
 					// TTL reached
 					setState(emailState, OUTDATED);
-					setTries(emailState, 0);
 					break;
 				}
 				// Check pending mail address
@@ -225,7 +226,6 @@ public class DefaultMailValidationService implements MailValidationService {
 				if( pending == null) {
 					// This should never happen, but treat it like TTL was reached
 					setState(emailState, OUTDATED);
-					setTries(emailState, 0);
 					break;
 				}
 				// ---Validation succeeded---

@@ -14,7 +14,7 @@
 		<script src="/assets/js/ode-ngjs-front/ode-ngjs-front.js?version={{#modVersion}}ode-ngjs-front{{/modVersion}}" type="text/javascript"></script>
 		<script type="text/javascript" src="/auth/public/dist/validate-mail/application.js"></script>
 	</head>
-	<body>
+	<body class="validate-mail">
 		<div ng-if="app.fullscreen">
 			<!-- navbar Theme 2D -->
 			<ode-navbar class="no-1d" title="[[app.lang.translate('validate-mail.title')]]"></ode-navbar>
@@ -24,8 +24,8 @@
 		</div>
 
 		<!-- Main -->
-		<main role="main" class="main container-applications">
-			<validate-mail step="app.step" force="app.force">
+		<main role="main" class="main container">
+			<validate-mail step="app.step" force="app.force" redirect="app.redirect">
 			</validate-mail>
 		</main>
 	</body>

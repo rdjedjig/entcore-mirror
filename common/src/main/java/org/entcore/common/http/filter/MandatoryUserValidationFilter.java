@@ -17,6 +17,8 @@ import org.entcore.common.utils.StringUtils;
 
 import static org.entcore.common.user.SessionAttributes.*;
 
+import java.net.URI;
+import java.net.URLEncoder;
 import java.util.Map;
 
 /**
@@ -67,6 +69,7 @@ public class MandatoryUserValidationFilter implements Filter {
                 final SecureHttpServerRequest sreq = (SecureHttpServerRequest) request;
                 // Chained mandatory validations for connected users.
                 // A failure will deny the filter and then cause a redirection.
+                request.pause();
                 Future.succeededFuture()
                 .compose( ignored -> {
                     return checkTermsOfUse(sreq, userInfos);
@@ -75,6 +78,7 @@ public class MandatoryUserValidationFilter implements Filter {
                     return checkEmailAddress(sreq, userInfos);
                 })
                 .onComplete( ar -> {
+                    request.resume();
                     if( ar.succeeded() ) {
                         handler.handle(true);
                     } else {
@@ -119,7 +123,7 @@ public class MandatoryUserValidationFilter implements Filter {
         if( isInWhiteList(request.path(), request.method().name(), EMAIL_ADDRESS_IDX) ) {
             return Future.succeededFuture(); // white-listed url
         }
-        return checkEmailAddress(userInfos);
+        return checkEmailAddress(userInfos, request.absoluteURI());
     }
 
     /** 
@@ -152,7 +156,7 @@ public class MandatoryUserValidationFilter implements Filter {
     /**
      * Only ADMLs are currently required to validate their email address.
      */
-    private Future<Void> checkEmailAddress(UserInfos userInfos) {
+    private Future<Void> checkEmailAddress(UserInfos userInfos, String redirectTo) {
         if (userInfos.isADML()) {
             Promise<Void> promise = Promise.promise();
             EmailState.isValid(eventBus, userInfos.getUserId())
@@ -160,7 +164,13 @@ public class MandatoryUserValidationFilter implements Filter {
                 if( "valid".equals(emailState.getString("state")) ) {
                     promise.complete();
                 } else {
-                    promise.fail("/auth/validate-mail"); // Where to redirect. Must be white-listed...
+                    String url = "/auth/validate-mail?force=true";
+                    try {
+                        url = url +"&redirect="+ URLEncoder.encode(redirectTo, "UTF-8");
+                    } catch( Exception e ) {
+                        // silent failure
+                    }
+                    promise.fail(url); // Where to redirect. Must be white-listed...
                 }
             })
             .onFailure( e -> {promise.fail("");});

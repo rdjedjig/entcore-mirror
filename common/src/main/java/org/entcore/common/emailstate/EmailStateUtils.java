@@ -64,7 +64,7 @@ public class EmailStateUtils {
         return json==null ? null : json.getLong(TTL_FIELD);
     }
     static public void setTtl(final JsonObject json, final Long ttl) {
-        if(ttl==null || ttl<=0l) {
+        if(ttl==null || ttl<0l) {
             json.remove(TTL_FIELD);
         } else {
             json.put(TTL_FIELD, ttl);
@@ -75,7 +75,7 @@ public class EmailStateUtils {
         return json==null ? null : json.getInteger(TRIES_FIELD);
     }
     static public void setTries(final JsonObject json, final Integer tries) {
-        if(tries==null || tries<=0l) {
+        if(tries==null || tries<0l) {
             json.remove(TRIES_FIELD);
         } else {
             json.put(TRIES_FIELD, tries);

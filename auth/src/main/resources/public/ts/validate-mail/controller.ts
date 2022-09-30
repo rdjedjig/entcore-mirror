@@ -9,6 +9,7 @@ export class AppController implements IController {
 	fullscreen = true;
 	force = false;
 	step:ValidationStep = "email";
+	redirect?:string;
 
 	constructor(
 		private $scope:IScope
@@ -31,6 +32,9 @@ export class AppController implements IController {
 		}
 		if( params.get("force") == "true" ) {
 			this.force = true;
+		}
+		if( params.get("redirect") ) {
+			this.redirect = params.get("redirect");
 		}
 	}
 
