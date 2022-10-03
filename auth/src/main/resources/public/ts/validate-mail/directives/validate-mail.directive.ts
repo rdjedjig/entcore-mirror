@@ -1,7 +1,7 @@
 import angular = require("angular");
 import { IAttributes, IController, IDirective, IScope } from "angular";
 import { L10n, conf, http, session, notify, notif } from "ode-ngjs-front";
-import { IEmailValidationInfos } from "ode-ts-client";
+import { IEmailValidationInfos, IPromisified } from "ode-ts-client";
 
 type OTPStatus = ""|"wait"|"ok"|"ko";
 
@@ -82,6 +82,9 @@ export class ValidateMailController implements IController {
 	}
 
 	public validateCode():Promise<OTPStatus> {
+		// Wait at least 0,5s while validating
+		const time = new Date().getTime();
+
 		return session().tryEmailValidation(this.inputCode)
 		.then( validation => {
 			if( validation.state === "valid" ) {
@@ -97,6 +100,14 @@ export class ValidateMailController implements IController {
 		})
 		.catch( e => {
 			notify.error('validate-mail.error.network');
+		})
+		.then( () => {
+			const waitMs = 500;
+			const duration = Math.min( Math.max(waitMs-new Date().getTime()+time, 0), waitMs);
+			const debounceTime:IPromisified<void> = notif().promisify();
+			setTimeout( () => debounceTime.resolve(), duration);
+console.log( "waiting "+duration+" ms" );
+			return debounceTime.promise;
 		})
 		.then( () => this.status );
 	}
@@ -136,6 +147,13 @@ class Directive implements IDirective<ValidateMailScope,JQLite,IAttributes,ICont
 	controllerAs = 'ctrl';
 	require = ['validateMail'];
 
+	private setAttr(el:string|HTMLElement, attr:"disabled"|"readonly", enabled:boolean = true) {
+		if( typeof el==="string" )
+			el = document.getElementById(el);
+		if( el )
+			angular.element(el).prop(attr, enabled ? attr : "");
+	}
+
     link(scope:ValidateMailScope, elem:JQLite, attr:IAttributes, controllers:IController[]|undefined) {
         const ctrl:ValidateMailController|null = controllers ? controllers[0] as ValidateMailController : null;
         if(!ctrl) return;
@@ -145,22 +163,22 @@ class Directive implements IDirective<ValidateMailScope,JQLite,IAttributes,ICont
 		scope.onValidate = async (step:ValidationStep): Promise<void> => {
 			if( step=="email" ) await ctrl.validateMail();
 			scope.$apply();
+			setTimeout( ()=>document.getElementById("input-data").focus(), 10 );
 		}
 
-		scope.onCodeChange = async (formCode) => {
-			const form = document.forms.namedItem('formCode');
+		scope.onCodeChange = async (form) => {
 			try {
-				if( formCode.$invalid ) {
+				if( form.$invalid ) {
 					ctrl.status = "";
-				} else if( formCode.$valid ) {
-					form && angular.element(form.inputCode).prop("readonly", "readonly");
+				} else if( form.$valid ) {
+					form && this.setAttr(form.inputCode, "readonly", true);
 					ctrl.status = "wait";
-					scope.$apply();
+					scope.$apply(); // Display the spinner
 					const newStatus = await ctrl.validateCode();
 					if( newStatus==="ok" ) {
 						// Lock UI and redirect after a few seconds
-						angular.element(document.getElementById('btnRenew')).prop("disabled", "disabled");
-						angular.element(document.getElementById('btnBack')).prop("disabled", "disabled");
+						this.setAttr('btnRenew', "disabled", true);
+						this.setAttr('btnBack',  "disabled", true);
 						if( ctrl.redirect ) {
 							setTimeout( () => {
 								try {
@@ -173,12 +191,12 @@ class Directive implements IDirective<ValidateMailScope,JQLite,IAttributes,ICont
 						}
 					} else {
 						// Unlock UI
-						form && angular.element(form.inputCode).prop("readonly", "");
+						form && this.setAttr(form.inputCode, "readonly", false);
 					}
 				}
 			} catch {
 			} finally {
-				angular.element(document.getElementById('btnRenew')).prop("disabled", "");
+				this.setAttr('btnRenew', "disabled", false);
 				scope.$apply();
 			}
 		}
