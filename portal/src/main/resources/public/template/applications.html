@@ -94,11 +94,11 @@
 				<i18n>apps.bookmarks.empty</i18n>
 			</p>
 			<button 
-				class="btn btn-outline-primary btn-md"
+				class="btn btn-outline-primary"
 				ng-class="{'active': display.modeBookmarkEdition}"
 				ng-click="toggleBookmarkEdition()"
 			>
-				[[lang.translate(display.modeBookmarkEditionButtonLabel)]]
+				<span>[[lang.translate(display.modeBookmarkEditionButtonLabel)]]</span>
 			</button>
 		</div>
 		
@@ -182,12 +182,12 @@
 		</section>
 		<div class="d-flex justify-content-end">
 			<button 
-				class="btn btn-outline-primary btn-md"
+				class="btn btn-outline-primary"
 				ng-class="{'active': display.modeBookmarkEdition}"
 				ng-click="toggleBookmarkEdition()"
 				ng-if="!display.searchText && bookmarks.length"
 			>
-				[[lang.translate(display.modeBookmarkEditionButtonLabel)]]
+				<span>[[lang.translate(display.modeBookmarkEditionButtonLabel)]]</span>
 			</button>
 		</div>
 	</section>
