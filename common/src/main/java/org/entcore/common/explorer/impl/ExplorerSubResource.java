@@ -46,7 +46,8 @@ public abstract class ExplorerSubResource implements IExplorerSubResource {
 
     @Override
     public Future<Void> notifyUpsert(final String id, final UserInfos user, final JsonObject source) {
-        final ExplorerMessage message = ExplorerMessage.upsert(id, user, isForSearch()).withType(getApplication(), getResourceType(), getEntityType());
+        final ExplorerMessage message = ExplorerMessage.upsert(
+                new IdAndVersion(id, getVersion(source)), user, isForSearch(), getApplication(), getResourceType(), getEntityType());
         return toMessage(message, source).compose(messages -> {
             return getCommunication().pushMessage(messages);
         });
@@ -56,7 +57,8 @@ public abstract class ExplorerSubResource implements IExplorerSubResource {
     public Future<Void> notifyUpsert(final UserInfos user, final Map<String, JsonObject> sourceById) {
         final List<Future> futures = sourceById.entrySet().stream().map(e->{
             final String id = e.getKey();
-            final ExplorerMessage message = ExplorerMessage.upsert(id, user, isForSearch()).withType(getApplication(), getResourceType(), getEntityType());
+            final ExplorerMessage message = ExplorerMessage.upsert(
+                    new IdAndVersion(id, getVersion(e.getValue())), user, isForSearch(), getApplication(), getResourceType(), getEntityType());
             return toMessage(message, e.getValue());
         }).collect(Collectors.toList());
         return CompositeFuture.all(futures).compose(all->{
@@ -67,7 +69,9 @@ public abstract class ExplorerSubResource implements IExplorerSubResource {
 
     @Override
     public Future<Void> notifyUpsert(final UserInfos user, final JsonObject source) {
-        final ExplorerMessage message = ExplorerMessage.upsert(getParentId(source), user, isForSearch()).withType(getApplication(), getResourceType(), getEntityType());
+        final ExplorerMessage message = ExplorerMessage.upsert(
+                new IdAndVersion(getParentId(source), getVersion(source)), user, isForSearch(),
+                getApplication(), getResourceType(), getEntityType());
         return toMessage(message, source).compose(messages -> {
             return getCommunication().pushMessage(messages);
         });
@@ -76,7 +80,9 @@ public abstract class ExplorerSubResource implements IExplorerSubResource {
     @Override
     public Future<Void> notifyUpsert(final UserInfos user, final List<JsonObject> sources) {
         return toMessage(sources, e -> {
-            final ExplorerMessage message = ExplorerMessage.upsert(getParentId(e), user, isForSearch()).withType(getApplication(), getResourceType(), getEntityType());
+            final ExplorerMessage message = ExplorerMessage.upsert(
+                    new IdAndVersion(getParentId(e), getVersion(e)), user, isForSearch(),
+                    getApplication(), getResourceType(), getEntityType());
             return message;
         }).compose(messages -> {
             return getCommunication().pushMessage(messages);
@@ -141,8 +147,8 @@ public abstract class ExplorerSubResource implements IExplorerSubResource {
             return toMessage(bulk, e -> {
                 final String id = getParentId(e);
                 final UserInfos user = getCreatorForModel(e);
-                final ExplorerMessage mess = ExplorerMessage.upsert(id, user, isForSearch())
-                        .withType(getApplication(), parent.getResourceType(), getResourceType())
+                final ExplorerMessage mess = ExplorerMessage.upsert(new IdAndVersion(id, now), user, isForSearch(),
+                                getApplication(), parent.getResourceType(), getEntityType())
                         .withVersion(now);
                 return mess;
             })
@@ -187,5 +193,9 @@ public abstract class ExplorerSubResource implements IExplorerSubResource {
             this.listenerIngestJobUpdate.apply(null);
         }
         this.listenerIngestJobUpdate = null;
+    }
+
+    private long getVersion(final JsonObject source) {
+        return source.getLong("version");
     }
 }

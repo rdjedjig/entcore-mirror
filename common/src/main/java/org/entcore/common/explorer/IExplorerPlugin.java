@@ -43,11 +43,11 @@ public interface IExplorerPlugin {
 
     Future<Map<String, JsonArray>> getShareInfo(Set<String> id);
 
-    Future<Void> notifyShare(String id, UserInfos user, JsonArray shared);
+    Future<Void> notifyShare(IdAndVersion id, UserInfos user, JsonArray shared);
 
-    Future<Void> notifyShare(Set<String> id, UserInfos user, JsonArray shared);
+    Future<Void> notifyShare(Set<IdAndVersion> id, UserInfos user, JsonArray shared);
 
-    Future<Void> notifyUpsert(String id, UserInfos user, JsonObject source);
+    Future<Void> notifyUpsert(IdAndVersion id, UserInfos user, JsonObject source);
 
     Future<Void> notifyUpsert(UserInfos user, Map<String, JsonObject> sourceById);
 
@@ -66,6 +66,8 @@ public interface IExplorerPlugin {
     Future<Void> notifyDelete(UserInfos user, JsonObject source);
 
     Future<Void> notifyDelete(UserInfos user, List<JsonObject> sources);
+
+    Future<Void> notifyMute(ExplorerMessage mutedResource);
 
     Future<String> create(UserInfos user, JsonObject source, boolean isCopy);
 
@@ -102,12 +104,14 @@ public interface IExplorerPlugin {
     }
 
     void onJobStateUpdatedMessageReceived(final IngestJobStateUpdateMessage message);
+
     enum ExplorerRemoteAction {
         QueryReindex,
         QueryCreate,
         QueryDelete,
         QueryShare,
         QueryMetrics,
+        QueryMute
     }
 
     enum ExplorerRemoteError {
@@ -118,7 +122,8 @@ public interface IExplorerPlugin {
         DeletePushFailed("explorer.remote.error.delete_push"),
         ShareFailed("explorer.remote.error.share"),
         ShareFailedMissing("explorer.remote.error.share.missing"),
-        ShareFailedPush("explorer.remote.error.share_push");
+        ShareFailedPush("explorer.remote.error.share_push"),
+        MuteFailed("explorer.remote.error.mute");
         private final String error;
 
         ExplorerRemoteError(final String e) {

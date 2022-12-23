@@ -12,14 +12,14 @@ import java.util.stream.Collectors;
 
 public class ExplorerMessage {
 
-
     public enum ExplorerContentType{
         Text, Html, Pdf
     }
     public enum ExplorerAction{
         Upsert(ExplorerPriority.High),
         Delete(ExplorerPriority.High),
-        Audience(ExplorerPriority.Low);
+        Audience(ExplorerPriority.Low),
+        Mute(ExplorerPriority.Low);
         private final ExplorerPriority priority;
         ExplorerAction(final ExplorerPriority i){
             this.priority = i;
@@ -62,14 +62,40 @@ public class ExplorerMessage {
         this.priority = action.getPriority(search);
     }
 
-    public static ExplorerMessage upsert(final String id, final UserInfos user, final boolean forSearch) {
-        final ExplorerMessage builder = new ExplorerMessage(id, ExplorerAction.Upsert, forSearch);
+    public static ExplorerMessage upsert(final IdAndVersion id, final UserInfos user, final boolean forSearch,
+                                         final String application, final String resourceType, final String entityType) {
+        final ExplorerMessage builder = new ExplorerMessage(id.getId(), ExplorerAction.Upsert, forSearch);
         builder.message.put("createdAt", new Date().getTime());
         builder.message.put("creatorId", user.getUserId());
         builder.message.put("creatorName", user.getUsername());
         builder.message.put("updatedAt", new Date().getTime());
         builder.message.put("updaterId", user.getUserId());
         builder.message.put("updaterName", user.getUsername());
+        builder.withVersion(id.getVersion());
+        builder.withType(application, resourceType, entityType);
+        return builder;
+    }
+
+    /**
+     * Create a message to notify EUR that a user has muted notifications for a resource.
+     * @param id Identifier of the resource
+     * @param version Version of the resource when it was muted
+     * @param application Identifier of the application that handles the resource that has been muted
+     * @param resourceType Type of the modified resource
+     * @param mute {@code true} if the user doesn't want to receive notifications concerning this resource, {@code false}
+     *                         otherwise
+     * @param user User who modified the mute status of the resource
+     * @return The message to send to EUR
+     */
+    public static ExplorerMessage mute(final IdAndVersion id,
+                                       final String application, final String resourceType,
+                                       final boolean mute,
+                                       final UserInfos user) {
+        final ExplorerMessage builder = new ExplorerMessage(id.getId(), ExplorerAction.Mute, false);
+        final String userId = user.getUserId();
+        builder.withVersion(id.getVersion());
+        builder.withMute(userId, mute);
+        builder.withType(application, resourceType, resourceType);
         return builder;
     }
 
@@ -142,6 +168,11 @@ public class ExplorerMessage {
     }
     public ExplorerMessage withVersion(Long version) {
         message.put("version", version);
+        return this;
+    }
+
+    public ExplorerMessage withMute(String userId, boolean mute) {
+        message.put("mute", new JsonObject().put(userId, mute));
         return this;
     }
 
@@ -289,6 +320,9 @@ public class ExplorerMessage {
     public String getName() {
         return message.getString("name");
     }
+    public long getVersion() {
+        return message.getLong("version");
+    }
     public String getCreatorName() {
         return message.getString("creatorName");
     }
@@ -321,6 +355,13 @@ public class ExplorerMessage {
     }
     public void setIdQueue(String idQueue) {
         this.idQueue = idQueue;
+    }
+    public JsonObject getMute() {
+        final JsonObject mute = this.message.getJsonObject("mute");
+        if(mute == null) {
+            return new JsonObject();
+        }
+        return mute;
     }
 
     @Override
