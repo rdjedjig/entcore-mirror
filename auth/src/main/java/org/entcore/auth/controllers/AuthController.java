@@ -514,7 +514,10 @@ public class AuthController extends BaseController {
 					if( validations != null ) {
 						requirements.mergeIn(validations);
 					}
-					requirements.put("mfaProtectedUrls", Mfa.getMfaProtectedUrls());
+					final UserInfos userInfos = UserUtils.sessionToUserInfos(session);
+					if( userInfos!=null && (userInfos.isADML() || userInfos.isADMC()) ) {
+						requirements.put("mfaProtectedUrls", Mfa.getMfaProtectedUrls());
+					}
 				})
 				.onComplete( ar -> {
 					if( ar.failed() ) {
