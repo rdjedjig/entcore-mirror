@@ -66,6 +66,7 @@ import org.entcore.common.events.EventStore;
 import org.entcore.common.http.filter.IgnoreCsrf;
 import org.entcore.common.http.filter.AppOAuthResourceProvider;
 import org.entcore.common.utils.MapFactory;
+import org.entcore.common.utils.Mfa;
 import org.entcore.common.utils.StringUtils;
 import org.entcore.common.validation.StringValidation;
 
@@ -513,6 +514,7 @@ public class AuthController extends BaseController {
 					if( validations != null ) {
 						requirements.mergeIn(validations);
 					}
+					requirements.put("mfaProtectedUrls", Mfa.getMfaProtectedUrls());
 				})
 				.onComplete( ar -> {
 					if( ar.failed() ) {
