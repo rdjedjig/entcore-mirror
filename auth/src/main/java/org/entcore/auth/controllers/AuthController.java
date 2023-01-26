@@ -515,7 +515,7 @@ public class AuthController extends BaseController {
 						requirements.mergeIn(validations);
 					}
 					final UserInfos userInfos = UserUtils.sessionToUserInfos(session);
-					if( userInfos!=null && (userInfos.isADML() || userInfos.isADMC()) ) {
+					if( userInfos!=null && (userInfos.isADML() || userInfos.isADMC()) ) {
 						requirements.put("mfaProtectedUrls", Mfa.getMfaProtectedUrls());
 					}
 				})
